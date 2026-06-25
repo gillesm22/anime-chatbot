@@ -1,13 +1,9 @@
 /**
- * Regenerate Kurisu + Merrick sprites with consistent bodies.
- * Strategy: Generate body-neutral with a fixed seed, then use img2img
- * (low denoise) from that base to create expression variants.
- * This keeps body/pose/outfit identical across all expressions.
- *
- * Run: node scripts/regen-sprites.mjs
+ * Regenerate Merrick sprites only with accurate dark skin.
+ * Run: node scripts/regen-merrick.mjs
  */
 import { writeFileSync, mkdirSync, copyFileSync } from "fs";
-import { join, dirname, basename } from "path";
+import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -15,13 +11,8 @@ const SPRITES_DIR = join(__dirname, "..", "public", "sprites");
 const COMFY_URL = "http://localhost:8188";
 const COMFY_INPUT = "C:/Users/G$/AppData/Local/Comfy-Desktop/ComfyUI-Shared/input";
 
-const BASE_NEGATIVE = "low quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature, worst quality, ugly, duplicate, morbid, mutilated, extra limbs, poorly drawn face, mutation, bad proportions, reference sheet, multiple views, character sheet, turnaround, expression sheet, collage, grid, thumbnails, panels, borders, frames, props, furniture, pedestal, column, pillar, statue, chair, table, background objects, magic circle, halo, aura, glowing background, ornate frame, full body, feet, shoes, boots, legs below thigh";
+const BASE_NEGATIVE = "low quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature, worst quality, ugly, duplicate, morbid, mutilated, extra limbs, poorly drawn face, mutation, bad proportions, reference sheet, multiple views, character sheet, turnaround, expression sheet, collage, grid, thumbnails, panels, borders, frames, props, furniture, background objects, magic circle, halo, aura, glowing background, ornate frame, full body, feet, shoes, boots, legs below thigh, pale skin, fair skin, light skin, white skin";
 
-// ── Kurisu Makise (Steins;Gate) ──
-const KURISU_BASE = "masterpiece, best quality, absurdres, highres, anime style, visual novel sprite, game cg, transparent background, png, white background, simple background, solo, 1girl, upper body, cowboy shot, makise kurisu, steins gate, long chestnut hair, auburn hair, wavy hair, hair between eyes, blue eyes, violet eyes, white lab coat, white collared shirt, red necktie, slender, medium breasts, looking at viewer, soft shading, clean lineart";
-const KURISU_SEED = 424242;
-
-// ── Merrick Mayfair (Anne Rice) ──
 const MERRICK_BASE = "masterpiece, best quality, absurdres, highres, anime style, visual novel sprite, game cg, transparent background, png, white background, simple background, solo, 1girl, upper body, cowboy shot, dark skin, dark-skinned female, very dark brown skin, chocolate skin, african american, creole woman, new orleans voodoo priestess, striking emerald green eyes, glowing green eyes, long flowing black hair, dark purple undertones in hair, hair past waist, white off-shoulder blouse, layered gold necklaces, jade pendant, gold hoop earrings, voodoo charms, occult jewelry, head wrap accent, tall statuesque graceful, large breasts, confident mysterious smile, looking at viewer, supernatural beauty, warm lighting, soft shading, clean lineart";
 const MERRICK_SEED = 171717;
 
@@ -43,7 +34,6 @@ const EXPRESSIONS = {
   "face-crying":     "crying expression, tears streaming, scrunched eyebrows, emotional",
 };
 
-// ── txt2img workflow (for body-neutral) ──
 function txt2imgWorkflow(positive, negative, width, height, seed) {
   return {
     prompt: {
@@ -56,12 +46,11 @@ function txt2imgWorkflow(positive, negative, width, height, seed) {
         model: ["1", 0], positive: ["2", 0], negative: ["3", 0], latent_image: ["4", 0],
       }},
       "6": { class_type: "VAEDecode", inputs: { samples: ["5", 0], vae: ["1", 2] } },
-      "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `regen-${Date.now()}` } },
+      "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `merrick-${Date.now()}` } },
     },
   };
 }
 
-// ── img2img workflow (expression variants from base image) ──
 function img2imgWorkflow(positive, negative, inputImage, width, height, seed, denoise = 0.45) {
   return {
     prompt: {
@@ -75,7 +64,7 @@ function img2imgWorkflow(positive, negative, inputImage, width, height, seed, de
         model: ["1", 0], positive: ["2", 0], negative: ["3", 0], latent_image: ["9", 0],
       }},
       "6": { class_type: "VAEDecode", inputs: { samples: ["5", 0], vae: ["1", 2] } },
-      "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `regen-${Date.now()}` } },
+      "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `merrick-${Date.now()}` } },
     },
   };
 }
@@ -96,10 +85,7 @@ async function waitForCompletion(promptId, timeoutMs = 180000) {
     const res = await fetch(`${COMFY_URL}/history/${promptId}`);
     const data = await res.json();
     if (data[promptId]?.outputs) return data[promptId].outputs;
-    if (data[promptId]?.status?.status_str === "error") {
-      console.error("  ERROR in generation:", JSON.stringify(data[promptId].status));
-      throw new Error("Generation failed");
-    }
+    if (data[promptId]?.status?.status_str === "error") throw new Error("Generation failed");
     await new Promise((r) => setTimeout(r, 3000));
   }
   throw new Error(`Timeout waiting for ${promptId}`);
@@ -108,15 +94,12 @@ async function waitForCompletion(promptId, timeoutMs = 180000) {
 async function downloadImage(filename, outputPath) {
   const res = await fetch(`${COMFY_URL}/view?filename=${encodeURIComponent(filename)}&type=output`);
   if (!res.ok) throw new Error(`Download failed: ${res.status}`);
-  const buffer = Buffer.from(await res.arrayBuffer());
-  writeFileSync(outputPath, buffer);
-  return outputPath;
+  writeFileSync(outputPath, Buffer.from(await res.arrayBuffer()));
 }
 
 async function generate(workflow, outputPath, label) {
   console.log(`  Generating: ${label}...`);
   const { prompt_id } = await queuePrompt(workflow);
-  console.log(`    Queued: ${prompt_id}`);
   const outputs = await waitForCompletion(prompt_id);
   const saveNode = Object.values(outputs).find((o) => o.images);
   if (!saveNode?.images?.[0]) throw new Error("No output image");
@@ -124,54 +107,46 @@ async function generate(workflow, outputPath, label) {
   console.log(`    Saved: ${outputPath}`);
 }
 
-async function generateCharacter(name, basePrompt, seed, dir) {
+async function main() {
+  console.log("=== Regenerating Merrick (book-accurate dark skin) ===\n");
+
+  const dir = join(SPRITES_DIR, "merrick");
   mkdirSync(dir, { recursive: true });
 
-  // Step 1: Generate body-neutral with fixed seed (txt2img)
+  // Step 1: body-neutral
+  console.log("--- body-neutral (txt2img) ---");
   const neutralPath = join(dir, "body-neutral.png");
-  console.log(`\n--- ${name}: body-neutral (txt2img, seed ${seed}) ---\n`);
-  await generate(
-    txt2imgWorkflow(basePrompt, BASE_NEGATIVE, 512, 768, seed),
-    neutralPath,
-    `${name}/body-neutral`
-  );
+  await generate(txt2imgWorkflow(MERRICK_BASE, BASE_NEGATIVE, 512, 768, MERRICK_SEED), neutralPath, "body-neutral");
 
-  // Step 2: Copy body-neutral to ComfyUI input dir for img2img
-  const inputFilename = `${name.toLowerCase()}-base.png`;
-  const inputPath = join(COMFY_INPUT, inputFilename);
-  copyFileSync(neutralPath, inputPath);
-  console.log(`  Copied base to ComfyUI input: ${inputPath}`);
+  // Step 2: Copy to ComfyUI input
+  const inputFilename = "merrick-base.png";
+  copyFileSync(neutralPath, join(COMFY_INPUT, inputFilename));
 
-  // Step 3: Generate each expression via img2img from the neutral base
-  // Using denoise 0.45 = keeps body/outfit intact, changes face expression
-  console.log(`\n--- ${name}: expression variants (img2img, denoise 0.45) ---\n`);
+  // Step 3: Expressions via img2img
+  console.log("\n--- expressions (img2img, denoise 0.45) ---");
   for (const [filename, exprPrompt] of Object.entries(EXPRESSIONS)) {
-    const exprPath = join(dir, `${filename}.png`);
     await generate(
-      img2imgWorkflow(
-        `${basePrompt}, ${exprPrompt}`,
-        BASE_NEGATIVE,
-        inputFilename,
-        512, 768,
-        seed + Object.keys(EXPRESSIONS).indexOf(filename) + 1,
-        0.45
-      ),
-      exprPath,
-      `${name}/${filename}`
+      img2imgWorkflow(`${MERRICK_BASE}, ${exprPrompt}`, BASE_NEGATIVE, inputFilename, 512, 768, MERRICK_SEED + Object.keys(EXPRESSIONS).indexOf(filename) + 1, 0.45),
+      join(dir, `${filename}.png`),
+      filename
     );
   }
-}
 
-async function main() {
-  console.log("=== Canon-Accurate Sprite Regen (img2img consistency) ===\n");
+  // Step 4: Remove backgrounds
+  console.log("\n--- Removing backgrounds with rembg ---");
+  const { execSync } = await import("child_process");
+  execSync(`"C:/Users/G$/AppData/Local/Programs/Python/Python313/python.exe" -c "
+from rembg import remove
+from PIL import Image
+import glob
+for path in glob.glob('${dir.replace(/\\/g, "/")}/*.png'):
+    img = Image.open(path)
+    out = remove(img)
+    out.save(path)
+    print(f'  bg removed: {path.split(chr(47))[-1]}')
+"`, { stdio: "inherit" });
 
-  try { await fetch(`${COMFY_URL}/system_stats`); }
-  catch { console.error("ComfyUI not running!"); process.exit(1); }
-
-  await generateCharacter("Kurisu", KURISU_BASE, KURISU_SEED, join(SPRITES_DIR, "kurisu"));
-  await generateCharacter("Merrick", MERRICK_BASE, MERRICK_SEED, join(SPRITES_DIR, "merrick"));
-
-  console.log("\n=== Done! 32 images generated (2 bases + 30 expressions). ===");
+  console.log("\n=== Done! 16 Merrick sprites regenerated with dark skin + bg removed. ===");
 }
 
 main().catch(console.error);
