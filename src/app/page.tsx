@@ -10,6 +10,7 @@ import { addAffinityPoints } from "@/lib/affinity";
 import { DailyRewardModal } from "@/components/DailyRewardModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { getHeroConfig, HERO_CLASS_MAP, isFirstRun } from "@/lib/heroAvatar";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -94,19 +95,83 @@ function HomeContent() {
       <div className="text-center relative z-10 animate-[fadeIn_0.6s_ease-out]">
         <h1
           className="text-2xl sm:text-4xl md:text-5xl font-light tracking-widest uppercase bg-clip-text text-transparent mb-3"
-          style={{ backgroundImage: "linear-gradient(to right, #f472b6, #fb923c, #a78bfa)" }}
+          style={{ backgroundImage: "linear-gradient(to right, #f472b6, #e53935, #fb923c, #a78bfa, #7b1fa2)" }}
         >
           Choose Your Companion
         </h1>
         <p className="text-text-secondary text-sm tracking-wide">
-          Each with their own personality, style, and attitude
+          Five voices. Five worlds. One conversation away.
         </p>
+        {(() => {
+          if (isFirstRun()) {
+            return (
+              <Link
+                href="/settings"
+                className="inline-block mt-3 px-4 py-1.5 rounded-full text-xs tracking-wide border border-white/10 text-text-secondary hover:text-text hover:border-white/20 transition-all"
+              >
+                Choose your identity
+              </Link>
+            );
+          }
+          const hero = getHeroConfig();
+          const classDef = HERO_CLASS_MAP[hero.classId];
+          return (
+            <Link
+              href="/settings"
+              className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full text-xs tracking-wide transition-all hover:scale-105"
+              style={{
+                background: `${classDef.theme.glow}`,
+                border: `1px solid ${classDef.theme.accent}44`,
+                color: classDef.theme.accent,
+              }}
+            >
+              <span style={{ filter: "brightness(1.3)" }}>{classDef.icon}</span>
+              <span>Playing as {hero.name} · {classDef.title}</span>
+            </Link>
+          );
+        })()}
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {[
+          { left: "10%", top: "15%", size: 3, delay: "0s", dur: "8s" },
+          { left: "85%", top: "20%", size: 2, delay: "1.5s", dur: "10s" },
+          { left: "25%", top: "70%", size: 4, delay: "3s", dur: "9s" },
+          { left: "70%", top: "80%", size: 2, delay: "0.5s", dur: "11s" },
+          { left: "50%", top: "40%", size: 3, delay: "2s", dur: "7s" },
+          { left: "90%", top: "55%", size: 2, delay: "4s", dur: "12s" },
+          { left: "15%", top: "45%", size: 3, delay: "1s", dur: "9s" },
+        ].map((p, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              left: p.left,
+              top: p.top,
+              width: p.size,
+              height: p.size,
+              background: "rgba(255,255,255,0.25)",
+              animation: `floatParticle ${p.dur} ease-in-out ${p.delay} infinite`,
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes floatParticle {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.2; }
+            25% { transform: translateY(-20px) translateX(8px); opacity: 0.5; }
+            50% { transform: translateY(-35px) translateX(-5px); opacity: 0.3; }
+            75% { transform: translateY(-15px) translateX(12px); opacity: 0.5; }
+          }
+        `}</style>
       </div>
 
       {/* Character cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 max-w-5xl w-full relative z-10">
+      <div className="flex flex-wrap justify-center gap-5 md:gap-8 max-w-5xl w-full relative z-10">
         {characterList.map((character, i) => (
-          <CharacterCard key={character.id} character={character} index={i} />
+          <div key={character.id} className="w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-22px)]">
+            <CharacterCard character={character} index={i} />
+          </div>
         ))}
       </div>
 
