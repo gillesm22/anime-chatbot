@@ -29,6 +29,9 @@ export function CharacterSprite({
   const showFrontBikini = outfit === "bikini-front";
   const basePath = character.sprite.basePath;
   const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick";
+  const hasOutfitAssets = character.id === "arisu" || character.id === "marin" || character.id === "nao";
+  const isGenericOutfit = outfit !== "default" && outfit !== "back" && outfit !== "bikini-back" && outfit !== "bikini-front";
+  const [outfitError, setOutfitError] = useState(false);
   const [visibleExpr, setVisibleExpr] = useState<Expression>(expression);
   const [fadeIn, setFadeIn] = useState(false);
   const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -63,6 +66,10 @@ export function CharacterSprite({
   const handleHeadPointerUp = useCallback(() => {
     headpatActive.current = false;
   }, []);
+
+  useEffect(() => {
+    setOutfitError(false);
+  }, [outfit]);
 
   useEffect(() => {
     if (expression !== visibleExpr) {
@@ -112,7 +119,7 @@ export function CharacterSprite({
           src={getSrc(visibleExpr)}
           alt={character.name}
           className="h-full object-contain object-bottom absolute inset-0"
-          style={{ zIndex: 1, opacity: (showBack || showFrontBikini) ? 0 : 1, transition: "opacity 300ms ease" }}
+          style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
         />
         {/* Transition layer */}
         {expression !== visibleExpr && (
@@ -122,32 +129,48 @@ export function CharacterSprite({
             className="h-full object-contain object-bottom absolute inset-0"
             style={{
               zIndex: 2,
-              opacity: fadeIn && !showBack && !showFrontBikini ? 1 : 0,
+              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
               transition: "opacity 300ms ease",
             }}
           />
         )}
-        {/* Back view */}
-        <img
-          src={`${basePath}/body-back.png`}
-          alt={`${character.name} back`}
-          className="h-full object-contain object-bottom absolute inset-0"
-          style={{ zIndex: 3, opacity: showBack && !showBikini ? 1 : 0, transition: "opacity 300ms ease" }}
-        />
-        {/* Bikini back */}
-        <img
-          src={`${basePath}/body-back-bikini.png`}
-          alt={`${character.name} bikini back`}
-          className="h-full object-contain object-bottom absolute inset-0"
-          style={{ zIndex: 4, opacity: showBikini ? 1 : 0, transition: "opacity 300ms ease" }}
-        />
-        {/* Front bikini */}
-        <img
-          src={`${basePath}/body-front-bikini.png`}
-          alt={`${character.name} bikini front`}
-          className="h-full object-contain object-bottom absolute inset-0"
-          style={{ zIndex: 5, opacity: showFrontBikini ? 1 : 0, transition: "opacity 300ms ease" }}
-        />
+        {/* Back view - only for characters with outfit assets */}
+        {hasOutfitAssets && (
+          <img
+            src={`${basePath}/body-back.png`}
+            alt={`${character.name} back`}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{ zIndex: 3, opacity: showBack && !showBikini ? 1 : 0, transition: "opacity 300ms ease" }}
+          />
+        )}
+        {/* Bikini back - only for characters with outfit assets */}
+        {hasOutfitAssets && (
+          <img
+            src={`${basePath}/body-back-bikini.png`}
+            alt={`${character.name} bikini back`}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{ zIndex: 4, opacity: showBikini ? 1 : 0, transition: "opacity 300ms ease" }}
+          />
+        )}
+        {/* Front bikini - only for characters with outfit assets */}
+        {hasOutfitAssets && (
+          <img
+            src={`${basePath}/body-front-bikini.png`}
+            alt={`${character.name} bikini front`}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{ zIndex: 5, opacity: showFrontBikini ? 1 : 0, transition: "opacity 300ms ease" }}
+          />
+        )}
+        {/* Generic outfit layer (casual, formal, school, etc.) */}
+        {isGenericOutfit && !outfitError && (
+          <img
+            src={`${basePath}/body-${outfit}.png`}
+            alt={`${character.name} ${outfit}`}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{ zIndex: 6, opacity: 1, transition: "opacity 300ms ease" }}
+            onError={() => setOutfitError(true)}
+          />
+        )}
         {/* Headpat zone */}
         <div
           className="absolute inset-x-0 top-0"
