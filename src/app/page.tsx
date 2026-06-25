@@ -30,6 +30,7 @@ export default function Home() {
 
 function HomeContent() {
   const characterList = Object.values(characters);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
 
   const [showReward, setShowReward] = useState(false);
   const [pendingReward, setPendingReward] = useState<{ reward: DailyReward; streak: number } | null>(null);
@@ -44,6 +45,21 @@ function HomeContent() {
         addAffinityPoints(char.id, { type: "daily_visit" });
       }
     }
+  }, []);
+
+  useEffect(() => {
+    let maxMsgs = 0;
+    let favId: string | null = null;
+    for (const char of characterList) {
+      try {
+        const raw = localStorage.getItem(`anime-chatbot-history-${char.id}`);
+        if (raw) {
+          const count = JSON.parse(raw).length;
+          if (count > maxMsgs) { maxMsgs = count; favId = char.id; }
+        }
+      } catch {}
+    }
+    if (maxMsgs > 0) setFavoriteId(favId);
   }, []);
 
   useEffect(() => {
@@ -119,15 +135,21 @@ function HomeContent() {
           return (
             <Link
               href="/settings"
-              className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full text-xs tracking-wide transition-all hover:scale-105"
+              className="inline-flex items-center gap-2.5 mt-3 pl-1.5 pr-4 py-1 rounded-full text-xs tracking-wide transition-all hover:scale-105"
               style={{
                 background: `${classDef.theme.glow}`,
                 border: `1px solid ${classDef.theme.accent}44`,
                 color: classDef.theme.accent,
               }}
             >
-              <span style={{ filter: "brightness(1.3)" }}>{classDef.icon}</span>
-              <span>Playing as {hero.name} · {classDef.title}</span>
+              <img
+                src={classDef.avatarPath}
+                alt={classDef.label}
+                className="rounded-full object-cover"
+                style={{ width: 24, height: 24, border: `1.5px solid ${classDef.theme.accent}60`, boxShadow: `0 0 8px ${classDef.theme.glow}` }}
+                draggable={false}
+              />
+              <span>{hero.name} · {classDef.title}</span>
             </Link>
           );
         })()}
@@ -170,17 +192,19 @@ function HomeContent() {
       {/* Character cards */}
       <div className="flex flex-wrap justify-center gap-5 md:gap-8 max-w-5xl w-full relative z-10">
         {characterList.map((character, i) => (
-          <div key={character.id} className="w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-22px)]">
-            <CharacterCard character={character} index={i} />
+          <div
+            key={character.id}
+            className="w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-22px)]"
+            style={{ opacity: 0, animation: `cardEntrance 0.5s ease-out ${i * 0.12}s forwards` }}
+          >
+            <CharacterCard character={character} index={i} isFavorite={character.id === favoriteId} />
           </div>
         ))}
       </div>
 
-      <p className="text-text-secondary text-xs tracking-wider relative z-10 opacity-30">
-        Click to start chatting
-      </p>
-
-      <BloodBat accentColor="#b71c1c" isIdle />
+      <div className="relative z-10">
+        <BloodBat accentColor="#b71c1c" landingMode />
+      </div>
 
       {showReward && pendingReward && (
         <DailyRewardModal

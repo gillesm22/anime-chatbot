@@ -12,6 +12,8 @@ interface BloodBatProps {
   isIdle?: boolean;
   /** Whether TTS/audio is playing */
   isAudioPlaying?: boolean;
+  /** Landing page mode with cycling personality phrases */
+  landingMode?: boolean;
 }
 
 type BatMood = "chill" | "excited" | "scared" | "sleepy" | "smug" | "love" | "angry";
@@ -42,7 +44,7 @@ function getBatMood(expression?: Expression, isIdle?: boolean): BatMood {
   }
 }
 
-export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying }: BloodBatProps) {
+export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying, landingMode }: BloodBatProps) {
   const [mood, setMood] = useState<BatMood>("chill");
   const [phrase, setPhrase] = useState<string | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -76,6 +78,28 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
     }, 3000);
     return () => { if (driftTimer.current) clearInterval(driftTimer.current); };
   }, []);
+
+  // Landing page personality phrases
+  useEffect(() => {
+    if (!landingMode) return;
+    const phrases = [
+      "pick someone already",
+      "they're all waiting y'know",
+      "I don't have all night",
+      "just pick. trust me.",
+      "the one on the left. no wait.",
+      "*taps foot impatiently*",
+      "you're overthinking this",
+      "any day now, chief",
+    ];
+    let idx = 0;
+    setPhrase(phrases[0]);
+    const interval = setInterval(() => {
+      idx = (idx + 1) % phrases.length;
+      setPhrase(phrases[idx]);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [landingMode]);
 
   // Click interaction
   const handleClick = useCallback(() => {
