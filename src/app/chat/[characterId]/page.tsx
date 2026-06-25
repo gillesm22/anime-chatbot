@@ -51,6 +51,8 @@ import { GiftShop } from "@/components/GiftShop";
 import type { Gift, CharacterReaction } from "@/lib/gifts";
 import { formatGiftContextForPrompt } from "@/lib/gifts";
 import { BottomNav } from "@/components/BottomNav";
+import { InteractiveElements } from "@/components/InteractiveElements";
+import { QuestPanel } from "@/components/QuestPanel";
 import { OutfitCarousel } from "@/components/OutfitCarousel";
 import { AffinityProgressBar } from "@/components/AffinityProgressBar";
 import { MoodIndicator } from "@/components/MoodIndicator";
@@ -135,6 +137,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [showDiary, setShowDiary] = useState(false);
   const [showGiftShop, setShowGiftShop] = useState(false);
   const [showOutfitCarousel, setShowOutfitCarousel] = useState(false);
+  const [showQuestPanel, setShowQuestPanel] = useState(false);
   const [giftReaction, setGiftReaction] = useState<{ gift: Gift; reaction: CharacterReaction } | null>(null);
 
   useEffect(() => {
@@ -381,6 +384,7 @@ function ChatContent({ characterId }: { characterId: string }) {
         suppressHydrationWarning
       >
         <SceneBackground sceneId={currentScene} characterAccent={character.theme.accent} />
+        <InteractiveElements sceneId={currentScene} accentColor={character.theme.accent} />
         {currentMilestone && character && (
           <MilestoneToast
             milestone={currentMilestone}
@@ -718,6 +722,7 @@ function ChatContent({ characterId }: { characterId: string }) {
           onShowHistory={() => setShowHistory(prev => !prev)}
           onShowScreenshot={() => setShowScreenshot(true)}
           onShowOutfits={() => setShowOutfitCarousel(prev => !prev)}
+          onShowQuests={() => setShowQuestPanel(true)}
         />
       </div>
 
@@ -747,6 +752,19 @@ function ChatContent({ characterId }: { characterId: string }) {
           accentColor={character.theme.accent}
           onGift={handleGift}
           onClose={() => setShowGiftShop(false)}
+        />
+      )}
+      {showQuestPanel && character && (
+        <QuestPanel
+          characterId={characterId}
+          accentColor={character.theme.accent}
+          onClose={() => setShowQuestPanel(false)}
+          onClaimReward={(points) => {
+            const result = addAffinityPoints(characterId, { type: "message_sent" });
+            if (result.newMilestones.length > 0) {
+              setMilestoneQueue(prev => [...prev, ...result.newMilestones]);
+            }
+          }}
         />
       )}
 

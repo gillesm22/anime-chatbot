@@ -6,6 +6,7 @@ export interface BottomNavProps {
   onShowHistory: () => void;
   onShowScreenshot: () => void;
   onShowOutfits: () => void;
+  onShowQuests: () => void;
 }
 
 export type BottomNavTab = "chat" | "outfits" | "gifts" | "diary" | "more";
@@ -124,6 +125,7 @@ export function BottomNav({
   onShowHistory,
   onShowScreenshot,
   onShowOutfits,
+  onShowQuests,
 }: BottomNavProps) {
   // activeTab is managed externally via callbacks; default highlight is "chat"
   // For a stateless nav, we highlight "chat" by default. Parent can lift state if needed.
@@ -154,7 +156,7 @@ export function BottomNav({
         label="Chat"
         active={activeTab === "chat"}
         accentColor={accentColor}
-        onClick={() => {}}
+        onClick={onShowHistory}
         icon={<ChatIcon />}
       />
       <NavButton
@@ -182,7 +184,7 @@ export function BottomNav({
         label="More"
         active={activeTab === "more"}
         accentColor={accentColor}
-        onClick={() => {}}
+        onClick={onShowQuests}
         icon={<DotsIcon />}
       />
     </nav>
