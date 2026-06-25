@@ -17,6 +17,16 @@ const CHARACTER_VOICES: Record<string, { voice: string; pitch: string; rate: str
     pitch: "-2Hz",
     rate: "+0%",
   },
+  kurisu: {
+    voice: "en-US-JennyNeural",      // Precise, articulate, slightly sharp
+    pitch: "+2Hz",
+    rate: "+3%",
+  },
+  merrick: {
+    voice: "en-US-AmberNeural",      // Deep, smooth, mysterious
+    pitch: "-4Hz",
+    rate: "-5%",
+  },
 };
 
 export async function POST(request: Request) {

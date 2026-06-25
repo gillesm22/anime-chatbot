@@ -3,7 +3,7 @@
 // Character humming system — plays a soft melody when the user is idle for 30+ seconds.
 // Uses the Web Audio API only (no external files).
 
-type CharacterId = "arisu" | "marin" | "nao";
+type CharacterId = "arisu" | "marin" | "nao" | "kurisu" | "merrick";
 
 interface NoteSpec {
   freq: number;
@@ -39,6 +39,16 @@ const melodies: Record<CharacterId, NoteSpec[]> = {
   nao: [
     "A3", "C4", "E4", "D4", "C4", "B3", "A3", "E4", "D4", "C4", "A3",
   ].map((n) => ({ freq: noteFreq[n], duration: 1.0 })),
+
+  // Kurisu — precise staccato, E minor, ~70 BPM, 0.6 s per note
+  kurisu: [
+    "E4", "G4", "B4", "A4", "G4", "E4", "D4", "E4", "G4", "A4", "E4",
+  ].map((n) => ({ freq: noteFreq[n], duration: 0.6 })),
+
+  // Merrick — slow haunting waltz, D minor, ~45 BPM, 1.2 s per note
+  merrick: [
+    "D4", "A3", "D4", "E4", "C4", "A3", "B3", "D4", "C4", "A3", "D4",
+  ].map((n) => ({ freq: noteFreq[n], duration: 1.2 })),
 };
 
 // ---------------------------------------------------------------------------

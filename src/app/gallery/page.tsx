@@ -10,6 +10,8 @@ const CHARACTERS = [
   { id: "arisu", name: "Arisu", color: "#f472b6" },
   { id: "marin", name: "Marin", color: "#fb923c" },
   { id: "nao", name: "Nao", color: "#a78bfa" },
+  { id: "kurisu", name: "Kurisu", color: "#e53935" },
+  { id: "merrick", name: "Merrick", color: "#7b1fa2" },
 ] as const;
 
 type CharacterId = (typeof CHARACTERS)[number]["id"];

@@ -86,6 +86,8 @@ function HomeContent() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-5" style={{ background: "#f472b6" }} />
         <div className="absolute top-1/3 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-5" style={{ background: "#fb923c" }} />
         <div className="absolute bottom-1/4 left-1/2 w-96 h-96 rounded-full blur-3xl opacity-5" style={{ background: "#a78bfa" }} />
+        <div className="absolute top-1/2 right-1/3 w-96 h-96 rounded-full blur-3xl opacity-5" style={{ background: "#e53935" }} />
+        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-5" style={{ background: "#7b1fa2" }} />
       </div>
 
       {/* Title */}

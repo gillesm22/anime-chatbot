@@ -28,7 +28,7 @@ export function CharacterSprite({
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
   const basePath = character.sprite.basePath;
-  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao";
+  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick";
   const [visibleExpr, setVisibleExpr] = useState<Expression>(expression);
   const [fadeIn, setFadeIn] = useState(false);
   const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);

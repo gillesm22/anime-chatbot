@@ -6,12 +6,14 @@ import { getAffinity } from "@/lib/affinity";
 // Constants
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_IDS = ["arisu", "marin", "nao"] as const;
+export const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
 
 export const NAMES: Record<string, string> = {
   arisu: "Arisu",
   marin: "Marin",
   nao: "Nao",
+  kurisu: "Kurisu",
+  merrick: "Merrick",
 };
 
 // ---------------------------------------------------------------------------
