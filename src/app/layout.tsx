@@ -21,6 +21,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              var stored = localStorage.getItem("anime-chatbot-theme-mode");
+              if (stored === "light" || stored === "dark") {
+                document.documentElement.setAttribute("data-theme", stored);
+              } else {
+                var h = new Date().getHours();
+                document.documentElement.setAttribute("data-theme", (h >= 18 || h < 6) ? "dark" : "light");
+              }
+            } catch(e) {}
+          })();
+        `}} />
         <link
           href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
           rel="stylesheet"
