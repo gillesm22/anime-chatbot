@@ -58,10 +58,13 @@ export function ChatProvider({
 
   useEffect(() => {
     if (state.messages.length > 0) {
-      localStorage.setItem(
-        getStorageKey(characterId),
-        JSON.stringify(state.messages)
-      );
+      try {
+        // Cap at 200 messages to prevent localStorage overflow
+        const toSave = state.messages.length > 200 ? state.messages.slice(-200) : state.messages;
+        localStorage.setItem(getStorageKey(characterId), JSON.stringify(toSave));
+      } catch {
+        // QuotaExceededError - silently fail rather than crash
+      }
     }
   }, [state.messages, characterId]);
 

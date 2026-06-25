@@ -235,6 +235,9 @@ function ChatContent({ characterId }: { characterId: string }) {
 
   const handleSend = useCallback(
     async (message: string) => {
+      // Guard against sending while a response is still streaming
+      if (state.phase === "waiting" || state.phase === "speaking") return;
+
       resetIdleTimer();
       playSendSwoosh();
       dispatch(sendMessage(message));
@@ -268,29 +271,32 @@ function ChatContent({ characterId }: { characterId: string }) {
 
       const typingHint = typingTrackerRef.current.getReactionHint();
 
-      await streamChat(
-        { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en" },
-        (event) => {
-          switch (event.type) {
-            case "expression":
-              expression = event.expression;
-              // Apply expression to sprite immediately during streaming
-              dispatch(setExpression(expression));
-              playExpressionChange();
-              playMessageReceived();
-              if (expression === "angry" || expression === "surprised") {
-                triggerScreenShake(expression === "angry" ? "heavy" : "medium");
-              }
-              break;
-            case "text":
-              fullText += event.content;
-              break;
-            case "error":
-              fullText = "I'm sorry, something went wrong. Please try again.";
-              break;
+      try {
+        await streamChat(
+          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en" },
+          (event) => {
+            switch (event.type) {
+              case "expression":
+                expression = event.expression;
+                dispatch(setExpression(expression));
+                playExpressionChange();
+                playMessageReceived();
+                if (expression === "angry" || expression === "surprised") {
+                  triggerScreenShake(expression === "angry" ? "heavy" : "medium");
+                }
+                break;
+              case "text":
+                fullText += event.content;
+                break;
+              case "error":
+                fullText = "I'm sorry, something went wrong. Please try again.";
+                break;
+            }
           }
-        }
-      );
+        );
+      } catch {
+        fullText = fullText || "Connection lost. Please try again.";
+      }
 
       if (!userName) {
         const nameFromUser = extractNameFromIntroduction(message);
@@ -328,17 +334,19 @@ function ChatContent({ characterId }: { characterId: string }) {
       }
       dispatch(receiveResponse(fullText || "...", expression));
     },
-    [dispatch, state.messages, characterId, userName]
+    [dispatch, state.messages, state.phase, characterId, userName]
   );
 
   const handleGift = useCallback((gift: Gift, reaction: CharacterReaction) => {
     setGiftReaction({ gift, reaction });
     setShowGiftShop(false);
-    dispatch(receiveResponse(reaction.dialogue, reaction.expression as any));
-    const result = addAffinityPoints(characterId, { type: "message_sent" });
-    if (result.newMilestones.length > 0) {
-      setMilestoneQueue(prev => [...prev, ...result.newMilestones]);
-    }
+    // Map compound expressions like "crying/devoted" to the first valid one
+    const exprParts = reaction.expression.split("/");
+    const validExpr = (exprParts[0] || "happy") as Expression;
+    dispatch(receiveResponse(reaction.dialogue, validExpr));
+    // Apply the actual gift affinity bonus
+    const result = addAffinityPoints(characterId, { type: "message_sent" }, gift.affinityBonus);
+    if (result.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...result.newMilestones]);
     setTimeout(() => setGiftReaction(null), 5000);
   }, [characterId, dispatch]);
 
@@ -719,12 +727,12 @@ function ChatContent({ characterId }: { characterId: string }) {
         <BottomNav
           characterId={characterId}
           accentColor={character.theme.accent}
-          onShowDiary={() => setShowDiary(true)}
-          onShowGifts={() => setShowGiftShop(true)}
+          onShowDiary={() => { setShowDiary(true); setShowGiftShop(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
+          onShowGifts={() => { setShowGiftShop(true); setShowDiary(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
           onShowHistory={() => setShowHistory(prev => !prev)}
           onShowScreenshot={() => setShowScreenshot(true)}
-          onShowOutfits={() => setShowOutfitCarousel(prev => !prev)}
-          onShowQuests={() => setShowQuestPanel(true)}
+          onShowOutfits={() => { setShowOutfitCarousel(prev => !prev); setShowDiary(false); setShowGiftShop(false); setShowQuestPanel(false); setShowScenePicker(false); }}
+          onShowQuests={() => { setShowQuestPanel(true); setShowDiary(false); setShowGiftShop(false); setShowOutfitCarousel(false); setShowScenePicker(false); }}
         />
         <BloodBat
           expression={state.currentExpression}

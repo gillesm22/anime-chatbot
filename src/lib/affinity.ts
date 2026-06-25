@@ -203,7 +203,8 @@ export function getNextLevelProgress(data: AffinityData): {
 
 export function addAffinityPoints(
   characterId: string,
-  event: AffinityEvent
+  event: AffinityEvent,
+  customPoints?: number
 ): { data: AffinityData; newMilestones: string[]; leveledUp: boolean } {
   if (typeof window === "undefined") {
     const data = getDefaultData();
@@ -214,7 +215,7 @@ export function addAffinityPoints(
   const previousLevel = data.level;
 
   // Add points
-  const earned = POINT_VALUES[event.type] ?? 0;
+  const earned = customPoints ?? POINT_VALUES[event.type] ?? 0;
   data.points += earned;
 
   // Track messages
