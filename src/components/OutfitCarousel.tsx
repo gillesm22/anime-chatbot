@@ -31,7 +31,10 @@ export interface OutfitCarouselProps {
   onClose: () => void;
 }
 
+const FULL_OUTFIT_CHARS = new Set(["arisu", "marin", "nao"]);
+
 export function OutfitCarousel({
+  characterId,
   basePath,
   accentColor,
   currentOutfit,
@@ -40,6 +43,8 @@ export function OutfitCarousel({
   onClose,
 }: OutfitCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasOutfits = FULL_OUTFIT_CHARS.has(characterId);
+  const visibleOutfits = hasOutfits ? OUTFITS : OUTFITS.filter((o) => o.id === "default");
 
   return (
     <>
@@ -135,7 +140,7 @@ export function OutfitCarousel({
             paddingBottom: "2px",
           }}
         >
-          {OUTFITS.map((outfit) => {
+          {visibleOutfits.map((outfit) => {
             const isActive = outfit.id === currentOutfit;
             return (
               <button
@@ -177,7 +182,7 @@ export function OutfitCarousel({
                   }}
                 >
                   <img
-                    src={`${basePath}/body-${outfit.id}.png`}
+                    src={`${basePath}/body-${outfit.id === "default" ? "neutral" : outfit.id}.png`}
                     alt={outfit.label}
                     style={{
                       width: "100%",

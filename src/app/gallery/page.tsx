@@ -19,14 +19,15 @@ type CharacterId = (typeof CHARACTERS)[number]["id"];
 interface SpriteEntry {
   file: string;
   label: string;
-  category: "expression" | "body" | "bikini";
+  category: "expression" | "body" | "outfit";
+  /** When set, only show for these characters */
+  onlyFor?: readonly string[];
 }
 
+const FULL_OUTFIT_CHARS = ["arisu", "marin", "nao"] as const;
+
 const SPRITES: SpriteEntry[] = [
-  { file: "body-neutral.png", label: "Body Neutral", category: "body" },
-  { file: "body-back.png", label: "Body Back", category: "body" },
-  { file: "body-front-bikini.png", label: "Front Bikini", category: "bikini" },
-  { file: "body-back-bikini.png", label: "Back Bikini", category: "bikini" },
+  // Expressions (all characters)
   { file: "face-happy.png", label: "Happy", category: "expression" },
   { file: "face-thinking.png", label: "Thinking", category: "expression" },
   { file: "face-surprised.png", label: "Surprised", category: "expression" },
@@ -35,15 +36,40 @@ const SPRITES: SpriteEntry[] = [
   { file: "face-laugh.png", label: "Laugh", category: "expression" },
   { file: "face-angry.png", label: "Angry", category: "expression" },
   { file: "face-flustered.png", label: "Flustered", category: "expression" },
+  { file: "face-devoted.png", label: "Devoted", category: "expression" },
+  { file: "face-teasing.png", label: "Teasing", category: "expression" },
+  { file: "face-sleepy.png", label: "Sleepy", category: "expression" },
+  { file: "face-excited.png", label: "Excited", category: "expression" },
+  { file: "face-shy.png", label: "Shy", category: "expression" },
+  { file: "face-jealous.png", label: "Jealous", category: "expression" },
+  { file: "face-crying.png", label: "Crying", category: "expression" },
+  // Body poses (all characters)
+  { file: "body-neutral.png", label: "Default", category: "body" },
+  // Body poses (arisu/marin/nao only)
+  { file: "body-back.png", label: "Back", category: "body", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-front-bikini.png", label: "Bikini Front", category: "body", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-back-bikini.png", label: "Bikini Back", category: "body", onlyFor: FULL_OUTFIT_CHARS },
+  // Outfits (arisu/marin/nao only)
+  { file: "body-casual.png", label: "Casual", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-formal.png", label: "Formal", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-school.png", label: "School", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-school-skimpy.png", label: "School+", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-cheerleader.png", label: "Cheerleader", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-cheer-extreme.png", label: "Cheer+", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-maid.png", label: "Maid", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-vampire.png", label: "Vampire", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-nurse.png", label: "Nurse", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-cowgirl.png", label: "Cowgirl", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-demon.png", label: "Demon", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
 ];
 
 const CATEGORY_LABELS: Record<SpriteEntry["category"], string> = {
   expression: "Expressions",
   body: "Body Poses",
-  bikini: "Bikini Views",
+  outfit: "Outfits",
 };
 
-const CATEGORY_ORDER: SpriteEntry["category"][] = ["expression", "body", "bikini"];
+const CATEGORY_ORDER: SpriteEntry["category"][] = ["expression", "body", "outfit"];
 
 export default function GalleryPage() {
   const router = useRouter();
@@ -137,7 +163,7 @@ export default function GalleryPage() {
               transition={{ duration: 0.3 }}
             >
               {CATEGORY_ORDER.map((category) => {
-                const sprites = SPRITES.filter((s) => s.category === category);
+                const sprites = SPRITES.filter((s) => s.category === category && (!s.onlyFor || s.onlyFor.includes(activeTab)));
                 if (sprites.length === 0) return null;
                 return (
                   <section key={category} className="mb-8">
@@ -245,7 +271,7 @@ export default function GalleryPage() {
                 className="mt-4 text-sm tracking-wide"
                 style={{ color: activeChar.color }}
               >
-                {activeChar.name} — {lightbox.label}
+                {activeChar.name} · {lightbox.label}
               </motion.p>
             </motion.div>
           )}
