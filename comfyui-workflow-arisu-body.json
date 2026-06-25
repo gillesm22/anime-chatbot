@@ -1,0 +1,74 @@
+{
+  "last_node_id": 9,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "CheckpointLoaderSimple",
+      "pos": [0, 0],
+      "size": [315, 98],
+      "properties": {},
+      "widgets_values": ["anything-v5.safetensors"]
+    },
+    {
+      "id": 2,
+      "type": "CLIPTextEncode",
+      "pos": [400, -100],
+      "size": [420, 170],
+      "properties": {},
+      "widgets_values": ["masterpiece, best quality, absurdres, highres, anime style, visual novel sprite, game cg, transparent background, png, simple background, full body, standing, solo, looking at viewer, 1girl, long hair, wavy hair, silver hair, pink hair, silver-pink hair, hair past waist, violet eyes, gentle eyes, fair skin, porcelain skin, slender build, elegant, white blouse, pink ribbon, cardigan, light cardigan, cherry blossom hair ornament, flower hairpin, standing, relaxed pose, arms at sides, soft expression, emilia (re:zero), violet evergarden, kyoto animation style"],
+      "title": "Positive Prompt"
+    },
+    {
+      "id": 3,
+      "type": "CLIPTextEncode",
+      "pos": [400, 150],
+      "size": [420, 170],
+      "properties": {},
+      "widgets_values": ["lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, multiple views, reference sheet, multiple characters, 3d, realistic, photorealistic, deformed, ugly, duplicate, morbid, mutilated, extra limbs, mutation, poorly drawn face, poorly drawn hands, extra fingers, fused fingers, long neck, background, colored background"],
+      "title": "Negative Prompt"
+    },
+    {
+      "id": 4,
+      "type": "EmptyLatentImage",
+      "pos": [400, 400],
+      "size": [315, 106],
+      "properties": {},
+      "widgets_values": [512, 896, 1]
+    },
+    {
+      "id": 5,
+      "type": "KSampler",
+      "pos": [900, 0],
+      "size": [315, 262],
+      "properties": {},
+      "widgets_values": [42, "fixed", 28, 7, "euler_ancestral", "normal", 1]
+    },
+    {
+      "id": 6,
+      "type": "VAEDecode",
+      "pos": [1300, 0],
+      "size": [210, 46],
+      "properties": {}
+    },
+    {
+      "id": 7,
+      "type": "SaveImage",
+      "pos": [1300, 150],
+      "size": [315, 270],
+      "properties": {},
+      "widgets_values": ["arisu-body-neutral"]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 5, 0, "MODEL"],
+    [2, 1, 1, 2, 0, "CLIP"],
+    [3, 1, 1, 3, 0, "CLIP"],
+    [4, 2, 0, 5, 1, "CONDITIONING"],
+    [5, 3, 0, 5, 2, "CONDITIONING"],
+    [6, 4, 0, 5, 3, "LATENT"],
+    [7, 5, 0, 6, 0, "LATENT"],
+    [8, 1, 2, 6, 1, "VAE"],
+    [9, 6, 0, 7, 0, "IMAGE"]
+  ]
+}

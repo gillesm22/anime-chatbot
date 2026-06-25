@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="102.4" fill="#0d0d12"/>
+  <circle cx="179.2" cy="230.4" r="40.96" fill="#f472b6" opacity="0.8"/>
+  <circle cx="256" cy="230.4" r="40.96" fill="#fb923c" opacity="0.8"/>
+  <circle cx="332.8" cy="230.4" r="40.96" fill="#a78bfa" opacity="0.8"/>
+  <text x="256" y="368.64" text-anchor="middle" fill="white" font-size="61.44" font-family="sans-serif" font-weight="300">CHAT</text>
+</svg>
