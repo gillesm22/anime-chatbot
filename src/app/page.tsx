@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { getHeroConfig, HERO_CLASS_MAP, isFirstRun } from "@/lib/heroAvatar";
 import { BloodBat } from "@/components/BloodBat";
+import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -31,6 +32,7 @@ export default function Home() {
 function HomeContent() {
   const characterList = Object.values(characters);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(() => isFirstRun());
 
   const [showReward, setShowReward] = useState(false);
   const [pendingReward, setPendingReward] = useState<{ reward: DailyReward; streak: number } | null>(null);
@@ -205,6 +207,10 @@ function HomeContent() {
       <div className="relative z-10">
         <BloodBat accentColor="#b71c1c" landingMode />
       </div>
+
+      {showOnboarding && (
+        <OnboardingOverlay onComplete={() => setShowOnboarding(false)} />
+      )}
 
       {showReward && pendingReward && (
         <DailyRewardModal
