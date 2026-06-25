@@ -259,6 +259,8 @@ const SCRIPTS: Record<string, ConfessionScript> = {
   arisu: ARISU_SCRIPT,
   marin: MARIN_SCRIPT,
   nao: NAO_SCRIPT,
+  kurisu: NAO_SCRIPT,   // TODO: write unique confession script for Kurisu
+  merrick: NAO_SCRIPT,  // TODO: write unique confession script for Merrick
 };
 
 // ---------------------------------------------------------------------------
@@ -275,12 +277,12 @@ export function getConfessionScript(characterId: string): ConfessionScript {
 
 export function hasConfessed(characterId: string): boolean {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem(`confession_done_${characterId}`) === "true";
+  return localStorage.getItem(`anime-chatbot-confession-done-${characterId}`) === "true";
 }
 
 export function markConfessed(characterId: string): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(`confession_done_${characterId}`, "true");
+  localStorage.setItem(`anime-chatbot-confession-done-${characterId}`, "true");
 }
 
 export function canConfess(characterId: string): boolean {

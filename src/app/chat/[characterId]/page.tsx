@@ -557,6 +557,10 @@ function ChatContent({ characterId }: { characterId: string }) {
             expression={state.currentExpression}
             isTalking={isTalking}
             outfit={outfit}
+            onHeadpat={() => {
+              const r = addAffinityPoints(characterId, { type: "headpat" });
+              if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
+            }}
           />
           <OutfitSelector
             accentColor={character.theme.accent}

@@ -56,9 +56,11 @@ const SPRITES: SpriteEntry[] = [
   { file: "body-school-skimpy.png", label: "School+", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-cheerleader.png", label: "Cheerleader", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-cheer-extreme.png", label: "Cheer+", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-cheer-extreme-back.png", label: "Cheer+ Back", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-maid.png", label: "Maid", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-vampire.png", label: "Vampire", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-nurse.png", label: "Nurse", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-cow.png", label: "Cow", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-cowgirl.png", label: "Cowgirl", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-demon.png", label: "Demon", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
 ];
