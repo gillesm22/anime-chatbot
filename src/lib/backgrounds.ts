@@ -10,7 +10,8 @@ export type SceneId =
   | "sakura"
   | "cyberpunk"
   | "cozy_room"
-  | "moonlight";
+  | "moonlight"
+  | "lab";
 
 export interface SceneConfig {
   id: SceneId;
@@ -122,6 +123,17 @@ export const SCENES: Record<SceneId, SceneConfig> = {
     particleColorLight: "#ff9800",
     ambientGlow: "rgba(200, 120, 40, 0.12)",
   },
+  lab: {
+    id: "lab",
+    name: "Future Gadget Lab",
+    gradient: "linear-gradient(to bottom, #1a1a2e 0%, #16213e 30%, #1a1a2e 60%, #0f0f1a 100%)",
+    gradientLight: "linear-gradient(to bottom, #e8eaf6 0%, #c5cae9 30%, #e0e0e0 60%, #eceff1 100%)",
+    bgImage: "/backgrounds/bg-lab.png",
+    particles: "fireflies",
+    particleColor: "#4fc3f7",
+    particleColorLight: "#0288d1",
+    ambientGlow: "rgba(79, 195, 247, 0.08)",
+  },
   moonlight: {
     id: "moonlight",
     name: "Moonlight",
@@ -149,7 +161,7 @@ export function getCharacterDefaultScene(characterId: string): SceneId {
     arisu: "sakura",
     marin: "beach",
     nao: "cyberpunk",
-    kurisu: "cozy_room",
+    kurisu: "lab",
     merrick: "moonlight",
   };
   return map[characterId.toLowerCase()] ?? "night_sky";
