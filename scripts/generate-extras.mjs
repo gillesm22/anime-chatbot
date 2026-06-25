@@ -74,7 +74,7 @@ async function generate(positive, negative, width, height, seed, outputPath, lab
 }
 
 const BG_NEGATIVE = "low quality, blurry, text, watermark, signature, worst quality, people, person, character, figure, anime girl, anime boy";
-const AVATAR_NEGATIVE = "low quality, blurry, deformed, text, watermark, signature, worst quality, ugly, bad anatomy, extra fingers, full body, legs, feet";
+const AVATAR_NEGATIVE = "low quality, blurry, deformed, text, watermark, signature, worst quality, ugly, bad anatomy, extra fingers, full body, legs, feet, feminine, girl, woman, pale skin, fair skin, light skin";
 
 async function main() {
   console.log("=== Generating Lab Background + Hero Avatars ===\n");
@@ -95,31 +95,40 @@ async function main() {
   // --- Hero Avatars ---
   mkdirSync(join(PUBLIC_DIR, "sprites", "hero"), { recursive: true });
 
+  // Consistent base: same character across all classes. Tanned pretty boy,
+  // manhwa style (Alucard / Jack Frost inspired), sharp jawline, stylish.
+  const HERO_BASE = "masterpiece, best quality, manhwa style, korean webtoon, portrait, upper body, 1boy, solo, handsome young man, sharp jawline, dark tanned skin, brown skin, golden tan, messy silver-white hair, undercut, crimson red eyes, intense gaze, sharp features, lean muscular, confident smirk, pretty boy, ikemen, bishounen, stylish, dark fantasy";
+
   const HEROES = [
     {
+      id: "avatar",
+      prompt: `${HERO_BASE}, long crimson red coat over dark armor, high collar, blood knight aesthetic, dark prince, broadsword hilt at shoulder, crimson aura, transparent background, png, simple background`,
+      seed: 880000,
+    },
+    {
       id: "mage",
-      prompt: "masterpiece, best quality, anime style, portrait, upper body, 1boy, mysterious arcane scholar, deep midnight-blue robes, silver runes on robes, glowing runes, crystalline pendant on chest, violet glowing eyes, flowing silver hair, magical aura, mana particles, calm authority, elegant, transparent background, png, simple background",
-      seed: 770001,
+      prompt: `${HERO_BASE}, dark navy mage coat with silver trim, high collar, glowing arcane circles around hands, crystalline pendant, magical aura, purple energy, mysterious, transparent background, png, simple background`,
+      seed: 880001,
     },
     {
       id: "rogue",
-      prompt: "masterpiece, best quality, anime style, portrait, upper body, 1boy, shadow walker, charcoal-grey leather armor, dark hood half-shadowing face, sharp silver eyes, scanning gaze, faint scar on cheekbone, twin daggers at hips, lithe build, mysterious, transparent background, png, simple background",
-      seed: 770002,
+      prompt: `${HERO_BASE}, black leather jacket, dark tactical gear, hood down around neck, silver chain necklace, fingerless gloves, daggers at belt, scar across cheekbone, shadow aesthetic, transparent background, png, simple background`,
+      seed: 880002,
     },
     {
       id: "demon",
-      prompt: "masterpiece, best quality, anime style, portrait, upper body, 1boy, dark sovereign, dark spiral horns from temples, molten gold burning eyes, black and violet flames on shoulders, ornate dark armor, glowing infernal sigils, hauntingly beautiful sharp features, regal commanding presence, transparent background, png, simple background",
-      seed: 770003,
+      prompt: `${HERO_BASE}, dark spiral horns from temples, black and crimson ornate armor, glowing infernal sigils on skin, dark flames, demon king aesthetic, regal dark prince, molten gold markings, transparent background, png, simple background`,
+      seed: 880003,
     },
     {
       id: "angel",
-      prompt: "masterpiece, best quality, anime style, portrait, upper body, 1boy, light bearer, luminous translucent gold wings, hair like spun light, compassionate cerulean blue eyes, flowing white and gold garments, soft warm radiance, sacred presence, gentle expression, transparent background, png, simple background",
-      seed: 770004,
+      prompt: `${HERO_BASE}, luminous white and gold armor, translucent golden wings, divine radiance, holy aura, warm light, celestial markings, flowing white cape, sacred warrior, transparent background, png, simple background`,
+      seed: 880004,
     },
     {
       id: "beast",
-      prompt: "masterpiece, best quality, anime style, portrait, upper body, 1boy, wild hunter, wolf ears through wild wind-swept hair, amber slit-pupiled eyes, lean muscular, weathered leather and fur clothing, claw-mark scars on forearms, feral untamed energy, predatory grace, transparent background, png, simple background",
-      seed: 770005,
+      prompt: `${HERO_BASE}, wolf ears, wild wind-swept hair, amber slit-pupiled eyes, open black fur-lined leather coat, no shirt, tribal tattoos on chest, claw marks on arms, feral grin, predator aesthetic, transparent background, png, simple background`,
+      seed: 880005,
     },
   ];
 
@@ -134,7 +143,7 @@ async function main() {
     );
   }
 
-  console.log("\n=== Done! 6 images generated (1 background + 5 hero avatars). ===");
+  console.log("\n=== Done! 7 images generated (1 background + 6 hero avatars). ===");
 }
 
 main().catch(console.error);
