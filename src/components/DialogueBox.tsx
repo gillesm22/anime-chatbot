@@ -17,23 +17,37 @@ interface DialogueBoxProps {
   typeSpeed?: number;
 }
 
-function TypingDots({ color }: { color: string }) {
+function ThinkingIndicator({ name, color }: { name: string; color: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 py-1">
+    <span
+      className="inline-flex items-center gap-1 py-1"
+      style={{ animation: "thinking-fade-in 0.3s ease-out" }}
+    >
+      <span
+        className="text-sm md:text-base italic"
+        style={{ color: `${color}cc` }}
+      >
+        {name} is thinking
+      </span>
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="inline-block w-2 h-2 rounded-full"
+          className="inline-block w-1.5 h-1.5 rounded-full"
           style={{
             backgroundColor: color,
-            animation: `typing-bounce 1.2s ease-in-out ${i * 0.15}s infinite`,
+            animation: `thinking-dot 1.4s ease-in-out ${i * 0.2}s infinite`,
           }}
         />
       ))}
       <style>{`
-        @keyframes typing-bounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30% { transform: translateY(-6px); opacity: 1; }
+        @keyframes thinking-dot {
+          0%, 20% { opacity: 0.2; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+          80%, 100% { opacity: 0.2; transform: scale(0.8); }
+        }
+        @keyframes thinking-fade-in {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </span>
@@ -157,7 +171,7 @@ export function DialogueBox({
       >
         <p className="text-text text-sm md:text-base leading-relaxed tracking-wide">
           {line === "..." ? (
-            <TypingDots color={accentColor} />
+            <ThinkingIndicator name={characterName} color={accentColor} />
           ) : (
             <>
               {displayedText}
