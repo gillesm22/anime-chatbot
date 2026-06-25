@@ -173,7 +173,7 @@ export function DialogueBox({
         className="px-4 pt-6 pb-4 md:px-8 md:pt-8 md:pb-5 min-h-[70px] md:min-h-[90px]"
         style={{ fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)" }}
       >
-        <p className="text-text text-sm md:text-base leading-relaxed tracking-wide">
+        <p className="text-sm md:text-base leading-relaxed tracking-wide" style={{ color: "#e0e0e8" }}>
           {line === "..." ? (
             <ThinkingIndicator name={characterName} color={accentColor} />
           ) : (
