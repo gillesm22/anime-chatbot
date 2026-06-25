@@ -57,6 +57,7 @@ import { OutfitCarousel } from "@/components/OutfitCarousel";
 import { AffinityProgressBar } from "@/components/AffinityProgressBar";
 import { MoodIndicator } from "@/components/MoodIndicator";
 import { getHeroAppearanceForPrompt, getHeroClassReactionForPrompt } from "@/lib/heroAvatar";
+import { BloodBat } from "@/components/BloodBat";
 
 const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
   { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
@@ -157,14 +158,18 @@ function ChatContent({ characterId }: { characterId: string }) {
     };
     document.addEventListener("click", startMusic);
     document.addEventListener("keydown", startMusic);
-    startSceneAudio(currentScene, characterId);
 
     return () => {
       stopAmbientMusic();
-      stopSceneAudio();
       document.removeEventListener("click", startMusic);
       document.removeEventListener("keydown", startMusic);
     };
+  }, [characterId]);
+
+  // Scene audio lifecycle (separate so scene changes don't kill ambient music)
+  useEffect(() => {
+    startSceneAudio(currentScene, characterId);
+    return () => { stopSceneAudio(); };
   }, [characterId, currentScene]);
 
   // Humming: separate effect so cleanup doesn't interfere
@@ -370,8 +375,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const isTalking = state.phase === "speaking" && state.isTyping;
   const showAdvanceIndicator =
     state.phase === "speaking" &&
-    !state.isTyping &&
-    state.currentLineIndex < state.currentLines.length - 1;
+    !state.isTyping;
 
   return (
     <PageTransition>
@@ -721,6 +725,11 @@ function ChatContent({ characterId }: { characterId: string }) {
           onShowScreenshot={() => setShowScreenshot(true)}
           onShowOutfits={() => setShowOutfitCarousel(prev => !prev)}
           onShowQuests={() => setShowQuestPanel(true)}
+        />
+        <BloodBat
+          expression={state.currentExpression}
+          accentColor={character.theme.accent}
+          isIdle={state.phase === "idle" && state.messages.length > 0}
         />
       </div>
 

@@ -11,6 +11,7 @@ import { DailyRewardModal } from "@/components/DailyRewardModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { getHeroConfig, HERO_CLASS_MAP, isFirstRun } from "@/lib/heroAvatar";
+import { BloodBat } from "@/components/BloodBat";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -178,6 +179,8 @@ function HomeContent() {
       <p className="text-text-secondary text-xs tracking-wider relative z-10 opacity-30">
         Click to start chatting
       </p>
+
+      <BloodBat accentColor="#b71c1c" isIdle />
 
       {showReward && pendingReward && (
         <DailyRewardModal
