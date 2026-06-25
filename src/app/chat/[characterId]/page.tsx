@@ -608,7 +608,7 @@ function ChatContent({ characterId }: { characterId: string }) {
         </div>
 
         {/* Dialogue / input area - always visible at bottom */}
-        <div className="flex-shrink-0 relative z-10 pb-20">
+        <div className="flex-shrink-0 relative z-10 pb-20" style={{ minHeight: showDialogue ? "120px" : undefined }}>
           {showDialogue && (
             <DialogueBox
               characterName={character.name}
@@ -640,7 +640,7 @@ function ChatContent({ characterId }: { characterId: string }) {
               ))}
             </div>
           )}
-          <div className="px-3 py-3 md:px-6 md:py-4">
+          <div className="px-3 py-3 md:px-6 md:py-4" style={{ display: showDialogue ? "none" : undefined }}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
