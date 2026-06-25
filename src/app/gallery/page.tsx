@@ -84,7 +84,7 @@ export default function GalleryPage() {
     <PageTransition>
       <div
         className="min-h-screen flex flex-col"
-        style={{ background: "linear-gradient(180deg, #16161e 0%, #0d0d12 100%)" }}
+        style={{ background: "linear-gradient(180deg, var(--color-surface, #16161e) 0%, var(--color-bg, #0d0d12) 100%)" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
@@ -122,7 +122,8 @@ export default function GalleryPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="flex gap-2 mb-8"
+            className="flex gap-2 mb-8 overflow-x-auto pb-1"
+            style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
           >
             {CHARACTERS.map((char) => {
               const isActive = activeTab === char.id;
@@ -130,7 +131,7 @@ export default function GalleryPage() {
                 <button
                   key={char.id}
                   onClick={() => setActiveTab(char.id)}
-                  className="relative px-5 py-2 rounded-full text-sm font-medium transition-colors"
+                  className="relative px-5 py-2 rounded-full text-sm font-medium transition-colors flex-shrink-0"
                   style={{
                     background: isActive
                       ? `${char.color}25`

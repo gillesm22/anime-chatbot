@@ -127,7 +127,7 @@ export default function SettingsPage() {
     <PageTransition>
       <div
         className="min-h-screen flex flex-col"
-        style={{ background: "linear-gradient(180deg, #16161e 0%, #0d0d12 100%)" }}
+        style={{ background: "linear-gradient(180deg, var(--color-surface, #16161e) 0%, var(--color-bg, #0d0d12) 100%)" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">

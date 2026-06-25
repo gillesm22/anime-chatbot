@@ -28,7 +28,7 @@ export function CharacterCard({ character, index }: CharacterCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[320px] sm:min-h-[420px] transition-transform duration-300"
       style={{
-        background: `linear-gradient(180deg, ${character.theme.tint} 0%, #0d0d12 100%)`,
+        background: `linear-gradient(180deg, ${character.theme.tint} 0%, var(--color-bg, #0d0d12) 100%)`,
         border: `1px solid ${character.theme.accent}30`,
         transform: isHovered ? "translateY(-12px) scale(1.03)" : "translateY(0) scale(1)",
       }}

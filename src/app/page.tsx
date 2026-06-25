@@ -62,7 +62,7 @@ function HomeContent() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 md:px-8 md:py-12 gap-6 md:gap-10 relative overflow-hidden">
       {/* Gallery, Settings & Theme */}
-      <div className="absolute top-4 right-4 z-30 flex items-center gap-3 px-3 py-2 rounded-xl" style={{ background: "rgba(13,13,18,0.5)", backdropFilter: "blur(8px)" }}>
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-3 px-3 py-2 rounded-xl" style={{ background: "var(--color-surface, rgba(13,13,18,0.5))", backdropFilter: "blur(8px)" }}>
         <ThemeToggle />
         <LanguageToggle />
         <Link

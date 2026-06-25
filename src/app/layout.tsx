@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Anime Chatbot",
-  description: "Chat with Arisu, Marin, and Nao",
+  description: "Chat with five unique anime companions",
 };
 
 export default function RootLayout({
