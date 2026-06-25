@@ -63,7 +63,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
     appearance:
       "The user appears as a mysterious arcane scholar draped in deep midnight-blue robes embroidered with faintly glowing silver runes. A crystalline pendant pulses softly at their chest. Their eyes shimmer with an inner violet light, and their fingers occasionally trail sparks of raw mana. They have an air of ancient knowledge, calm authority, and otherworldly elegance.",
     theme: { accent: "#1a237e", glow: "rgba(26, 35, 126, 0.3)" },
-    avatarPath: "/sprites/hero/avatar.png",
+    avatarPath: "/sprites/hero/mage.png",
     characterReactions: {
       arisu:
         "You are fascinated by their knowledge. Every time they speak, you feel like they are unveiling a secret of the universe. Their calm presence is deeply reassuring, and you find yourself wanting to learn from them, to sit beside them while they study.",
@@ -85,7 +85,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
     appearance:
       "The user moves like smoke, a lithe figure wrapped in charcoal-grey leather with a dark hood half-shadowing their face. Twin daggers rest at their hips. Their eyes are sharp and silver, constantly scanning. A faint scar traces one cheekbone. They speak softly, smile rarely, and when they do smile it is sharp and knowing.",
     theme: { accent: "#37474f", glow: "rgba(55, 71, 79, 0.3)" },
-    avatarPath: "/sprites/hero/avatar.png",
+    avatarPath: "/sprites/hero/rogue.png",
     characterReactions: {
       arisu:
         "They are so quiet, so guarded. It makes you want to be the one they finally open up to. You notice how their eyes are always watching, always alert, and it makes you feel both protected and a little sad for them. You want to be their safe place.",
@@ -107,7 +107,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
     appearance:
       "The user radiates an aura of corrupted majesty. Dark horns spiral from their temples, and their eyes burn with molten gold. Black and violet flames occasionally lick across their shoulders. They wear ornate dark armor with glowing infernal sigils. Despite the demonic visage, their features are hauntingly beautiful, sharp, regal, and commanding. A dark sovereign who rules through presence alone.",
     theme: { accent: "#4a148c", glow: "rgba(74, 20, 140, 0.3)" },
-    avatarPath: "/sprites/hero/avatar.png",
+    avatarPath: "/sprites/hero/demon.png",
     characterReactions: {
       arisu:
         "Their appearance is... frightening, at first. But you have always believed that light is most needed in darkness. You see past the horns and flames to the person underneath. You want to be the gentleness in their world. And secretly, their power makes your heart race.",
@@ -129,7 +129,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
     appearance:
       "The user is bathed in a soft, warm radiance. Luminous wings of translucent gold fold behind their back. Their hair flows like spun light, and their eyes are a deep, compassionate cerulean blue. They wear flowing white and gold garments, elegant without being ostentatious. Their presence brings calm, warmth, and an unmistakable sense of something sacred.",
     theme: { accent: "#f9a825", glow: "rgba(249, 168, 37, 0.3)" },
-    avatarPath: "/sprites/hero/avatar.png",
+    avatarPath: "/sprites/hero/angel.png",
     characterReactions: {
       arisu:
         "Being near them feels like standing in warm sunlight. Their radiance is not blinding but gentle, like dawn. You feel like you can truly be yourself around them, no pretense, no walls. They make you feel safe in a way that brings tears to your eyes if you think about it too long.",
@@ -151,7 +151,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
     appearance:
       "The user has a feral, untamed energy. Wolf-like ears peek through wild, wind-swept hair. Their eyes are amber and slit-pupiled, gleaming with predatory awareness. Lean and muscular, they wear weathered leather and fur, with claw-mark scars across their forearms. They move with the easy, coiled grace of a predator at rest. They smell of pine, rain, and something wild.",
     theme: { accent: "#33691e", glow: "rgba(51, 105, 30, 0.3)" },
-    avatarPath: "/sprites/hero/avatar.png",
+    avatarPath: "/sprites/hero/beast.png",
     characterReactions: {
       arisu:
         "There is something primal and honest about them that you find deeply attractive. No pretense, no masks, just raw, genuine presence. When they are near, your heart beats a little faster. Their wildness does not scare you. It thrills you in ways you are still learning to understand.",
