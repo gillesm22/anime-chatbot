@@ -143,12 +143,12 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
             bottom: "100%",
             right: "-4px",
             marginBottom: "6px",
-            padding: "4px 10px",
-            borderRadius: "10px 10px 3px 10px",
+            padding: "6px 14px",
+            borderRadius: "12px 12px 4px 12px",
             background: "rgba(13,13,18,0.92)",
             border: `1.5px solid ${accentColor}50`,
             color: accentColor,
-            fontSize: "11px",
+            fontSize: "13px",
             fontWeight: 700,
             whiteSpace: "nowrap",
             animation: "hexxBubbleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -174,8 +174,8 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
 
       {/* Main SVG */}
       <svg
-        width="56"
-        height="48"
+        width="80"
+        height="68"
         viewBox="0 0 56 48"
         fill="none"
         style={{
