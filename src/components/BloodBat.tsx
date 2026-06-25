@@ -19,12 +19,12 @@ interface BloodBatProps {
 type BatMood = "chill" | "excited" | "scared" | "sleepy" | "smug" | "love" | "angry";
 
 const BAT_PHRASES: Record<BatMood, string[]> = {
-  chill: ["*yawn*", "sup", "...", "zzz", "*wing stretch*", "bored", "yo"],
-  excited: ["!!!", "LET'S GO", "hehe", "yooo", "*flap flap*", "sick", "no way"],
-  scared: ["!!!", "nope", "bruh", "*hides*", "scary", "uh oh"],
-  sleepy: ["zzz", "...zzz", "*snore*", "5 more min", "tired", "meh"],
-  smug: ["heh", "called it", "told ya", "*smirk*", "ez", "smooth"],
-  love: ["aww", "<3", "cute", "*blush*", "ship it", "goals"],
+  chill: ["*yawn*", "sup", "...", "zzz", "*wing stretch*", "bored", "yo", "meh"],
+  excited: ["!!!", "LET'S GO", "hehe", "yooo", "*flap flap*", "no way", "oh?!"],
+  scared: ["!!!", "nope", "bruh", "*hides*", "uh oh", "not cool"],
+  sleepy: ["zzz", "...zzz", "*snore*", "5 more min", "wake me never", "meh"],
+  smug: ["heh", "called it", "told ya", "*smirk*", "ez", "smooth", "classic"],
+  love: ["...", "hmph", "not cute", "*looks away*", "whatever", "...fine"],
   angry: ["tch", "rude", "fight me", "*hiss*", "grr", "wow ok"],
 };
 
@@ -88,16 +88,18 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
       "I don't have all night",
       "just pick. trust me.",
       "the one on the left. no wait.",
-      "*taps foot impatiently*",
+      "*taps wing impatiently*",
       "you're overthinking this",
       "any day now, chief",
+      "I could be napping rn",
+      "...fine. take your time. whatever.",
     ];
     let idx = 0;
     setPhrase(phrases[0]);
     const interval = setInterval(() => {
       idx = (idx + 1) % phrases.length;
       setPhrase(phrases[idx]);
-    }, 5000);
+    }, 12000);
     return () => clearInterval(interval);
   }, [landingMode]);
 
@@ -109,9 +111,11 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
 
     const clickPhrases = clickCount < 3
       ? ["hey!", "what", "*squeak*", "yo?!", "watch it"]
-      : clickCount < 6
-        ? ["again?", "dude", "stop", "chill", "I bite"]
-        : ["...", "fine", "*nuzzle*", "ok ok", "we cool"];
+      : clickCount < 7
+        ? ["again?", "dude", "stop", "I bite", "personal space??"]
+        : clickCount < 12
+          ? ["...", "fine", "*nuzzle*", "ok ok", "we cool", "you're weird"]
+          : ["...you're kinda sweet", "*purrs*", "don't tell anyone", "this stays between us", "...whatever"];
     setPhrase(clickPhrases[Math.floor(Math.random() * clickPhrases.length)]);
     if (phraseTimer.current) clearTimeout(phraseTimer.current);
     phraseTimer.current = setTimeout(() => setPhrase(null), 2000);
@@ -133,7 +137,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         transform: `translate(${position.x}px, ${position.y}px)`,
       }}
       onClick={handleClick}
-      title="Blood Bat"
+      title="Hexx"
     >
       {/* Speech bubble */}
       {phrase && (
