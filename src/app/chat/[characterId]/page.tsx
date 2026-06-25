@@ -121,7 +121,19 @@ function ChatContent({ characterId }: { characterId: string }) {
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const recentExpressionsRef = useRef<string[]>([]);
   const currentMoodRef = useRef<ReturnType<typeof getMood>>("neutral");
-  const [outfit, setOutfit] = useState<Outfit>("default");
+  const [outfit, setOutfit] = useState<Outfit>(() => {
+    if (typeof window === "undefined") return "default";
+    return (localStorage.getItem(`anime-chatbot-outfit-${characterId}`) as Outfit) || "default";
+  });
+
+  // Persist outfit selection
+  useEffect(() => {
+    if (outfit !== "default") {
+      try { localStorage.setItem(`anime-chatbot-outfit-${characterId}`, outfit); } catch {}
+    } else {
+      localStorage.removeItem(`anime-chatbot-outfit-${characterId}`);
+    }
+  }, [outfit, characterId]);
   const [showHistory, setShowHistory] = useState(false);
   const [showCharInfo, setShowCharInfo] = useState(false);
   const [showScreenshot, setShowScreenshot] = useState(false);
@@ -755,6 +767,7 @@ function ChatContent({ characterId }: { characterId: string }) {
         <BottomNav
           characterId={characterId}
           accentColor={character.theme.accent}
+          activeTab={showOutfitCarousel ? "outfits" : showGiftShop ? "gifts" : showDiary ? "diary" : showQuestPanel ? "more" : "chat"}
           onShowDiary={() => { setShowDiary(true); setShowGiftShop(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
           onShowGifts={() => { setShowGiftShop(true); setShowDiary(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
           onShowHistory={() => setShowHistory(prev => !prev)}

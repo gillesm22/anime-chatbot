@@ -1,6 +1,7 @@
 export interface BottomNavProps {
   characterId: string;
   accentColor: string;
+  activeTab?: BottomNavTab;
   onShowDiary: () => void;
   onShowGifts: () => void;
   onShowHistory: () => void;
@@ -120,6 +121,7 @@ function DotsIcon() {
 
 export function BottomNav({
   accentColor,
+  activeTab: activeTabProp,
   onShowDiary,
   onShowGifts,
   onShowHistory,
@@ -127,9 +129,7 @@ export function BottomNav({
   onShowOutfits,
   onShowQuests,
 }: BottomNavProps) {
-  // activeTab is managed externally via callbacks; default highlight is "chat"
-  // For a stateless nav, we highlight "chat" by default. Parent can lift state if needed.
-  const activeTab = "chat" as BottomNavTab;
+  const activeTab = activeTabProp ?? "chat";
 
   return (
     <nav

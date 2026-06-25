@@ -399,6 +399,20 @@ function buildNaoMelody(audioCtx: AudioContext, dest: AudioNode): () => void {
   return buildArpeggioMelody(audioCtx, dest, aMinor, 0.75, "sawtooth", 0.28);
 }
 
+// kurisu — precise staccato sine, E minor, clinical tempo (~70 bpm feel).
+// E3 G3 B3 D4 E4 G4
+function buildKurisuMelody(audioCtx: AudioContext, dest: AudioNode): () => void {
+  const eMinor = [164.81, 196.0, 246.94, 293.66, 329.63, 392.0];
+  return buildArpeggioMelody(audioCtx, dest, eMinor, 0.5, "sine", 0.3);
+}
+
+// merrick — haunting triangle wave, D minor, slow and ethereal (~45 bpm feel).
+// D3 F3 A3 C4 D4 F4
+function buildMerrickMelody(audioCtx: AudioContext, dest: AudioNode): () => void {
+  const dMinor = [146.83, 174.61, 220.0, 261.63, 293.66, 349.23];
+  return buildArpeggioMelody(audioCtx, dest, dMinor, 0.9, "triangle", 0.32);
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
@@ -437,10 +451,18 @@ export function startSceneAudio(sceneId: string, characterId: string): void {
       buildRain(audioCtx, masterGain);
       break;
     case "night_sky":
+    case "moonlight":
+    case "lab":
       buildNightSky(audioCtx, masterGain);
       break;
+    case "cozy_room":
+      buildCafe(audioCtx, masterGain);
+      break;
+    case "morning":
+    case "sunset":
+      buildBeach(audioCtx, masterGain);
+      break;
     default:
-      // Unknown scene — silent (no crash).
       break;
   }
 
@@ -516,8 +538,13 @@ export function setCharacterMusic(characterId: string): void {
     case "nao":
       melodyCleanup = buildNaoMelody(audioCtx, melodyGain);
       break;
+    case "kurisu":
+      melodyCleanup = buildKurisuMelody(audioCtx, melodyGain);
+      break;
+    case "merrick":
+      melodyCleanup = buildMerrickMelody(audioCtx, melodyGain);
+      break;
     default:
-      // No melody for unknown characters — that's fine.
       break;
   }
 }
