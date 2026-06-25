@@ -35,7 +35,7 @@ import { getCrossCharacterContext } from "@/lib/crosschar";
 import { detectMiniGame, getMiniGamePrompt } from "@/lib/minigames";
 import { MilestoneToast } from "@/components/MilestoneToast";
 import { SceneBackground } from "@/components/SceneBackground";
-import { getCharacterDefaultScene } from "@/lib/backgrounds";
+import { getCharacterDefaultScene, SCENES, type SceneId } from "@/lib/backgrounds";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { startSceneAudio, stopSceneAudio } from "@/lib/sceneSounds";
 import { triggerScreenShake } from "@/lib/screenShake";
@@ -128,7 +128,8 @@ function ChatContent({ characterId }: { characterId: string }) {
   const greetingShownRef = useRef(false);
   const [milestoneQueue, setMilestoneQueue] = useState<string[]>([]);
   const [currentMilestone, setCurrentMilestone] = useState<string | null>(null);
-  const [currentScene] = useState(() => getCharacterDefaultScene(characterId));
+  const [currentScene, setCurrentScene] = useState(() => getCharacterDefaultScene(characterId));
+  const [showScenePicker, setShowScenePicker] = useState(false);
   const typingTrackerRef = useRef(new TypingTracker());
   const [showConfession, setShowConfession] = useState(false);
   const [showDiary, setShowDiary] = useState(false);
@@ -161,7 +162,7 @@ function ChatContent({ characterId }: { characterId: string }) {
       document.removeEventListener("click", startMusic);
       document.removeEventListener("keydown", startMusic);
     };
-  }, [characterId]);
+  }, [characterId, currentScene]);
 
   // Humming: separate effect so cleanup doesn't interfere
   useEffect(() => {
@@ -475,6 +476,18 @@ function ChatContent({ characterId }: { characterId: string }) {
               </svg>
               <span className="hidden sm:inline">Gifts</span>
             </button>
+            <button
+              onClick={() => setShowScenePicker((prev) => !prev)}
+              className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
+              style={{ color: showScenePicker ? character.theme.accent : "rgba(255,255,255,0.5)" }}
+              title="Change scene"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
+                <path d="M1 10l4-3 3 2 4-4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" strokeLinecap="round"/>
+                <circle cx="11" cy="5.5" r="1.5" stroke="currentColor" strokeWidth="1"/>
+              </svg>
+            </button>
           </div>
 
           {/* Center - name + info */}
@@ -626,6 +639,76 @@ function ChatContent({ characterId }: { characterId: string }) {
           isOpen={showOutfitCarousel}
           onClose={() => setShowOutfitCarousel(false)}
         />
+
+        {/* Scene picker panel */}
+        <div
+          style={{
+            position: "fixed",
+            bottom: "65px",
+            left: 0,
+            right: 0,
+            zIndex: 35,
+            background: "rgba(13,13,18,0.9)",
+            backdropFilter: "blur(14px)",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+            padding: "12px 12px 16px",
+            transform: showScenePicker ? "translateY(0)" : "translateY(110%)",
+            transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            pointerEvents: showScenePicker ? "auto" : "none",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+              Scenes
+            </span>
+            <button
+              onClick={() => setShowScenePicker(false)}
+              style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: 1, padding: 0 }}
+              aria-label="Close scene picker"
+            >
+              ✕
+            </button>
+          </div>
+          <div style={{ display: "flex", gap: "8px", overflowX: "auto", overflowY: "hidden", paddingBottom: "2px" }}>
+            {(Object.values(SCENES) as { id: SceneId; name: string; gradient: string }[]).map((scene) => {
+              const isActive = scene.id === currentScene;
+              return (
+                <button
+                  key={scene.id}
+                  onClick={() => { setCurrentScene(scene.id); setShowScenePicker(false); }}
+                  style={{
+                    flex: "0 0 auto",
+                    width: "60px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "5px",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                  title={scene.name}
+                >
+                  <div
+                    style={{
+                      width: "60px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: isActive ? `2px solid ${character.theme.accent}` : "2px solid rgba(255,255,255,0.1)",
+                      boxShadow: isActive ? `0 0 10px ${character.theme.accent}66` : "none",
+                      background: scene.gradient,
+                    }}
+                  />
+                  <span style={{ fontSize: "8px", color: isActive ? character.theme.accent : "rgba(255,255,255,0.45)", fontWeight: isActive ? 600 : 400, textAlign: "center", maxWidth: "60px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {scene.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <BottomNav
           characterId={characterId}

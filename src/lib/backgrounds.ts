@@ -149,6 +149,12 @@ export function getCharacterDefaultScene(characterId: string): SceneId {
     arisu: "sakura",
     marin: "beach",
     nao: "cyberpunk",
+    kurisu: "cozy_room",
+    merrick: "moonlight",
   };
   return map[characterId.toLowerCase()] ?? "night_sky";
+}
+
+export function getAllScenes(): SceneConfig[] {
+  return Object.values(SCENES);
 }
