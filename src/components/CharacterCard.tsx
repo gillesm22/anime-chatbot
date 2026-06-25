@@ -17,10 +17,17 @@ interface CharacterCardProps {
 
 export function CharacterCard({ character, index, isFavorite }: CharacterCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const [hoverExpr, setHoverExpr] = useState<string | null>(null);
   const [affinity, setAffinity] = useState<AffinityData | null>(null);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleNavigate = () => {
+    if (isExiting) return;
+    setIsExiting(true);
+    setTimeout(() => router.push(`/chat/${character.id}`), 300);
+  };
 
   useEffect(() => {
     setAffinity(getAffinity(character.id));
@@ -46,8 +53,8 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
       role="button"
       tabIndex={0}
       aria-label={`Chat with ${character.name}`}
-      onClick={() => router.push(`/chat/${character.id}`)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/chat/${character.id}`); } }}
+      onClick={handleNavigate}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleNavigate(); } }}
       onMouseEnter={() => {
         setIsHovered(true);
         setHoverExpr(PREVIEW_EXPRESSIONS[Math.floor(Math.random() * PREVIEW_EXPRESSIONS.length)]);
@@ -58,11 +65,15 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
       }}
       onFocus={() => setIsHovered(true)}
       onBlur={() => { setIsHovered(false); setHoverExpr(null); }}
-      className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[320px] sm:min-h-[420px] transition-transform duration-300 outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+      className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[320px] sm:min-h-[420px] outline-none focus-visible:ring-2 focus-visible:ring-white/30"
       style={{
         background: `linear-gradient(180deg, ${character.theme.tint} 0%, var(--color-bg, #0d0d12) 100%)`,
         border: `1px solid ${character.theme.accent}${isFavorite ? "60" : "30"}`,
-        transform: isHovered ? "translateY(-12px) scale(1.03)" : "translateY(0) scale(1)",
+        transform: isExiting
+          ? "scale(0.95)"
+          : isHovered ? "translateY(-12px) scale(1.03)" : "translateY(0) scale(1)",
+        opacity: isExiting ? 0 : 1,
+        transition: "transform 300ms ease, opacity 300ms ease",
       }}
     >
       {/* Glow effect on hover */}
