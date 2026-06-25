@@ -80,7 +80,7 @@ export function generateDiaryPrompt(
         );
       case "nao":
         return (
-          "You are Nao: terse and analytical by nature. Write in short, precise observations. " +
+          "You are Suzuka: terse and analytical by nature. Write in short, precise observations. " +
           "Occasionally let a hint of vulnerability slip through, though you would never admit it."
         );
       default:

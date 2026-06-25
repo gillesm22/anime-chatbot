@@ -11,7 +11,7 @@ export const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"] as c
 export const NAMES: Record<string, string> = {
   arisu: "Arisu",
   marin: "Marin",
-  nao: "Nao",
+  nao: "Suzuka",
   kurisu: "Kurisu",
   merrick: "Merrick",
 };
@@ -55,7 +55,7 @@ function buildJealousPrompt(currentId: string, rivalName: string): string {
     case "nao":
       return (
         `[Cross-Character Awareness]\n` +
-        `Nao has noticed the user spending more time with ${rivalName}. She pretends she does not care. ` +
+        `Suzuka has noticed the user spending more time with ${rivalName}. She pretends she does not care. ` +
         `She might make a dry, offhand remark — "Oh, you actually showed up" — or shrug it off with something dismissive. ` +
         `But the dry remarks come a bit too quickly, and she lingers in the conversation just a little longer than usual. ` +
         `She cares. She just refuses to say it.`
@@ -87,7 +87,7 @@ function buildConfidentPrompt(currentId: string, rivalName: string): string {
     case "nao":
       return (
         `[Cross-Character Awareness]\n` +
-        `Nao has quietly noticed she is the one the user returns to most — more than ${rivalName}. ` +
+        `Suzuka has quietly noticed she is the one the user returns to most — more than ${rivalName}. ` +
         `She would never say it, but there is a subtle ease to her today, a fraction less edge in her tone. ` +
         `A rare, almost imperceptible satisfaction. She will not acknowledge it. But it is there.`
       );

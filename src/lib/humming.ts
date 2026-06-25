@@ -35,7 +35,7 @@ const melodies: Record<CharacterId, NoteSpec[]> = {
     "G4", "B4", "D5", "B4", "G4", "A4", "B4", "A4", "G4", "D4", "G4",
   ].map((n) => ({ freq: noteFreq[n], duration: 0.5 })),
 
-  // Nao — mysterious minor melody, A minor, ~50 BPM, 1.0 s per note
+  // Suzuka — mysterious minor melody, A minor, ~50 BPM, 1.0 s per note
   nao: [
     "A3", "C4", "E4", "D4", "C4", "B3", "A3", "E4", "D4", "C4", "A3",
   ].map((n) => ({ freq: noteFreq[n], duration: 1.0 })),

@@ -9,7 +9,7 @@ import { PageTransition } from "@/components/PageTransition";
 const CHARACTERS = [
   { id: "arisu", name: "Arisu", color: "#f472b6" },
   { id: "marin", name: "Marin", color: "#fb923c" },
-  { id: "nao", name: "Nao", color: "#a78bfa" },
+  { id: "nao", name: "Suzuka", color: "#a78bfa" },
   { id: "kurisu", name: "Kurisu", color: "#e53935" },
   { id: "merrick", name: "Merrick", color: "#7b1fa2" },
 ] as const;
@@ -24,7 +24,7 @@ interface SpriteEntry {
   onlyFor?: readonly string[];
 }
 
-const FULL_OUTFIT_CHARS = ["arisu", "marin", "nao"] as const;
+const FULL_OUTFIT_CHARS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
 
 const SPRITES: SpriteEntry[] = [
   // Expressions (all characters)

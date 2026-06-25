@@ -13,7 +13,7 @@ const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
 const CHARACTER_LABELS: Record<string, { name: string; color: string }> = {
   arisu: { name: "Arisu", color: "#f472b6" },
   marin: { name: "Marin", color: "#fb923c" },
-  nao: { name: "Nao", color: "#a78bfa" },
+  nao: { name: "Suzuka", color: "#a78bfa" },
   kurisu: { name: "Kurisu", color: "#e53935" },
   merrick: { name: "Merrick", color: "#7b1fa2" },
 };

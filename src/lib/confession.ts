@@ -182,7 +182,7 @@ const NAO_SCRIPT: ConfessionScript = {
   nodes: {
     start: {
       lines: [
-        { speaker: "narration", text: "Nao approaches with a tablet in hand, but her eyes aren't quite focused on it." },
+        { speaker: "narration", text: "Suzuka approaches with a tablet in hand, but her eyes aren't quite focused on it." },
         { speaker: "character", text: "I've been running some analyses lately. On... interpersonal dynamics.", expression: "composed" },
         { speaker: "character", text: "The data has led me to a conclusion I find difficult to... classify.", expression: "slightly_uncertain" },
       ],
@@ -205,7 +205,7 @@ const NAO_SCRIPT: ConfessionScript = {
         { speaker: "character", text: "It suggested... a high degree of resonance. Shared signal, low noise.", expression: "technical_soft" },
         { speaker: "character", text: "In simpler terms -- two variables that influence each other more than expected.", expression: "careful" },
         { speaker: "character", text: "In even simpler terms...", expression: "struggling" },
-        { speaker: "narration", text: "A long pause. A very Nao pause." },
+        { speaker: "narration", text: "A long pause. A very Suzuka pause." },
       ],
       nextNode: "confession",
     },
@@ -236,7 +236,7 @@ const NAO_SCRIPT: ConfessionScript = {
     },
     accepted: {
       lines: [
-        { speaker: "narration", text: "Something in Nao's carefully maintained composure cracks -- just a little. In the best possible way." },
+        { speaker: "narration", text: "Something in Suzuka's carefully maintained composure cracks -- just a little. In the best possible way." },
         { speaker: "character", text: "...Good.", expression: "quiet_joy" },
         { speaker: "character", text: "That is a better outcome than my most optimistic projection.", expression: "soft_smile" },
         { speaker: "narration", text: "She looks away briefly, but you catch the faint curve of a genuine smile she can't quite suppress." },
