@@ -146,12 +146,20 @@ export default function SettingsPage() {
             </svg>
             Back
           </button>
-          <Link
-            href="/gallery"
-            className="text-text-secondary hover:text-text transition-colors text-xs tracking-wide uppercase"
-          >
-            Gallery
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/profile"
+              className="text-text-secondary hover:text-text transition-colors text-xs tracking-wide uppercase"
+            >
+              Profile
+            </Link>
+            <Link
+              href="/gallery"
+              className="text-text-secondary hover:text-text transition-colors text-xs tracking-wide uppercase"
+            >
+              Gallery
+            </Link>
+          </div>
         </div>
 
         {/* Content */}

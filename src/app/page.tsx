@@ -85,6 +85,12 @@ function HomeContent() {
         <ThemeToggle />
         <LanguageToggle />
         <Link
+          href="/profile"
+          className="text-text hover:opacity-70 transition-opacity text-xs tracking-wide uppercase font-medium"
+        >
+          Profile
+        </Link>
+        <Link
           href="/gallery"
           className="text-text hover:opacity-70 transition-opacity text-xs tracking-wide uppercase font-medium"
         >
