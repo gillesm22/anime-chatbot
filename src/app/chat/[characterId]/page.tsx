@@ -53,6 +53,7 @@ import { formatGiftContextForPrompt } from "@/lib/gifts";
 import { BottomNav } from "@/components/BottomNav";
 import { InteractiveElements } from "@/components/InteractiveElements";
 import { QuestPanel } from "@/components/QuestPanel";
+import { getStarters } from "@/lib/conversationStarters";
 import { OutfitCarousel } from "@/components/OutfitCarousel";
 import { AffinityProgressBar } from "@/components/AffinityProgressBar";
 import { MoodIndicator } from "@/components/MoodIndicator";
@@ -140,6 +141,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [showOutfitCarousel, setShowOutfitCarousel] = useState(false);
   const [showQuestPanel, setShowQuestPanel] = useState(false);
   const [giftReaction, setGiftReaction] = useState<{ gift: Gift; reaction: CharacterReaction } | null>(null);
+  const [starters, setStarters] = useState<string[]>([]);
 
   useEffect(() => {
     currentMoodRef.current = getMood(characterId);
@@ -197,6 +199,14 @@ function ChatContent({ characterId }: { characterId: string }) {
       dispatch(receiveResponse(fullGreeting, daysAbsent >= 4 ? "sad" : "happy"));
     }
   }, [character, state.historyLoaded, state.messages.length, dispatch, characterId]);
+
+  useEffect(() => {
+    if (state.historyLoaded && state.messages.length === 0) {
+      setStarters(getStarters(characterId));
+    } else {
+      setStarters([]);
+    }
+  }, [state.historyLoaded, state.messages.length, characterId]);
 
   useEffect(() => {
     if (milestoneQueue.length > 0 && !currentMilestone) {
@@ -611,6 +621,24 @@ function ChatContent({ characterId }: { characterId: string }) {
               showAdvance={showAdvanceIndicator}
               typeSpeed={textSpeed}
             />
+          )}
+          {starters.length > 0 && showInput && (
+            <div className="flex flex-wrap gap-2 px-4 mb-2 relative z-20 animate-[fadeIn_0.4s_ease-out]">
+              {starters.map((text) => (
+                <button
+                  key={text}
+                  onClick={() => { handleSend(text); setStarters([]); }}
+                  className="px-3 py-1.5 rounded-full text-xs transition-all hover:scale-105"
+                  style={{
+                    background: `${character.theme.accent}15`,
+                    border: `1px solid ${character.theme.accent}30`,
+                    color: character.theme.accent,
+                  }}
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
           )}
           <div className="px-3 py-3 md:px-6 md:py-4">
             <form
