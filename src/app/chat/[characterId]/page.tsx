@@ -45,7 +45,7 @@ import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession
 import { ConfessionScene } from "@/components/ConfessionScene";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { VoiceToggle } from "@/components/VoiceToggle";
-import { addDiaryEntry, generateDiaryPrompt } from "@/lib/diary";
+import { addDiaryEntry } from "@/lib/diary";
 import { DiaryView } from "@/components/DiaryView";
 import { GiftShop } from "@/components/GiftShop";
 import type { Gift, CharacterReaction } from "@/lib/gifts";

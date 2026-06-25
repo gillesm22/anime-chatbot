@@ -5,7 +5,7 @@ import { parseExpressionTag, stripExpressionTags } from "@/lib/sprites/expressio
 const openai = new OpenAI();
 
 export async function POST(request: Request) {
-  const { message, characterId, history, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint } = await request.json();
+  const { message, characterId, history, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language } = await request.json();
 
   const validModels = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"];
   const model = validModels.includes(provider) ? provider : "gpt-4o";
@@ -63,6 +63,9 @@ export async function POST(request: Request) {
   }
   if (typingHint) {
     systemContent += `\n\nObservation about the user right now: ${typingHint}`;
+  }
+  if (language && language !== "en") {
+    systemContent += `\n\nIMPORTANT: The user prefers to chat in ${language === "fr" ? "French (fr-CA)" : language}. Respond in that language while staying in character.`;
   }
 
   const lengthInstructions: Record<string, string> = {
