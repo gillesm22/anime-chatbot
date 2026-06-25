@@ -123,8 +123,12 @@ export function DialogueBox({
   return (
     <div
       data-testid="dialogue-box"
+      role="button"
+      tabIndex={0}
+      aria-label="Advance dialogue"
       onClick={handleClick}
-      className="relative w-full cursor-pointer select-none mx-2 md:mx-4"
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
+      className="relative w-full cursor-pointer select-none mx-2 md:mx-4 outline-none"
       style={{
         background: "rgba(13, 13, 18, 0.88)",
         backdropFilter: "blur(12px)",

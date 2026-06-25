@@ -30,20 +30,29 @@ const CHARACTER_VOICES: Record<string, { voice: string; pitch: string; rate: str
 };
 
 export async function POST(request: Request) {
-  const { text, characterId } = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
+  }
 
-  if (!text || !characterId) {
+  const { text, characterId } = body;
+
+  if (!text || !characterId || typeof text !== "string") {
     return new Response(JSON.stringify({ error: "Missing text or characterId" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
 
+  // Cap text length to prevent abuse
+  const safeText = text.slice(0, 500);
   const config = CHARACTER_VOICES[characterId] || CHARACTER_VOICES.arisu;
 
   try {
     const tts = new EdgeTTS();
-    await tts.synthesize(text, config.voice, {
+    await tts.synthesize(safeText, config.voice, {
       pitch: config.pitch,
       rate: config.rate,
       volume: "90%",

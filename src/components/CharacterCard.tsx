@@ -43,7 +43,11 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Chat with ${character.name}`}
       onClick={() => router.push(`/chat/${character.id}`)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/chat/${character.id}`); } }}
       onMouseEnter={() => {
         setIsHovered(true);
         setHoverExpr(PREVIEW_EXPRESSIONS[Math.floor(Math.random() * PREVIEW_EXPRESSIONS.length)]);
@@ -52,7 +56,9 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
         setIsHovered(false);
         setHoverExpr(null);
       }}
-      className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[320px] sm:min-h-[420px] transition-transform duration-300"
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => { setIsHovered(false); setHoverExpr(null); }}
+      className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[320px] sm:min-h-[420px] transition-transform duration-300 outline-none focus-visible:ring-2 focus-visible:ring-white/30"
       style={{
         background: `linear-gradient(180deg, ${character.theme.tint} 0%, var(--color-bg, #0d0d12) 100%)`,
         border: `1px solid ${character.theme.accent}${isFavorite ? "60" : "30"}`,

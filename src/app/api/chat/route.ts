@@ -5,7 +5,19 @@ import { parseExpressionTag, stripExpressionTags } from "@/lib/sprites/expressio
 const openai = new OpenAI();
 
 export async function POST(request: Request) {
-  const { message, characterId, history, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language } = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
+  }
+
+  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language } = body;
+  const history = Array.isArray(body.history) ? body.history.slice(-50) : []; // Cap history at 50 messages
+
+  if (!message || typeof message !== "string") {
+    return new Response(JSON.stringify({ error: "Missing message" }), { status: 400, headers: { "Content-Type": "application/json" } });
+  }
 
   const validModels = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"];
   const model = validModels.includes(provider) ? provider : "gpt-4o";
