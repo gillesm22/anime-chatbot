@@ -269,6 +269,13 @@ function ChatContent({ characterId }: { characterId: string }) {
           switch (event.type) {
             case "expression":
               expression = event.expression;
+              // Apply expression to sprite immediately during streaming
+              dispatch(setExpression(expression));
+              playExpressionChange();
+              playMessageReceived();
+              if (expression === "angry" || expression === "surprised") {
+                triggerScreenShake(expression === "angry" ? "heavy" : "medium");
+              }
               break;
             case "text":
               fullText += event.content;
@@ -306,8 +313,6 @@ function ChatContent({ characterId }: { characterId: string }) {
       }
       currentMoodRef.current = updateMood(characterId, recentExpressionsRef.current);
 
-      playMessageReceived();
-      playExpressionChange();
       if (expression === "laugh") {
         const r = addAffinityPoints(characterId, { type: "made_her_laugh" });
         if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
@@ -317,13 +322,6 @@ function ChatContent({ characterId }: { characterId: string }) {
         if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
       }
       dispatch(receiveResponse(fullText || "...", expression));
-
-      if (expression === "angry" || expression === "surprised") {
-        triggerScreenShake(expression === "angry" ? "heavy" : "medium");
-      }
-      if (expression === "laugh" || expression === "excited") {
-        triggerScreenShake("light");
-      }
     },
     [dispatch, state.messages, characterId, userName]
   );

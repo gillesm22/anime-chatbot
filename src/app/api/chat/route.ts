@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
           fullText += delta;
 
-          if (!expressionSent && fullText.includes("\n")) {
+          if (!expressionSent && (fullText.includes("\n") || (fullText.includes("]") && fullText.length > 15))) {
             const { expression, text } = parseExpressionTag(fullText);
             expressionSent = true;
 
