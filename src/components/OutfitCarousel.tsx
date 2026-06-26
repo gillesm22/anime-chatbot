@@ -3,7 +3,6 @@ import type { Outfit } from "./OutfitSelector";
 
 const OUTFITS: { id: Outfit; label: string }[] = [
   { id: "default", label: "Default" },
-  { id: "back", label: "Back" },
   { id: "bikini-front", label: "Bikini" },
   { id: "bikini-back", label: "Bikini Back" },
   { id: "casual", label: "Casual" },
@@ -12,7 +11,6 @@ const OUTFITS: { id: Outfit; label: string }[] = [
   { id: "school-skimpy", label: "School+" },
   { id: "cheerleader", label: "Cheer" },
   { id: "cheer-extreme", label: "Cheer+" },
-  { id: "cheer-extreme-back", label: "Cheer+ Back" },
   { id: "maid", label: "Maid" },
   { id: "vampire", label: "Vampire" },
   { id: "nurse", label: "Nurse" },
