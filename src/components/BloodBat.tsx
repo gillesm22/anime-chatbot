@@ -11,36 +11,59 @@ interface BloodBatProps {
   landingMode?: boolean;
 }
 
-type BatMood = "chill" | "excited" | "scared" | "sleepy" | "smug" | "love" | "angry";
+type HexxMood = "neutral" | "happy" | "angry" | "sleepy" | "excited" | "love" | "smug" | "sad" | "surprised" | "shy" | "grumpy" | "curious";
 
-const BAT_PHRASES: Record<BatMood, string[]> = {
-  chill: ["*yawn*", "sup", "...", "*wing stretch*", "bored", "yo", "meh", "hmm"],
-  excited: ["!!!", "LET'S GO", "hehe", "yooo", "*flap flap*", "no way", "oh?!", "kyaa~!"],
-  scared: ["!!!", "nope", "bruh", "*hides behind you*", "uh oh", "not cool", "eep"],
-  sleepy: ["zzz", "...zzz", "*snore*", "5 more min", "wake me never", "*curls up*"],
-  smug: ["heh", "called it", "told ya", "*smirk*", "ez", "smooth", "classic", "too easy~"],
-  love: ["...", "hmph", "not cute", "*looks away*", "whatever", "...fine", "b-baka"],
-  angry: ["tch", "rude", "fight me", "*hiss*", "grr", "wow ok", "try that again"],
+const HEXX_SPRITES: Record<HexxMood, string> = {
+  neutral: "/sprites/hexx/neutral.png",
+  happy: "/sprites/hexx/happy.png",
+  angry: "/sprites/hexx/angry.png",
+  sleepy: "/sprites/hexx/zzz.png",
+  excited: "/sprites/hexx/excited.png",
+  love: "/sprites/hexx/love.png",
+  smug: "/sprites/hexx/smug.png",
+  sad: "/sprites/hexx/sad.png",
+  surprised: "/sprites/hexx/surprised.png",
+  shy: "/sprites/hexx/shy.png",
+  grumpy: "/sprites/hexx/grumpy.png",
+  curious: "/sprites/hexx/curious.png",
 };
 
-function getBatMood(expression?: Expression, isIdle?: boolean): BatMood {
+const HEXX_PHRASES: Record<HexxMood, string[]> = {
+  neutral: ["*yawn*", "sup", "...", "*wing stretch*", "bored", "yo", "meh", "hmm"],
+  happy: ["hehe", "yooo", "*flap flap*", "no way", "oh?!", "kyaa~!", "nice~"],
+  angry: ["tch", "rude", "fight me", "*hiss*", "grr", "wow ok", "try that again"],
+  sleepy: ["zzz", "...zzz", "*snore*", "5 more min", "wake me never", "*curls up*"],
+  excited: ["!!!", "LET'S GO", "yooo", "no way", "oh?!", "LETS GOOOO"],
+  love: ["...", "hmph", "not cute", "*looks away*", "whatever", "...fine", "b-baka"],
+  smug: ["heh", "called it", "told ya", "*smirk*", "ez", "smooth", "classic", "too easy~"],
+  sad: ["...", "oh", "*sniff*", "it's fine", "whatever"],
+  surprised: ["!!!", "wait what", "bruh", "no way", "eep"],
+  shy: ["...", "um", "*hides*", "don't look", "..."],
+  grumpy: ["tch", "leave me alone", "not in the mood", "ugh"],
+  curious: ["hmm?", "what's that", "interesting...", "tell me more"],
+};
+
+function getHexxMood(expression?: Expression, isIdle?: boolean): HexxMood {
   if (isIdle) return "sleepy";
-  if (!expression) return "chill";
+  if (!expression) return "neutral";
   switch (expression) {
-    case "happy": case "laugh": case "excited": return "excited";
-    case "sad": case "crying": return "love";
-    case "angry": return "scared";
-    case "flustered": case "shy": case "devoted": return "smug";
+    case "happy": case "laugh": return "happy";
+    case "excited": return "excited";
+    case "sad": case "crying": return "sad";
+    case "angry": return "angry";
+    case "flustered": case "devoted": return "love";
+    case "shy": return "shy";
     case "smirk": case "teasing": return "smug";
-    case "jealous": return "angry";
+    case "jealous": return "grumpy";
     case "sleepy": return "sleepy";
-    case "surprised": return "excited";
-    default: return "chill";
+    case "surprised": return "surprised";
+    case "thinking": return "curious";
+    default: return "neutral";
   }
 }
 
 export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying, landingMode }: BloodBatProps) {
-  const [mood, setMood] = useState<BatMood>("chill");
+  const [mood, setMood] = useState<HexxMood>("neutral");
   const [phrase, setPhrase] = useState<string | null>(null);
   const [isClicked, setIsClicked] = useState(false);
   const [clickCount, setClickCount] = useState(0);
@@ -73,7 +96,6 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   const handlePointerUp = useCallback(() => {
     setIsDragging(false);
     if (!hasMoved.current) {
-      // It was a click, not a drag
       setIsClicked(true);
       setClickCount((c) => c + 1);
       setTimeout(() => setIsClicked(false), 500);
@@ -92,11 +114,11 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   }, [clickCount]);
 
   useEffect(() => {
-    const newMood = getBatMood(expression, isIdle);
+    const newMood = getHexxMood(expression, isIdle);
     if (newMood !== mood) {
       setMood(newMood);
-      if (newMood !== "chill" && newMood !== "sleepy") {
-        const phrases = BAT_PHRASES[newMood];
+      if (newMood !== "neutral" && newMood !== "sleepy") {
+        const phrases = HEXX_PHRASES[newMood];
         setPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
         if (phraseTimer.current) clearTimeout(phraseTimer.current);
         phraseTimer.current = setTimeout(() => setPhrase(null), 2500);
@@ -134,11 +156,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
     return () => clearInterval(interval);
   }, [landingMode]);
 
-  const wingSpeed = mood === "excited" ? "0.25s" : mood === "sleepy" ? "2.5s" : "0.7s";
-  const isSleep = mood === "sleepy";
-  const isScared = mood === "scared";
-  const showFangs = mood === "excited" || mood === "smug" || mood === "angry" || isClicked;
-  const showBlush = mood === "smug" || mood === "love" || (clickCount >= 8 && isClicked);
+  const spriteUrl = HEXX_SPRITES[mood] || HEXX_SPRITES.neutral;
   const bodySquish = isClicked ? "scaleY(0.88) scaleX(1.08)" : isHovered ? "scaleY(1.03)" : "scaleY(1)";
 
   return (
@@ -171,18 +189,18 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
             padding: "7px 14px",
             borderRadius: "14px 14px 4px 14px",
             background: "rgba(10,10,16,0.94)",
-            border: `1.5px solid ${accentColor}50`,
+            border: "1.5px solid rgba(183,28,28,0.5)",
             color: "#f0e0e4",
             fontSize: "14px",
             fontWeight: 700,
             whiteSpace: "nowrap",
             animation: "hexxBubbleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
             letterSpacing: "0.01em",
-            boxShadow: `0 4px 16px rgba(0,0,0,0.4), 0 0 8px ${accentColor}15`,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.4), 0 0 8px rgba(183,28,28,0.15)",
             fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)",
           }}
         >
-          <span style={{ color: accentColor, marginRight: 4, fontSize: "10px", opacity: 0.6 }}>Hexx:</span>
+          <span style={{ color: "#b71c1c", marginRight: 4, fontSize: "10px", opacity: 0.6 }}>Hexx:</span>
           {phrase}
           <div style={{
             position: "absolute", bottom: "-6px", right: "16px", width: 0, height: 0,
@@ -192,181 +210,26 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         </div>
       )}
 
-      {/* Main SVG - Sanrio-inspired: big round head, tiny body, sparkle eyes */}
-      <svg
-        width="100"
-        height="90"
-        viewBox="0 0 100 90"
-        fill="none"
+      {/* Hexx PNG sprite */}
+      <img
+        src={spriteUrl}
+        alt="Hexx"
+        draggable={false}
         style={{
+          width: "100px",
+          height: "100px",
+          objectFit: "contain",
           transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease",
-          transform: `rotate(${isSleep ? 180 : headTilt}deg) ${bodySquish}`,
-          filter: `drop-shadow(0 3px 10px ${accentColor}40) ${isHovered ? `drop-shadow(0 0 16px ${accentColor}30)` : ""}`,
+          transform: `rotate(${mood === "sleepy" ? 180 : headTilt}deg) ${bodySquish}`,
+          filter: `drop-shadow(0 3px 10px rgba(183,28,28,0.4)) ${isHovered ? "drop-shadow(0 0 16px rgba(183,28,28,0.3)) brightness(1.05)" : ""}`,
+          imageRendering: "auto",
         }}
-      >
-        {/* Left wing */}
-        <g style={{ transformOrigin: "42px 38px", animation: `hexxWingL ${wingSpeed} ease-in-out infinite` }}>
-          <path d="M42 38 C36 28, 22 18, 8 22 C12 25, 14 28, 16 31 C12 28, 8 27, 4 30 C8 33, 14 35, 22 37 C16 36, 8 34, 4 38 C10 40, 20 40, 34 40 Z" fill={accentColor} opacity="0.75" />
-          {/* Wing membrane lines */}
-          <path d="M40 35 C34 27, 20 20, 10 24" stroke={accentColor} strokeWidth="0.4" opacity="0.3" fill="none" />
-          <path d="M38 32 C32 25, 16 22, 8 26" stroke={accentColor} strokeWidth="0.3" opacity="0.2" fill="none" />
-        </g>
-        {/* Right wing */}
-        <g style={{ transformOrigin: "58px 38px", animation: `hexxWingR ${wingSpeed} ease-in-out infinite` }}>
-          <path d="M58 38 C64 28, 78 18, 92 22 C88 25, 86 28, 84 31 C88 28, 92 27, 96 30 C92 33, 86 35, 78 37 C84 36, 92 34, 96 38 C90 40, 80 40, 66 40 Z" fill={accentColor} opacity="0.75" />
-          <path d="M60 35 C66 27, 80 20, 90 24" stroke={accentColor} strokeWidth="0.4" opacity="0.3" fill="none" />
-          <path d="M62 32 C68 25, 84 22, 92 26" stroke={accentColor} strokeWidth="0.3" opacity="0.2" fill="none" />
-        </g>
-
-        {/* Body - very round, Sanrio proportions (big head, smol body) */}
-        <ellipse cx="50" cy="44" rx="16" ry="18" fill="#1c1c30" />
-        <ellipse cx="50" cy="44" rx="14.5" ry="16.5" fill="#252540" />
-        {/* Belly patch - lighter, rounder */}
-        <ellipse cx="50" cy="48" rx="9" ry="9" fill="#2e2e4a" opacity="0.5" />
-
-        {/* Ears - big and cute */}
-        <path d="M36 28 L38 16 L43 27" fill="#1c1c30" />
-        <path d="M64 28 L62 16 L57 27" fill="#1c1c30" />
-        {/* Inner ear - pink accent */}
-        <path d="M38 27 L39 19 L42 26" fill={accentColor} opacity="0.2" />
-        <path d="M62 27 L61 19 L58 26" fill={accentColor} opacity="0.2" />
-
-        {/* Crown/ribbon accessory - Sanrio touch */}
-        <path d="M46 20 Q50 16, 54 20" stroke={accentColor} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <circle cx="50" cy="17" r="2" fill={accentColor} opacity="0.6" />
-
-        {/* Eyes - BIG Sanrio sparkle eyes */}
-        {isSleep ? (
-          <>
-            <path d="M40 38 Q44 42, 48 38" stroke={accentColor} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            <path d="M52 38 Q56 42, 60 38" stroke={accentColor} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-          </>
-        ) : (
-          <>
-            {/* Eye sockets */}
-            <ellipse cx="43" cy="37" rx="6" ry={isScared ? "7" : "5.5"} fill="#0e0e1a" />
-            <ellipse cx="57" cy="37" rx="6" ry={isScared ? "7" : "5.5"} fill="#0e0e1a" />
-            {/* Iris */}
-            <ellipse cx="43" cy="37.5" rx="4.5" ry={isScared ? "5.5" : "4.5"} fill={accentColor} />
-            <ellipse cx="57" cy="37.5" rx="4.5" ry={isScared ? "5.5" : "4.5"} fill={accentColor} />
-            {/* Pupil */}
-            <ellipse cx="43.5" cy="37.5" rx="2.2" ry="2.8" fill="#0a0a14" />
-            <ellipse cx="57.5" cy="37.5" rx="2.2" ry="2.8" fill="#0a0a14" />
-            {/* Big sparkle - star shaped */}
-            <circle cx="41" cy="35.5" r="1.8" fill="white" opacity="0.95" />
-            <circle cx="55" cy="35.5" r="1.8" fill="white" opacity="0.95" />
-            {/* Small sparkle */}
-            <circle cx="45" cy="39" r="0.9" fill="white" opacity="0.6" />
-            <circle cx="59" cy="39" r="0.9" fill="white" opacity="0.6" />
-            {/* Tiny star sparkle */}
-            <path d="M40 34 L40.5 33 L41 34 L42 33.5 L41 34.5 L40.5 35.5 L40 34.5 L39 35 Z" fill="white" opacity="0.4" />
-            <path d="M54 34 L54.5 33 L55 34 L56 33.5 L55 34.5 L54.5 35.5 L54 34.5 L53 35 Z" fill="white" opacity="0.4" />
-          </>
-        )}
-
-        {/* Blush - two soft ovals */}
-        {showBlush && (
-          <>
-            <ellipse cx="35" cy="42" rx="3.5" ry="2" fill="#ff6b8a" opacity="0.3" />
-            <ellipse cx="65" cy="42" rx="3.5" ry="2" fill="#ff6b8a" opacity="0.3" />
-          </>
-        )}
-
-        {/* Mouth */}
-        {showFangs ? (
-          <g>
-            <path d="M44 48 Q50 53, 56 48" stroke="#0e0e1a" strokeWidth="0.5" fill="#1a0a12" />
-            {/* Cute fangs */}
-            <path d="M45.5 48 L46 51 L47 48.5" fill="white" />
-            <path d="M54.5 48 L54 51 L53 48.5" fill="white" />
-          </g>
-        ) : isScared ? (
-          <ellipse cx="50" cy="49" rx="3" ry="2.5" fill="#1a0a12" stroke={accentColor} strokeWidth="0.5" />
-        ) : mood === "love" ? (
-          /* Pout */
-          <path d="M45 48 Q50 46, 55 48" stroke={accentColor} strokeWidth="1" fill="none" strokeLinecap="round" />
-        ) : (
-          <>
-            {/* Default smile with tiny fang */}
-            <path d="M44 47 Q50 50, 56 47" stroke={accentColor} strokeWidth="0.8" fill="none" strokeLinecap="round" />
-            <path d="M45.5 47.5 L45.8 49.5 L46.5 47.8" fill="white" opacity="0.8" />
-          </>
-        )}
-
-        {/* Tail - curly with heart tip */}
-        <path
-          d="M50 62 Q56 66, 60 63 Q64 60, 66 63 Q68 66, 66 68"
-          stroke={accentColor}
-          strokeWidth="1.8"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.65"
-          style={{ animation: "hexxTail 2.5s ease-in-out infinite" }}
-        />
-        {/* Heart on tail tip */}
-        <path d="M64.5 67 Q64.5 65.5, 66 66.5 Q67.5 65.5, 67.5 67 Q67.5 68.5, 66 70 Q64.5 68.5, 64.5 67 Z" fill={accentColor} opacity="0.5" />
-
-        {/* Tiny paws */}
-        <ellipse cx="43" cy="60" rx="3.5" ry="2" fill="#1c1c30" />
-        <ellipse cx="57" cy="60" rx="3.5" ry="2" fill="#1c1c30" />
-
-        {/* Zzz for sleepy */}
-        {isSleep && (
-          <g style={{ animation: "hexxZzz 2s ease-in-out infinite" }}>
-            <text x="64" y="28" fill={accentColor} fontSize="10" fontWeight="bold" opacity="0.7">z</text>
-            <text x="70" y="22" fill={accentColor} fontSize="7" fontWeight="bold" opacity="0.4">z</text>
-          </g>
-        )}
-
-        {/* Angry vein */}
-        {mood === "angry" && (
-          <path d="M60 24 L63 26 L61 23 L64 25" stroke={accentColor} strokeWidth="1.2" fill="none" opacity="0.6" />
-        )}
-
-        {/* Sparkles when excited */}
-        {mood === "excited" && (
-          <g style={{ animation: "hexxSparkle 0.6s ease-in-out infinite" }}>
-            <path d="M20 22 L21.5 18 L23 22 L27 20 L23 24 L21.5 28 L20 24 L16 26 Z" fill={accentColor} opacity="0.45" />
-            <path d="M76 18 L77.5 14 L79 18 L83 16 L79 20 L77.5 24 L76 20 L72 22 Z" fill={accentColor} opacity="0.35" />
-          </g>
-        )}
-
-        {/* Floating heart */}
-        {(mood === "love" || clickCount >= 12) && !isClicked && (
-          <g style={{ animation: "hexxHeart 1.5s ease-in-out infinite" }}>
-            <path d="M47 14 Q47 11, 50 13 Q53 11, 53 14 Q53 17, 50 20 Q47 17, 47 14 Z" fill="#ff6b8a" opacity="0.45" />
-          </g>
-        )}
-      </svg>
+      />
 
       <style>{`
-        @keyframes hexxWingL {
-          0%, 100% { transform: rotate(0deg) scaleY(1); }
-          50% { transform: rotate(-15deg) scaleY(0.82); }
-        }
-        @keyframes hexxWingR {
-          0%, 100% { transform: rotate(0deg) scaleY(1); }
-          50% { transform: rotate(15deg) scaleY(0.82); }
-        }
         @keyframes hexxBubbleIn {
           from { opacity: 0; transform: translateY(8px) scale(0.6); }
           to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes hexxTail {
-          0%, 100% { transform: translateX(0) rotate(0deg); }
-          50% { transform: translateX(3px) rotate(5deg); }
-        }
-        @keyframes hexxZzz {
-          0%, 100% { transform: translateY(0); opacity: 0.7; }
-          50% { transform: translateY(-6px); opacity: 0.3; }
-        }
-        @keyframes hexxSparkle {
-          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.45; }
-          50% { transform: scale(1.3) rotate(15deg); opacity: 0.8; }
-        }
-        @keyframes hexxHeart {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.45; }
-          50% { transform: translateY(-5px) scale(1.2); opacity: 0.65; }
         }
       `}</style>
     </div>
