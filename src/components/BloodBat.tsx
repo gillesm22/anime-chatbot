@@ -251,24 +251,6 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         </div>
       )}
 
-      {/* Mood label */}
-      <div style={{
-        position: "absolute",
-        top: "-16px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        fontSize: "9px",
-        color: "rgba(183,28,28,0.5)",
-        fontWeight: 600,
-        letterSpacing: "0.05em",
-        textTransform: "uppercase",
-        whiteSpace: "nowrap",
-        opacity: isHovered ? 1 : 0,
-        transition: "opacity 0.2s ease",
-      }}>
-        {mood}
-      </div>
-
       {/* Hexx PNG sprite - rendered at 2x for retina crispness */}
       <img
         src={spriteUrl}
