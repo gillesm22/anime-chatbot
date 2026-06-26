@@ -49,3 +49,19 @@ export function stripExpressionTags(text: string, trim = true): string {
   }
   return result;
 }
+
+const SCENE_TAG_SINGLE = /\[scene:([a-z_]+)\]/;
+const SCENE_TAG_GLOBAL = /\[scene:[a-z_]+\]/g;
+
+export function parseSceneTag(
+  text: string
+): { sceneId: string; text: string } | null {
+  const match = text.match(SCENE_TAG_SINGLE);
+  if (!match) return null;
+  const sceneId = match[1];
+  const stripped = text
+    .replace(SCENE_TAG_GLOBAL, " ")
+    .replace(/  +/g, " ")
+    .trim();
+  return { sceneId, text: stripped };
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSpritePaths, parseExpressionTag } from "@/lib/sprites/expressions";
+import { getSpritePaths, parseExpressionTag, parseSceneTag } from "@/lib/sprites/expressions";
 import { arisu } from "@/lib/characters/arisu";
 
 describe("getSpritePaths", () => {
@@ -51,5 +51,31 @@ describe("parseExpressionTag", () => {
   it("handles tag with extra whitespace", () => {
     const result = parseExpressionTag("  [surprised]  \n  Wow!");
     expect(result).toEqual({ expression: "surprised", text: "Wow!" });
+  });
+});
+
+describe("parseSceneTag", () => {
+  it("extracts scene tag from text", () => {
+    const result = parseSceneTag("Let's go to the beach! [scene:beach] It's beautiful.");
+    expect(result).toEqual({ sceneId: "beach", text: "Let's go to the beach! It's beautiful." });
+  });
+
+  it("returns null when no scene tag", () => {
+    expect(parseSceneTag("Just a normal message.")).toBeNull();
+  });
+
+  it("handles scene tag at start of text", () => {
+    const result = parseSceneTag("[scene:rain] The sky opened up.");
+    expect(result).toEqual({ sceneId: "rain", text: "The sky opened up." });
+  });
+
+  it("handles scene tag at end of text", () => {
+    const result = parseSceneTag("Follow me. [scene:rooftop]");
+    expect(result).toEqual({ sceneId: "rooftop", text: "Follow me." });
+  });
+
+  it("only extracts the first scene tag", () => {
+    const result = parseSceneTag("[scene:cafe] Let's move. [scene:beach]");
+    expect(result!.sceneId).toBe("cafe");
   });
 });
