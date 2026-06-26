@@ -13,6 +13,8 @@ interface BloodBatProps {
 
 type HexxMood = "neutral" | "happy" | "angry" | "sleepy" | "excited" | "love" | "smug" | "sad" | "surprised" | "shy" | "grumpy" | "curious";
 
+const ALL_MOODS: HexxMood[] = ["neutral", "happy", "angry", "sleepy", "excited", "love", "smug", "sad", "surprised", "shy", "grumpy", "curious"];
+
 const HEXX_SPRITES: Record<HexxMood, string> = {
   neutral: "/sprites/hexx/neutral.png",
   happy: "/sprites/hexx/happy.png",
@@ -62,6 +64,11 @@ function getHexxMood(expression?: Expression, isIdle?: boolean): HexxMood {
   }
 }
 
+const MIN_SIZE = 60;
+const MAX_SIZE = 200;
+const DEFAULT_SIZE = 100;
+const SIZE_KEY = "anime-chatbot-hexx-size";
+
 export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying, landingMode }: BloodBatProps) {
   const [mood, setMood] = useState<HexxMood>("neutral");
   const [phrase, setPhrase] = useState<string | null>(null);
@@ -69,14 +76,40 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   const [clickCount, setClickCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [headTilt, setHeadTilt] = useState(0);
+  const [size, setSize] = useState(DEFAULT_SIZE);
   const phraseTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const tiltTimer = useRef<ReturnType<typeof setInterval>>(undefined);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Drag state
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, px: 0, py: 0 });
   const hasMoved = useRef(false);
+
+  // Load saved size
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SIZE_KEY);
+      if (saved) setSize(Math.min(MAX_SIZE, Math.max(MIN_SIZE, Number(saved))));
+    } catch {}
+  }, []);
+
+  // Scroll wheel to resize
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setSize((prev) => {
+        const next = Math.min(MAX_SIZE, Math.max(MIN_SIZE, prev - e.deltaY * 0.3));
+        try { localStorage.setItem(SIZE_KEY, String(Math.round(next))); } catch {}
+        return next;
+      });
+    };
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, []);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     setIsDragging(true);
@@ -97,8 +130,13 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
     setIsDragging(false);
     if (!hasMoved.current) {
       setIsClicked(true);
-      setClickCount((c) => c + 1);
       setTimeout(() => setIsClicked(false), 500);
+      setClickCount((c) => c + 1);
+
+      // Click cycles through expressions
+      const nextMoodIdx = (ALL_MOODS.indexOf(mood) + 1) % ALL_MOODS.length;
+      const nextMood = ALL_MOODS[nextMoodIdx];
+      setMood(nextMood);
 
       const clickPhrases = clickCount < 3
         ? ["hey!", "what", "*squeak*", "yo?!", "watch it"]
@@ -111,8 +149,9 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
       if (phraseTimer.current) clearTimeout(phraseTimer.current);
       phraseTimer.current = setTimeout(() => setPhrase(null), 2500);
     }
-  }, [clickCount]);
+  }, [clickCount, mood]);
 
+  // Auto mood from character expression (only override if not manually cycling)
   useEffect(() => {
     const newMood = getHexxMood(expression, isIdle);
     if (newMood !== mood) {
@@ -124,7 +163,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         phraseTimer.current = setTimeout(() => setPhrase(null), 2500);
       }
     }
-  }, [expression, isIdle, mood]);
+  }, [expression, isIdle]);
 
   useEffect(() => {
     tiltTimer.current = setInterval(() => {
@@ -158,9 +197,11 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
 
   const spriteUrl = HEXX_SPRITES[mood] || HEXX_SPRITES.neutral;
   const bodySquish = isClicked ? "scaleY(0.88) scaleX(1.08)" : isHovered ? "scaleY(1.03)" : "scaleY(1)";
+  const bubbleSize = Math.max(12, Math.round(size * 0.14));
 
   return (
     <div
+      ref={containerRef}
       style={{
         position: "fixed",
         bottom: `calc(80px - ${pos.y}px)`,
@@ -176,7 +217,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
       onPointerCancel={handlePointerUp}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      title="Hexx (drag me!)"
+      title="Hexx (click to change expression, scroll to resize, drag to move!)"
     >
       {/* Speech bubble */}
       {phrase && (
@@ -186,12 +227,12 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
             bottom: "100%",
             right: "-8px",
             marginBottom: "8px",
-            padding: "7px 14px",
+            padding: `${Math.max(5, bubbleSize * 0.5)}px ${Math.max(10, bubbleSize)}px`,
             borderRadius: "14px 14px 4px 14px",
             background: "rgba(10,10,16,0.94)",
             border: "1.5px solid rgba(183,28,28,0.5)",
             color: "#f0e0e4",
-            fontSize: "14px",
+            fontSize: `${bubbleSize}px`,
             fontWeight: 700,
             whiteSpace: "nowrap",
             animation: "hexxBubbleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -200,7 +241,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
             fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)",
           }}
         >
-          <span style={{ color: "#b71c1c", marginRight: 4, fontSize: "10px", opacity: 0.6 }}>Hexx:</span>
+          <span style={{ color: "#b71c1c", marginRight: 4, fontSize: `${Math.max(9, bubbleSize * 0.7)}px`, opacity: 0.6 }}>Hexx:</span>
           {phrase}
           <div style={{
             position: "absolute", bottom: "-6px", right: "16px", width: 0, height: 0,
@@ -210,21 +251,54 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         </div>
       )}
 
-      {/* Hexx PNG sprite */}
+      {/* Mood label */}
+      <div style={{
+        position: "absolute",
+        top: "-16px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        fontSize: "9px",
+        color: "rgba(183,28,28,0.5)",
+        fontWeight: 600,
+        letterSpacing: "0.05em",
+        textTransform: "uppercase",
+        whiteSpace: "nowrap",
+        opacity: isHovered ? 1 : 0,
+        transition: "opacity 0.2s ease",
+      }}>
+        {mood}
+      </div>
+
+      {/* Hexx PNG sprite - rendered at 2x for retina crispness */}
       <img
         src={spriteUrl}
-        alt="Hexx"
+        alt={`Hexx - ${mood}`}
         draggable={false}
         style={{
-          width: "100px",
-          height: "100px",
+          width: `${size}px`,
+          height: `${size}px`,
           objectFit: "contain",
-          transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease",
+          transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease, width 0.2s ease, height 0.2s ease",
           transform: `rotate(${mood === "sleepy" ? 180 : headTilt}deg) ${bodySquish}`,
           filter: `drop-shadow(0 3px 10px rgba(183,28,28,0.4)) ${isHovered ? "drop-shadow(0 0 16px rgba(183,28,28,0.3)) brightness(1.05)" : ""}`,
           imageRendering: "auto",
         }}
       />
+
+      {/* Size indicator on hover */}
+      {isHovered && (
+        <div style={{
+          position: "absolute",
+          bottom: "-14px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontSize: "8px",
+          color: "rgba(255,255,255,0.3)",
+          whiteSpace: "nowrap",
+        }}>
+          scroll to resize
+        </div>
+      )}
 
       <style>{`
         @keyframes hexxBubbleIn {
