@@ -11,9 +11,9 @@ interface BloodBatProps {
   landingMode?: boolean;
 }
 
-type HexxMood = "neutral" | "happy" | "angry" | "sleepy" | "excited" | "love" | "smug" | "sad" | "surprised" | "shy" | "grumpy" | "curious";
+type HexxMood = "neutral" | "happy" | "angry" | "sleepy" | "excited" | "love" | "smug" | "sad" | "surprised" | "shy" | "grumpy" | "curious" | "cool" | "scared" | "rage" | "cozy" | "queen" | "edgy" | "hearteyes" | "tongue" | "proud" | "crying" | "wizard" | "detective" | "dj" | "chef" | "guitar" | "playful" | "lol" | "nature";
 
-const ALL_MOODS: HexxMood[] = ["neutral", "happy", "angry", "sleepy", "excited", "love", "smug", "sad", "surprised", "shy", "grumpy", "curious"];
+const ALL_MOODS: HexxMood[] = ["neutral", "happy", "angry", "sleepy", "excited", "love", "smug", "sad", "surprised", "shy", "grumpy", "curious", "cool", "scared", "rage", "cozy", "queen", "edgy", "hearteyes", "tongue", "proud", "crying", "wizard", "detective", "dj", "chef", "guitar", "playful", "lol", "nature"];
 
 const HEXX_SPRITES: Record<HexxMood, string> = {
   neutral: "/sprites/hexx/neutral.png",
@@ -28,6 +28,24 @@ const HEXX_SPRITES: Record<HexxMood, string> = {
   shy: "/sprites/hexx/shy.png",
   grumpy: "/sprites/hexx/grumpy.png",
   curious: "/sprites/hexx/curious.png",
+  cool: "/sprites/hexx/cool.png",
+  scared: "/sprites/hexx/scared.png",
+  rage: "/sprites/hexx/rage.png",
+  cozy: "/sprites/hexx/cozy.png",
+  queen: "/sprites/hexx/queen.png",
+  edgy: "/sprites/hexx/edgy.png",
+  hearteyes: "/sprites/hexx/hearteyes.png",
+  tongue: "/sprites/hexx/tongue.png",
+  proud: "/sprites/hexx/proud.png",
+  crying: "/sprites/hexx/crying.png",
+  wizard: "/sprites/hexx/wizard.png",
+  detective: "/sprites/hexx/detective.png",
+  dj: "/sprites/hexx/dj.png",
+  chef: "/sprites/hexx/chef.png",
+  guitar: "/sprites/hexx/guitar.png",
+  playful: "/sprites/hexx/playful.png",
+  lol: "/sprites/hexx/lol.png",
+  nature: "/sprites/hexx/nature.png",
 };
 
 const HEXX_PHRASES: Record<HexxMood, string[]> = {
@@ -43,6 +61,24 @@ const HEXX_PHRASES: Record<HexxMood, string[]> = {
   shy: ["...", "um", "*hides*", "don't look", "..."],
   grumpy: ["tch", "leave me alone", "not in the mood", "ugh"],
   curious: ["hmm?", "what's that", "interesting...", "tell me more"],
+  cool: ["B)", "too cool", "deal with it", "sunglasses emoji"],
+  scared: ["AAAH", "nope nope nope", "*hides*", "help"],
+  rage: ["AAARRGH", "I WILL END YOU", "FIGHT ME", "that's IT"],
+  cozy: ["*snuggle*", "so warm", "don't move", "perfect"],
+  queen: ["bow down", "that's queen to you", "crown me", "naturally"],
+  edgy: ["...", "darkness", "you wouldn't understand", "hmph"],
+  hearteyes: ["omg", "so pretty", "I can't", "*sparkle eyes*"],
+  tongue: ["bleh~", "nyeh", "*raspberry*", "catch me if you can"],
+  proud: ["of course", "as expected", "you're welcome", "I'm the best"],
+  crying: ["*sobbing*", "why", "it's not fair", "I'm not crying"],
+  wizard: ["abracadabra", "*magic*", "I put a spell on you", "hocus pocus"],
+  detective: ["elementary", "suspicious...", "I see everything", "clue found"],
+  dj: ["drop the bass", "*wub wub*", "TURN UP", "this is my jam"],
+  chef: ["chef's kiss", "perfection", "bon appetit", "taste this"],
+  guitar: ["*shreds*", "rock on", "anyway here's wonderwall", "encore!"],
+  playful: ["catch me~", "hehe", "can't touch this", "wheee"],
+  lol: ["HAHAHAHA", "I'm dying", "LMAOOO", "stop I can't"],
+  nature: ["peaceful", "*butterfly*", "so pretty", "I love it here"],
 };
 
 function getHexxMood(expression?: Expression, isIdle?: boolean): HexxMood {
@@ -77,6 +113,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   const [isHovered, setIsHovered] = useState(false);
   const [headTilt, setHeadTilt] = useState(0);
   const [size, setSize] = useState(DEFAULT_SIZE);
+  const [sparkle, setSparkle] = useState(false);
   const phraseTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const tiltTimer = useRef<ReturnType<typeof setInterval>>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -217,7 +254,7 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
       onPointerCancel={handlePointerUp}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      title="Hexx (click to change expression, scroll to resize, drag to move!)"
+      onDoubleClick={(e) => { e.stopPropagation(); setSparkle((s) => !s); }}
     >
       {/* Speech bubble */}
       {phrase && (
@@ -267,18 +304,25 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         }}
       />
 
-      {/* Size indicator on hover */}
-      {isHovered && (
-        <div style={{
-          position: "absolute",
-          bottom: "-14px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontSize: "8px",
-          color: "rgba(255,255,255,0.3)",
-          whiteSpace: "nowrap",
-        }}>
-          scroll to resize
+      {/* Sparkle overlay */}
+      {sparkle && (
+        <div style={{ position: "absolute", inset: -10, pointerEvents: "none", overflow: "visible" }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                width: "4px",
+                height: "4px",
+                borderRadius: "50%",
+                background: i % 2 === 0 ? "#fff" : "#ff4444",
+                boxShadow: `0 0 6px ${i % 2 === 0 ? "#fff" : "#ff4444"}`,
+                left: `${15 + Math.random() * 70}%`,
+                top: `${10 + Math.random() * 80}%`,
+                animation: `hexxSparkle ${1 + Math.random() * 1.5}s ease-in-out ${Math.random() * 1}s infinite`,
+              }}
+            />
+          ))}
         </div>
       )}
 
@@ -286,6 +330,11 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
         @keyframes hexxBubbleIn {
           from { opacity: 0; transform: translateY(8px) scale(0.6); }
           to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes hexxSparkle {
+          0%, 100% { opacity: 0; transform: scale(0.5) translateY(0); }
+          30% { opacity: 1; transform: scale(1.2) translateY(-8px); }
+          70% { opacity: 0.8; transform: scale(1) translateY(-4px); }
         }
       `}</style>
     </div>
