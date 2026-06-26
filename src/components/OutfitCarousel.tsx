@@ -184,6 +184,7 @@ export function OutfitCarousel({
                   <img
                     src={`${basePath}/body-${outfit.id === "default" ? "neutral" : outfit.id}.png`}
                     alt={outfit.label}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     style={{
                       width: "100%",
                       height: "100%",
