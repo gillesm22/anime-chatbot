@@ -20,6 +20,8 @@ export interface PlayerStats {
   totalMilestones: number;
   totalOutfits: number;
   favoriteCharacter: { id: string; name: string; messages: number } | null;
+  /** Estimated total play time in minutes (from message timestamps) */
+  estimatedPlayTimeMinutes: number;
   /** Per-character affinity snapshot */
   characterBreakdown: {
     id: string;
@@ -109,6 +111,32 @@ export function computePlayerStats(): PlayerStats {
     }
   }
 
+  // Estimate play time from message timestamps across all characters.
+  // Sum gaps between consecutive messages, capping each gap at 5 min
+  // to avoid counting AFK time.
+  let estimatedPlayTimeMs = 0;
+  for (const char of charList) {
+    try {
+      const raw = typeof window !== "undefined"
+        ? localStorage.getItem(`anime-chatbot-history-${char.id}`)
+        : null;
+      if (!raw) continue;
+      const msgs: { timestamp?: number }[] = JSON.parse(raw);
+      const MAX_GAP = 5 * 60 * 1000; // 5 minutes
+      for (let i = 1; i < msgs.length; i++) {
+        const prev = msgs[i - 1].timestamp;
+        const curr = msgs[i].timestamp;
+        if (prev && curr) {
+          const gap = curr - prev;
+          if (gap > 0 && gap < MAX_GAP) {
+            estimatedPlayTimeMs += gap;
+          }
+        }
+      }
+    } catch { /* skip corrupted data */ }
+  }
+  const estimatedPlayTimeMinutes = Math.round(estimatedPlayTimeMs / 60000);
+
   const averageLevel =
     breakdown.length > 0
       ? Math.round((breakdown.reduce((sum, b) => sum + b.level, 0) / breakdown.length) * 10) / 10
@@ -126,6 +154,7 @@ export function computePlayerStats(): PlayerStats {
     totalMilestones,
     totalOutfits,
     favoriteCharacter,
+    estimatedPlayTimeMinutes,
     characterBreakdown: breakdown,
   };
 }

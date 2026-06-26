@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-bg text-text antialiased" suppressHydrationWarning>
+        <SplashScreen />
         <OfflineIndicator />
         <script dangerouslySetInnerHTML={{ __html: `
           // Suppress hydration error overlay in dev

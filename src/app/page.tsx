@@ -141,12 +141,12 @@ function HomeContent() {
       {/* Title */}
       <div className="text-center relative z-10 animate-[fadeIn_0.6s_ease-out]">
         <h1
-          className="text-2xl sm:text-4xl md:text-5xl font-light tracking-widest uppercase bg-clip-text text-transparent mb-3"
+          className="text-4xl sm:text-6xl md:text-7xl font-light tracking-[0.3em] uppercase bg-clip-text text-transparent mb-2"
           style={{ backgroundImage: "linear-gradient(to right, #f472b6, #e53935, #fb923c, #a78bfa, #7b1fa2)" }}
         >
-          Choose Your Companion
+          HEXXII
         </h1>
-        <p className="text-text-secondary text-sm tracking-wide inline-flex items-center justify-center gap-2">
+        <p className="text-text-secondary text-sm tracking-wide inline-flex items-center justify-center gap-2 mb-1">
           <img
             src="/sprites/hexx/neutral.png"
             alt="Hexx"
@@ -154,7 +154,7 @@ function HomeContent() {
             style={{ width: 40, height: 40, objectFit: "cover", filter: "drop-shadow(0 0 6px rgba(229,57,53,0.4))" }}
             draggable={false}
           />
-          <span>Five voices. Five worlds. One conversation away.</span>
+          <span>Choose Your Companion</span>
         </p>
         {(() => {
           if (isFirstRun()) {

@@ -152,6 +152,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [showGiftShop, setShowGiftShop] = useState(false);
   const [showOutfitCarousel, setShowOutfitCarousel] = useState(false);
   const [showQuestPanel, setShowQuestPanel] = useState(false);
+  const [showMoreControls, setShowMoreControls] = useState(false);
   const [giftReaction, setGiftReaction] = useState<{ gift: Gift; reaction: CharacterReaction } | null>(null);
   const [starters, setStarters] = useState<string[]>([]);
 
@@ -426,11 +427,8 @@ function ChatContent({ characterId }: { characterId: string }) {
         )}
         {/* Control bar */}
         <div className="flex items-center justify-between px-3 py-2 md:px-6 md:py-3 relative z-20" style={{ background: "rgba(13,13,18,0.4)", backdropFilter: "blur(8px)" }}>
-          {/* Left - back + history toggle + theme */}
+          {/* Left - essential controls always visible */}
           <div className="flex items-center gap-2 md:gap-4">
-            <VoiceToggle />
-            <ThemeToggle />
-            <LanguageToggle />
             <button
               onClick={() => router.push("/")}
               className="flex items-center gap-1 md:gap-2 text-text-secondary hover:text-text transition-colors text-xs md:text-sm"
@@ -440,16 +438,8 @@ function ChatContent({ characterId }: { characterId: string }) {
               </svg>
               <span className="hidden sm:inline">Back</span>
             </button>
-            <Link
-              href="/settings"
-              className="flex items-center text-text-secondary hover:text-text transition-colors"
-              title="Settings"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6.86 1.45a1.2 1.2 0 0 1 2.28 0l.27.82a1.2 1.2 0 0 0 1.52.74l.82-.27a1.2 1.2 0 0 1 1.61 1.61l-.27.82a1.2 1.2 0 0 0 .74 1.52l.82.27a1.2 1.2 0 0 1 0 2.28l-.82.27a1.2 1.2 0 0 0-.74 1.52l.27.82a1.2 1.2 0 0 1-1.61 1.61l-.82-.27a1.2 1.2 0 0 0-1.52.74l-.27.82a1.2 1.2 0 0 1-2.28 0l-.27-.82a1.2 1.2 0 0 0-1.52-.74l-.82.27a1.2 1.2 0 0 1-1.61-1.61l.27-.82a1.2 1.2 0 0 0-.74-1.52l-.82-.27a1.2 1.2 0 0 1 0-2.28l.82-.27a1.2 1.2 0 0 0 .74-1.52l-.27-.82A1.2 1.2 0 0 1 4.25 1.9l.82.27a1.2 1.2 0 0 0 1.52-.74l.27-.82Z" stroke="currentColor" strokeWidth="1.2" />
-                <circle cx="8" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.2" />
-              </svg>
-            </Link>
+            <VoiceToggle />
+            <ThemeToggle />
             <button
               onClick={() => setShowHistory((prev) => !prev)}
               className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm transition-colors"
@@ -458,72 +448,104 @@ function ChatContent({ characterId }: { characterId: string }) {
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              Log
+              <span className="hidden sm:inline">Log</span>
             </button>
-            {state.messages.length > 0 && (
-              <>
-                <button
-                  onClick={() => exportAsText(state.messages, character.name)}
-                  className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
-                  title="Export chat"
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setShowScreenshot(true)}
-                  className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
-                  title="Screenshot mode"
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <rect x="1.5" y="3.5" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-                    <circle cx="8" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.3" />
-                    <path d="M5.5 3.5L6.5 1.5h3l1 2" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </>
-            )}
+
+            {/* Mobile: "..." toggle for secondary actions */}
             <button
-              onClick={() => setShowDiary(true)}
-              className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-              style={{ color: character.theme.accent, opacity: 0.7 }}
-              title="Diary"
+              onClick={() => setShowMoreControls((prev) => !prev)}
+              className="md:hidden flex items-center justify-center w-6 h-6 rounded-full transition-colors text-xs"
+              style={{
+                color: showMoreControls ? character.theme.accent : "rgba(255,255,255,0.5)",
+                background: showMoreControls ? `${character.theme.accent}20` : "transparent",
+              }}
+              title="More actions"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="2" y="1" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
-                <path d="M4 1v14" stroke="currentColor" strokeWidth="1.3"/>
-              </svg>
-              <span className="hidden sm:inline">Diary</span>
-            </button>
-            <button
-              onClick={() => setShowGiftShop(true)}
-              className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-              style={{ color: character.theme.accent, opacity: 0.7 }}
-              title="Gifts"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="7" width="14" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M8 7v8" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M1 10h14" stroke="currentColor" strokeWidth="1" opacity="0.4"/>
-                <path d="M8 7C8 7 6 5.5 4.5 4.5C3 3.5 3 1.5 5 1.5C7 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                <path d="M8 7C8 7 10 5.5 11.5 4.5C13 3.5 13 1.5 11 1.5C9 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
-              <span className="hidden sm:inline">Gifts</span>
-            </button>
-            <button
-              onClick={() => setShowScenePicker((prev) => !prev)}
-              className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-              style={{ color: showScenePicker ? character.theme.accent : "rgba(255,255,255,0.5)" }}
-              title="Change scene"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M1 10l4-3 3 2 4-4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" strokeLinecap="round"/>
-                <circle cx="11" cy="5.5" r="1.5" stroke="currentColor" strokeWidth="1"/>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="3" cy="7" r="1.2" fill="currentColor" />
+                <circle cx="7" cy="7" r="1.2" fill="currentColor" />
+                <circle cx="11" cy="7" r="1.2" fill="currentColor" />
               </svg>
             </button>
+
+            {/* Secondary actions: always visible on md+, toggled on mobile */}
+            <div className={`${showMoreControls ? "flex" : "hidden"} md:flex items-center gap-2 md:gap-4`}>
+              <LanguageToggle />
+              <Link
+                href="/settings"
+                className="flex items-center text-text-secondary hover:text-text transition-colors"
+                title="Settings"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6.86 1.45a1.2 1.2 0 0 1 2.28 0l.27.82a1.2 1.2 0 0 0 1.52.74l.82-.27a1.2 1.2 0 0 1 1.61 1.61l-.27.82a1.2 1.2 0 0 0 .74 1.52l.82.27a1.2 1.2 0 0 1 0 2.28l-.82.27a1.2 1.2 0 0 0-.74 1.52l.27.82a1.2 1.2 0 0 1-1.61 1.61l-.82-.27a1.2 1.2 0 0 0-1.52.74l-.27.82a1.2 1.2 0 0 1-2.28 0l-.27-.82a1.2 1.2 0 0 0-1.52-.74l-.82.27a1.2 1.2 0 0 1-1.61-1.61l.27-.82a1.2 1.2 0 0 0-.74-1.52l-.82-.27a1.2 1.2 0 0 1 0-2.28l.82-.27a1.2 1.2 0 0 0 .74-1.52l-.27-.82A1.2 1.2 0 0 1 4.25 1.9l.82.27a1.2 1.2 0 0 0 1.52-.74l.27-.82Z" stroke="currentColor" strokeWidth="1.2" />
+                  <circle cx="8" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.2" />
+                </svg>
+              </Link>
+              {state.messages.length > 0 && (
+                <>
+                  <button
+                    onClick={() => exportAsText(state.messages, character.name)}
+                    className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
+                    title="Export chat"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setShowScreenshot(true)}
+                    className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
+                    title="Screenshot mode"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <rect x="1.5" y="3.5" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                      <circle cx="8" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.3" />
+                      <path d="M5.5 3.5L6.5 1.5h3l1 2" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => setShowDiary(true)}
+                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
+                style={{ color: character.theme.accent, opacity: 0.7 }}
+                title="Diary"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="2" y="1" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+                  <path d="M4 1v14" stroke="currentColor" strokeWidth="1.3"/>
+                </svg>
+                <span className="hidden sm:inline">Diary</span>
+              </button>
+              <button
+                onClick={() => setShowGiftShop(true)}
+                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
+                style={{ color: character.theme.accent, opacity: 0.7 }}
+                title="Gifts"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="1" y="7" width="14" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M8 7v8" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M1 10h14" stroke="currentColor" strokeWidth="1" opacity="0.4"/>
+                  <path d="M8 7C8 7 6 5.5 4.5 4.5C3 3.5 3 1.5 5 1.5C7 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                  <path d="M8 7C8 7 10 5.5 11.5 4.5C13 3.5 13 1.5 11 1.5C9 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                <span className="hidden sm:inline">Gifts</span>
+              </button>
+              <button
+                onClick={() => setShowScenePicker((prev) => !prev)}
+                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
+                style={{ color: showScenePicker ? character.theme.accent : "rgba(255,255,255,0.5)" }}
+                title="Change scene"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M1 10l4-3 3 2 4-4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" strokeLinecap="round"/>
+                  <circle cx="11" cy="5.5" r="1.5" stroke="currentColor" strokeWidth="1"/>
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Center - name + info */}

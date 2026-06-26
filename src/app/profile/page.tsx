@@ -45,7 +45,7 @@ export default function ProfilePage() {
     <PageTransition>
       <div
         className="min-h-screen flex flex-col"
-        style={{ background: "linear-gradient(180deg, var(--color-surface, #16161e) 0%, var(--color-bg, #0d0d12) 100%)" }}
+        style={{ background: `linear-gradient(180deg, ${classDef.theme.accent}12 0%, var(--color-surface, #16161e) 30%, var(--color-bg, #0d0d12) 100%)` }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
@@ -80,31 +80,43 @@ export default function ProfilePage() {
             variants={itemVariants}
             className="rounded-2xl p-6 mb-8 relative overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${classDef.theme.accent}18, ${classDef.theme.accent}08)`,
-              border: `1px solid ${classDef.theme.accent}30`,
+              background: `linear-gradient(135deg, ${classDef.theme.accent}20, ${classDef.theme.accent}08, transparent)`,
+              border: `1px solid ${classDef.theme.accent}35`,
+              boxShadow: `0 4px 24px ${classDef.theme.accent}10`,
             }}
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0"
-                style={{
-                  border: `2px solid ${classDef.theme.accent}60`,
-                  boxShadow: `0 0 16px ${classDef.theme.glow}`,
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={classDef.avatarPath}
-                  alt={classDef.label}
-                  className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            <div className="flex flex-col items-center gap-3 mb-5">
+              {/* Avatar with glow aura */}
+              <div className="relative">
+                {/* Aura glow behind avatar */}
+                <div
+                  className="absolute inset-0 rounded-full blur-xl"
+                  style={{
+                    background: `radial-gradient(circle, ${classDef.theme.accent}40 0%, transparent 70%)`,
+                    transform: "scale(1.5)",
+                  }}
                 />
+                <div
+                  className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0"
+                  style={{
+                    border: `3px solid ${classDef.theme.accent}70`,
+                    boxShadow: `0 0 24px ${classDef.theme.glow}, 0 0 48px ${classDef.theme.accent}20`,
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={classDef.avatarPath}
+                    alt={classDef.label}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-light tracking-wide text-text">
+              <div className="text-center">
+                <h1 className="text-2xl font-light tracking-wide text-text">
                   {hero.name || "Hero"}
                 </h1>
-                <p className="text-xs tracking-wide" style={{ color: classDef.theme.accent }}>
+                <p className="text-sm tracking-widest uppercase mt-1" style={{ color: classDef.theme.accent }}>
                   {classDef.title}
                 </p>
               </div>
@@ -150,6 +162,14 @@ export default function ProfilePage() {
               <StatBox label="Longest Streak" value={`${stats.longestStreak}d`} />
               <StatBox label="Milestones" value={stats.totalMilestones} />
               <StatBox label="Outfits Unlocked" value={stats.totalOutfits} />
+              <StatBox
+                label="Total Play Time"
+                value={
+                  stats.estimatedPlayTimeMinutes >= 60
+                    ? `${Math.floor(stats.estimatedPlayTimeMinutes / 60)}h ${stats.estimatedPlayTimeMinutes % 60}m`
+                    : `${stats.estimatedPlayTimeMinutes}m`
+                }
+              />
             </div>
           </motion.section>
 
@@ -179,7 +199,7 @@ export default function ProfilePage() {
 
           {/* Per-Character Breakdown */}
           <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
+            <h2 className="text-sm font-medium tracking-wide uppercase mb-3" style={{ color: classDef.theme.accent, opacity: 0.8 }}>
               Character Bonds
             </h2>
             <div
@@ -253,17 +273,76 @@ export default function ProfilePage() {
                 return (
                   <div
                     key={m.id}
-                    className="flex items-center gap-3 py-1"
+                    className="flex items-center gap-3 py-2"
                     style={{ opacity: earned ? 1 : 0.35 }}
                   >
-                    <span className="text-sm">{earned ? "\u2605" : "\u2606"}</span>
-                    <span className="text-xs text-text">{m.label}</span>
+                    <div
+                      className="relative w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                      style={{
+                        background: earned ? `${classDef.theme.accent}20` : "rgba(255,255,255,0.04)",
+                        border: earned ? `1px solid ${classDef.theme.accent}40` : "1px solid rgba(255,255,255,0.06)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {earned && (
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: `linear-gradient(105deg, transparent 40%, ${classDef.theme.accent}30 45%, ${classDef.theme.accent}50 50%, ${classDef.theme.accent}30 55%, transparent 60%)`,
+                            animation: "milestoneShine 3s ease-in-out infinite",
+                          }}
+                        />
+                      )}
+                      <span className="relative z-10">{earned ? "\u2605" : "\u2606"}</span>
+                    </div>
+                    <span className="text-sm text-text">{m.label}</span>
                   </div>
                 );
               })}
             </div>
           </motion.section>
+
+          {/* Hexx Commentary */}
+          <motion.section variants={itemVariants} className="mt-10 mb-4">
+            <div
+              className="rounded-2xl p-5 flex items-start gap-4"
+              style={{
+                background: `linear-gradient(135deg, ${classDef.theme.accent}08, rgba(255,255,255,0.02))`,
+                border: `1px solid ${classDef.theme.accent}20`,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/sprites/hexx/smug.png"
+                alt="Hexx"
+                className="flex-shrink-0"
+                style={{ width: 60, height: 60, imageRendering: "pixelated" }}
+              />
+              <div>
+                <p className="text-xs font-medium tracking-wide uppercase mb-1.5" style={{ color: classDef.theme.accent }}>
+                  Hexx says...
+                </p>
+                <p className="text-xs text-text-secondary leading-relaxed italic">
+                  {stats.totalMessages > 500
+                    ? `"${stats.totalMessages} messages? You're basically living here. I respect the dedication."`
+                    : stats.totalMessages > 100
+                    ? `"Not bad, not bad. ${stats.totalMessages} messages in. You're starting to get interesting."`
+                    : stats.totalMessages > 0
+                    ? `"Only ${stats.totalMessages} messages so far? Come on, the adventure's just getting started!"`
+                    : `"You haven't said a word yet? Go talk to someone, you wallflower."`}
+                </p>
+              </div>
+            </div>
+          </motion.section>
         </motion.div>
+
+        {/* Shine animation for milestone badges */}
+        <style jsx global>{`
+          @keyframes milestoneShine {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+          }
+        `}</style>
       </div>
     </PageTransition>
   );
