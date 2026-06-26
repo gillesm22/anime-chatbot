@@ -62,3 +62,75 @@ export function moodToExpression(mood: Mood): Expression {
       return "neutral";
   }
 }
+
+const SESSION_MOOD_PREFIX = "anime-chatbot-session-mood-";
+
+export function saveSessionEndMood(characterId: string, mood: Mood): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(`${SESSION_MOOD_PREFIX}${characterId}`, mood);
+}
+
+export function getSessionStartMood(
+  characterId: string,
+  daysAbsent: number,
+  streak: number
+): { mood: Mood; prompt: string } {
+  if (typeof window === "undefined") {
+    return { mood: "neutral", prompt: "" };
+  }
+
+  // Long absence: emotional distance
+  if (daysAbsent >= 5) {
+    return {
+      mood: "neutral",
+      prompt:
+        "It has been a while since you last spoke. Acknowledge the gap warmly but with a hint of emotional distance — you missed them but aren't sure how to pick back up.",
+    };
+  }
+
+  const stored = localStorage.getItem(`${SESSION_MOOD_PREFIX}${characterId}`);
+
+  // No prior session recorded
+  if (!stored) {
+    return {
+      mood: "neutral",
+      prompt:
+        "This is a fresh start. Greet the user openly and with curiosity, as if meeting for the first time.",
+    };
+  }
+
+  const lastMood = stored as Mood;
+
+  // Last session ended sad or thoughtful — check in gently
+  if (lastMood === "thoughtful") {
+    return {
+      mood: "thoughtful",
+      prompt:
+        "Last time things felt a little heavy. Gently check in on how they are doing before diving into anything new.",
+    };
+  }
+
+  // Consecutive days with positive mood — warm familiar tone
+  if (streak >= 2 && (lastMood === "cheerful" || lastMood === "excited")) {
+    return {
+      mood: lastMood,
+      prompt:
+        "You two have been connecting well lately. Pick up with a warm, familiar energy — no need for formalities.",
+    };
+  }
+
+  // Short absence (2-4 days)
+  if (daysAbsent >= 2) {
+    return {
+      mood: "neutral",
+      prompt:
+        "A few days have passed. Acknowledge the brief gap casually and ease back into conversation.",
+    };
+  }
+
+  // Default: returning same day or next day with a neutral/non-positive last mood
+  return {
+    mood: lastMood,
+    prompt: "Continue naturally from where you left off.",
+  };
+}
