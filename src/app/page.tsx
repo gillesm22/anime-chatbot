@@ -13,6 +13,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { getHeroConfig, HERO_CLASS_MAP, isFirstRun } from "@/lib/heroAvatar";
 import { BloodBat } from "@/components/BloodBat";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
+import { AwayNotificationStack } from "@/components/AwayNotificationStack";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -91,8 +92,20 @@ function HomeContent() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 md:px-8 md:py-12 gap-6 md:gap-10 relative overflow-hidden">
+      <AwayNotificationStack />
+      {/* Full-screen animated background gradient */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{
+        background: "linear-gradient(135deg, rgba(244,114,182,0.12), rgba(229,57,53,0.12), rgba(167,139,250,0.12), rgba(251,146,60,0.12), rgba(123,31,162,0.12))",
+        backgroundSize: "400% 400%",
+        animation: "bgGradientShift 30s ease infinite",
+      }} />
+
+      {/* Vignette overlay */}
+      <div className="fixed inset-0 pointer-events-none z-[1]" style={{
+        background: "radial-gradient(ellipse at center, transparent 40%, var(--color-vignette-outer) 100%)",
+      }} />
       {/* Nav bar */}
-      <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2 py-1.5 rounded-full" style={{ background: "var(--color-surface, rgba(13,13,18,0.6))", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2 py-1.5 rounded-full" style={{ background: "var(--color-overlay)", backdropFilter: "blur(12px)", border: "1px solid var(--color-card-border)" }}>
         <ThemeToggle />
         <LanguageToggle />
         <Link
@@ -154,7 +167,13 @@ function HomeContent() {
             style={{ width: 40, height: 40, objectFit: "cover", filter: "drop-shadow(0 0 6px rgba(229,57,53,0.4))" }}
             draggable={false}
           />
-          <span>Choose Your Companion</span>
+          <span className="typewriter-text" style={{
+            overflow: "hidden",
+            borderRight: "2px solid rgba(244,114,182,0.6)",
+            whiteSpace: "nowrap",
+            width: 0,
+            animation: "typewriter 2s steps(22) 0.8s forwards, blinkCaret 0.7s step-end 0.8s 4",
+          }}>Choose Your Companion</span>
         </p>
         {(() => {
           if (isFirstRun()) {
@@ -208,28 +227,39 @@ function HomeContent() {
       {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {[
-          { left: "10%", top: "15%", size: 3, delay: "0s", dur: "8s", color: "#f472b6" },
-          { left: "85%", top: "20%", size: 2, delay: "1.5s", dur: "10s", color: "#e53935" },
-          { left: "25%", top: "70%", size: 4, delay: "3s", dur: "9s", color: "#fb923c" },
-          { left: "70%", top: "80%", size: 2, delay: "0.5s", dur: "11s", color: "#a78bfa" },
-          { left: "50%", top: "40%", size: 3, delay: "2s", dur: "7s", color: "#7b1fa2" },
-          { left: "90%", top: "55%", size: 2, delay: "4s", dur: "12s", color: "#f472b6" },
-          { left: "15%", top: "45%", size: 3, delay: "1s", dur: "9s", color: "#e53935" },
-          { left: "40%", top: "10%", size: 2, delay: "2.5s", dur: "10s", color: "#fb923c" },
-          { left: "60%", top: "60%", size: 3, delay: "3.5s", dur: "8s", color: "#a78bfa" },
-          { left: "5%", top: "85%", size: 2, delay: "1s", dur: "11s", color: "#7b1fa2" },
-          { left: "75%", top: "35%", size: 3, delay: "0.5s", dur: "9s", color: "#f472b6" },
-          { left: "35%", top: "90%", size: 2, delay: "4.5s", dur: "10s", color: "#e53935" },
+          { left: "10%", top: "15%", size: 3, delay: "0s", dur: "8s", color: "#f472b6", star: false },
+          { left: "85%", top: "20%", size: 2, delay: "1.5s", dur: "10s", color: "#e53935", star: true },
+          { left: "25%", top: "70%", size: 5, delay: "3s", dur: "9s", color: "#fb923c", star: false },
+          { left: "70%", top: "80%", size: 2, delay: "0.5s", dur: "11s", color: "#a78bfa", star: false },
+          { left: "50%", top: "40%", size: 4, delay: "2s", dur: "7s", color: "#7b1fa2", star: true },
+          { left: "90%", top: "55%", size: 3, delay: "4s", dur: "12s", color: "#f472b6", star: false },
+          { left: "15%", top: "45%", size: 6, delay: "1s", dur: "9s", color: "#e53935", star: false },
+          { left: "40%", top: "10%", size: 2, delay: "2.5s", dur: "10s", color: "#fb923c", star: true },
+          { left: "60%", top: "60%", size: 4, delay: "3.5s", dur: "8s", color: "#a78bfa", star: false },
+          { left: "5%", top: "85%", size: 3, delay: "1s", dur: "11s", color: "#7b1fa2", star: false },
+          { left: "75%", top: "35%", size: 5, delay: "0.5s", dur: "9s", color: "#f472b6", star: true },
+          { left: "35%", top: "90%", size: 2, delay: "4.5s", dur: "10s", color: "#e53935", star: false },
+          { left: "20%", top: "30%", size: 3, delay: "2s", dur: "11s", color: "#a78bfa", star: true },
+          { left: "80%", top: "45%", size: 6, delay: "0.8s", dur: "8s", color: "#7b1fa2", star: false },
+          { left: "55%", top: "15%", size: 2, delay: "3.2s", dur: "10s", color: "#f472b6", star: false },
+          { left: "30%", top: "55%", size: 4, delay: "1.8s", dur: "9s", color: "#fb923c", star: true },
+          { left: "95%", top: "75%", size: 3, delay: "4.2s", dur: "12s", color: "#e53935", star: false },
+          { left: "45%", top: "85%", size: 5, delay: "0.3s", dur: "7s", color: "#a78bfa", star: true },
+          { left: "65%", top: "25%", size: 2, delay: "2.8s", dur: "11s", color: "#7b1fa2", star: false },
+          { left: "12%", top: "65%", size: 4, delay: "1.5s", dur: "8s", color: "#fb923c", star: true },
         ].map((p, i) => (
           <div
             key={i}
-            className="absolute rounded-full"
+            className={p.star ? "absolute" : "absolute rounded-full"}
             style={{
               left: p.left,
               top: p.top,
-              width: p.size,
-              height: p.size,
-              background: p.color,
+              width: p.star ? 0 : p.size,
+              height: p.star ? 0 : p.size,
+              background: p.star ? "transparent" : p.color,
+              ...(p.star ? {
+                boxShadow: `0 -${p.size}px 0 0 ${p.color}, ${p.size}px 0 0 0 ${p.color}, 0 ${p.size}px 0 0 ${p.color}, -${p.size}px 0 0 0 ${p.color}`,
+              } : {}),
               animation: `floatParticle ${p.dur} ease-in-out ${p.delay} infinite`,
             }}
           />
@@ -244,8 +274,22 @@ function HomeContent() {
         `}</style>
       </div>
 
+      {/* Glowing divider */}
+      <div className="relative z-10 w-full max-w-md mx-auto" style={{
+        height: 2,
+        background: "linear-gradient(90deg, transparent, #f472b6, #e53935, #a78bfa, #fb923c, #7b1fa2, transparent)",
+        backgroundSize: "200% 100%",
+        animation: "dividerPulse 4s ease-in-out infinite",
+        borderRadius: 1,
+        boxShadow: "0 0 12px rgba(244,114,182,0.4), 0 0 24px rgba(167,139,250,0.2)",
+      }} />
+
       {/* Character cards */}
-      <div className="flex flex-wrap justify-center gap-5 md:gap-8 max-w-5xl w-full relative z-10">
+      <div className="flex flex-wrap justify-center gap-5 md:gap-8 max-w-5xl w-full relative z-10" style={{
+        perspective: "1200px",
+        perspectiveOrigin: "center 40%",
+        transform: "translateZ(0)",
+      }}>
         {characterList.map((character, i) => (
           <div
             key={character.id}
@@ -272,6 +316,47 @@ function HomeContent() {
           onClaim={() => setShowReward(false)}
         />
       )}
+
+      {/* Scroll hint arrow - hidden on short viewports via CSS */}
+      <div className="scroll-hint-arrow fixed bottom-6 left-1/2 z-20" style={{
+        transform: "translateX(-50%)",
+        animation: "scrollBounce 2s ease-in-out infinite",
+        opacity: 0.5,
+      }}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(244,114,182,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </div>
+
+      {/* Global cinematic keyframes */}
+      <style>{`
+        @keyframes bgGradientShift {
+          0% { background-position: 0% 50%; }
+          25% { background-position: 100% 0%; }
+          50% { background-position: 100% 100%; }
+          75% { background-position: 0% 100%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        @keyframes blinkCaret {
+          0%, 100% { border-color: rgba(244,114,182,0.6); }
+          50% { border-color: transparent; }
+        }
+        @keyframes dividerPulse {
+          0%, 100% { background-position: 0% 50%; opacity: 0.6; }
+          50% { background-position: 100% 50%; opacity: 1; }
+        }
+        @keyframes scrollBounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(8px); }
+        }
+        @media (max-height: 700px) {
+          .scroll-hint-arrow { display: none !important; }
+        }
+      `}</style>
     </main>
   );
 }
