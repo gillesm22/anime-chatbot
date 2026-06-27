@@ -9,6 +9,8 @@ interface BloodBatProps {
   isIdle?: boolean;
   isAudioPlaying?: boolean;
   landingMode?: boolean;
+  chatPhrase?: string | null;
+  onChatPhraseDone?: () => void;
 }
 
 type HexxMood = "neutral" | "happy" | "angry" | "sleepy" | "excited" | "love" | "smug" | "sad" | "surprised" | "shy" | "grumpy" | "curious" | "cool" | "scared" | "rage" | "cozy" | "queen" | "edgy" | "hearteyes" | "tongue" | "proud" | "crying" | "wizard" | "detective" | "dj" | "chef" | "guitar" | "playful" | "lol" | "nature";
@@ -105,7 +107,7 @@ const MAX_SIZE = 200;
 const DEFAULT_SIZE = 100;
 const SIZE_KEY = "anime-chatbot-hexx-size";
 
-export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying, landingMode }: BloodBatProps) {
+export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioPlaying, landingMode, chatPhrase, onChatPhraseDone }: BloodBatProps) {
   const [mood, setMood] = useState<HexxMood>("neutral");
   const [phrase, setPhrase] = useState<string | null>(null);
   const [isClicked, setIsClicked] = useState(false);
@@ -231,6 +233,19 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
     }, 12000);
     return () => clearInterval(interval);
   }, [landingMode]);
+
+  // Chat-generated Hexx phrase (from AI when user mentions Hexx)
+  useEffect(() => {
+    if (!chatPhrase) return;
+    setPhrase(chatPhrase);
+    const chatMoods: HexxMood[] = ["excited", "smug", "playful", "proud", "curious"];
+    setMood(chatMoods[Math.floor(Math.random() * chatMoods.length)]);
+    if (phraseTimer.current) clearTimeout(phraseTimer.current);
+    phraseTimer.current = setTimeout(() => {
+      setPhrase(null);
+      onChatPhraseDone?.();
+    }, 5000);
+  }, [chatPhrase, onChatPhraseDone]);
 
   const spriteUrl = HEXX_SPRITES[mood] || HEXX_SPRITES.neutral;
   const bodySquish = isClicked ? "scaleY(0.88) scaleX(1.08)" : isHovered ? "scaleY(1.03)" : "scaleY(1)";
