@@ -66,6 +66,7 @@ import { saveSessionEndMood, getSessionStartMood } from "@/lib/mood";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
 import { haptic } from "@/lib/haptics";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
+import { prefetchSpeech } from "@/lib/speech";
 
 const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
   { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
@@ -165,6 +166,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [starters, setStarters] = useState<string[]>([]);
   const [activeEffect, setActiveEffect] = useState<ExpressionEffect | null>(null);
   const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
+  const [hexxPhrase, setHexxPhrase] = useState<string | null>(null);
 
   // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
   // useEffect cleanup is NOT reliable on tab/app close — these events are.
@@ -346,10 +348,11 @@ function ChatContent({ characterId }: { characterId: string }) {
         ? buildGreetingContext(characterId, 0, getAffinity(characterId).streak)
         : undefined;
       const personalityCtx = getPersonalityContext(characterId) || undefined;
+      const hexxMentioned = message.toLowerCase().includes("hexx");
 
       try {
         await streamChat(
-          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx },
+          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx, hexxMentioned },
           (event) => {
             switch (event.type) {
               case "expression":
@@ -369,6 +372,9 @@ function ChatContent({ characterId }: { characterId: string }) {
                 if (event.sceneId) {
                   setCurrentScene(event.sceneId as SceneId);
                 }
+                break;
+              case "hexx":
+                setHexxPhrase(event.content);
                 break;
               case "error":
                 fullText = "I'm sorry, something went wrong. Please try again.";
@@ -439,8 +445,13 @@ function ChatContent({ characterId }: { characterId: string }) {
   }, [characterId, dispatch]);
 
   const handleTypeComplete = useCallback(() => {
+    // Prefetch the NEXT line's audio so it's ready when the user advances
+    const nextIndex = state.currentLineIndex + 1;
+    if (nextIndex < state.currentLines.length) {
+      prefetchSpeech(state.currentLines[nextIndex], characterId);
+    }
     dispatch(lineTyped());
-  }, [dispatch]);
+  }, [dispatch, state.currentLineIndex, state.currentLines, characterId]);
 
   const handleAdvance = useCallback(() => {
     haptic.tick();
@@ -945,6 +956,8 @@ function ChatContent({ characterId }: { characterId: string }) {
           expression={state.currentExpression}
           accentColor={character.theme.accent}
           isIdle={state.phase === "idle" && state.messages.length > 0}
+          chatPhrase={hexxPhrase}
+          onChatPhraseDone={() => setHexxPhrase(null)}
         />
       </div>
 
