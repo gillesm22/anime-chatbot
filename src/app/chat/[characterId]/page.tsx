@@ -163,9 +163,21 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [activeEffect, setActiveEffect] = useState<ExpressionEffect | null>(null);
   const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
 
+  // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
+  // useEffect cleanup is NOT reliable on tab/app close — these events are.
   useEffect(() => {
-    return () => {
+    const saveState = () => {
       saveSessionEndMood(characterId, currentMoodRef.current);
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") saveState();
+    };
+    window.addEventListener("beforeunload", saveState);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      saveState(); // also save on normal unmount (navigation)
+      window.removeEventListener("beforeunload", saveState);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [characterId]);
 

@@ -56,6 +56,7 @@ export function ChatProvider({
     }
   }, [characterId]);
 
+  // Save messages to localStorage on every change
   useEffect(() => {
     if (state.messages.length > 0) {
       try {
@@ -66,6 +67,27 @@ export function ChatProvider({
         // QuotaExceededError - silently fail rather than crash
       }
     }
+  }, [state.messages, characterId]);
+
+  // Also save on app close / tab switch — useEffect cleanup is NOT reliable on hard close
+  useEffect(() => {
+    const saveMessages = () => {
+      if (state.messages.length > 0) {
+        try {
+          const toSave = state.messages.length > 200 ? state.messages.slice(-200) : state.messages;
+          localStorage.setItem(getStorageKey(characterId), JSON.stringify(toSave));
+        } catch {}
+      }
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") saveMessages();
+    };
+    window.addEventListener("beforeunload", saveMessages);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("beforeunload", saveMessages);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [state.messages, characterId]);
 
   return (
