@@ -13,9 +13,9 @@ const openai = process.env.OPENAI_API_KEY
 
 // Anthropic models to try in order (newest → oldest)
 const CLAUDE_MODELS = [
-  "claude-sonnet-4-20250514",
-  "claude-3-5-sonnet-20241022",
-  "claude-3-haiku-20240307",
+  "claude-sonnet-4-6",
+  "claude-haiku-4-5",
+  "claude-3-5-haiku-20241022",
 ];
 
 // OpenAI models to try in order
