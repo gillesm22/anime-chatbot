@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { speakLine, stopSpeaking } from "@/lib/speech";
+import { speakLine, stopSpeaking, prefetchSpeech } from "@/lib/speech";
 import { playTypingClick } from "@/lib/sounds";
 import { ClickToContinue } from "./ClickToContinue";
 import { getDialogueEffect, DIALOGUE_EFFECT_STYLES } from "@/lib/dialogueEffects";
@@ -86,12 +86,14 @@ export function DialogueBox({
       charIndexRef.current = 0;
       setIsTypewriting(true);
 
-      // Speak the line (skip typing indicator)
+      // Play the line — speakLine will use prefetched audio if available
       if (line !== "..." && characterId) {
         stopSpeaking();
         speakLine(line, characterId);
       }
 
+      // VN-standard: fast typewriter (~25ms per char), independent of speech.
+      // Speech plays alongside at its own pace — text doesn't wait for it.
       intervalRef.current = setInterval(() => {
         charIndexRef.current++;
         if (charIndexRef.current >= line.length) {
