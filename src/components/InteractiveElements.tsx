@@ -506,9 +506,12 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
         ref={containerRef}
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 80, // above BottomNav
           pointerEvents: "none",
-          zIndex: 5,
+          zIndex: 15, // above sprite (z-10), below control bar (z-20)
         }}
       >
         <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
@@ -576,7 +579,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   className="ie-hotspot"
                   style={{
                     ...hotspot,
-                    left: `${item.position.x}%`, bottom: "5%",
+                    left: `${item.position.x}%`, top: `${item.position.y}%`,
                     width: `${item.position.width}%`, height: 70,
                     borderRadius: 10,
                     background: fireOn ? "#ff8c0028" : "#33220018",
@@ -624,11 +627,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
             const elHeight = isLargeArea ? `${item.position.height}%` : `${Math.max(60, item.position.height * 8)}px`;
             const emojiSize = isLargeArea ? Math.min(36, item.position.height * 1.2) : Math.max(28, Math.min(42, item.position.height * 5));
 
-            // Bottom-anchored elements (y > 70) use bottom positioning for better layout
-            const useBottom = item.position.y > 70;
-            const posY = useBottom
-              ? { bottom: `${100 - item.position.y - item.position.height}%` }
-              : { top: `${item.position.y}%` };
+            const posY = { top: `${item.position.y}%` };
             const posX = { left: `${item.position.x}%` };
 
             // Shimmer mode — glowing hint, tappable but no emoji visible

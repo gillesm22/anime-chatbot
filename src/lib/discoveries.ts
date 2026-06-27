@@ -165,7 +165,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   // ── Beach ──
   {
     id: "beach-splash", sceneId: "beach", type: "visible", revealAt: 0,
-    position: { x: 20, y: 88, width: 60, height: 8 }, emoji: "🌊", label: "Splash the water",
+    position: { x: 20, y: 78, width: 60, height: 8 }, emoji: "🌊", label: "Splash the water",
     affinityPerTap: 2, cooldown: 30, reward: { type: "affinity", value: 5 }, aiOnFirstDiscovery: false,
     reactions: {
       arisu: { lines: ["Ahh! You got me wet!", "The water feels so nice~", "Hehe, splash fight?"], expression: "surprised" },
@@ -177,7 +177,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   },
   {
     id: "beach-shell", sceneId: "beach", type: "hidden", revealAt: 2,
-    position: { x: 72, y: 82, width: 8, height: 8 }, emoji: "🐚", label: "A shell in the sand",
+    position: { x: 72, y: 72, width: 8, height: 8 }, emoji: "🐚", label: "A shell in the sand",
     affinityPerTap: 2, cooldown: 30, reward: { type: "diary", value: "We found a beautiful shell on the beach today. I can still hear the ocean in it." }, aiOnFirstDiscovery: false,
     reactions: {
       arisu: { lines: ["Oh, it's so pretty! Keep it safe~", "Can you hear the ocean in it?", "A gift from the sea..."], expression: "happy" },
@@ -189,7 +189,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   },
   {
     id: "beach-crab", sceneId: "beach", type: "hidden", revealAt: 4,
-    position: { x: 10, y: 85, width: 8, height: 8 }, emoji: "🦀", label: "A crab under a rock",
+    position: { x: 10, y: 75, width: 8, height: 8 }, emoji: "🦀", label: "A crab under a rock",
     affinityPerTap: 2, cooldown: 30, reward: { type: "outfit", value: "bikini-front" }, aiOnFirstDiscovery: true,
     reactions: {
       arisu: { lines: ["Eep! A crab! Is it friendly?", "He's so tiny and brave~", "Don't let him pinch you!"], expression: "surprised" },
@@ -214,7 +214,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   },
   {
     id: "cafe-cat", sceneId: "cafe", type: "hidden", revealAt: 2,
-    position: { x: 65, y: 80, width: 10, height: 10 }, emoji: "🐱", label: "A cat under the table",
+    position: { x: 65, y: 70, width: 10, height: 10 }, emoji: "🐱", label: "A cat under the table",
     affinityPerTap: 2, cooldown: 30, reward: { type: "diary", value: "There was a cat hiding under the cafe table today. It purred when we found it. Perfect moment." }, aiOnFirstDiscovery: true,
     reactions: {
       arisu: { lines: ["Aww, a kitty! Come here~", "She's purring! So sweet...", "Can we adopt her?"], expression: "happy" },
@@ -350,7 +350,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   // ── Cozy Room ──
   {
     id: "cozy-fire", sceneId: "cozy_room", type: "visible", revealAt: 0,
-    position: { x: 38, y: 85, width: 24, height: 10 }, emoji: "🔥", label: "Toggle the fireplace",
+    position: { x: 38, y: 75, width: 24, height: 10 }, emoji: "🔥", label: "Toggle the fireplace",
     affinityPerTap: 2, cooldown: 30, reward: { type: "affinity", value: 5 }, aiOnFirstDiscovery: false,
     reactions: {
       arisu: { lines: ["So warm and cozy~", "The crackling sound is so soothing.", "Can we stay like this forever?"], expression: "happy" },
@@ -411,7 +411,7 @@ export const ALL_INTERACTABLES: Interactable[] = [
   },
   {
     id: "moonlight-rose", sceneId: "moonlight", type: "hidden", revealAt: 3,
-    position: { x: 25, y: 80, width: 12, height: 10 }, emoji: "🌹", label: "A rose garden",
+    position: { x: 25, y: 72, width: 12, height: 10 }, emoji: "🌹", label: "A rose garden",
     affinityPerTap: 2, cooldown: 30, reward: { type: "outfit", value: "formal" }, aiOnFirstDiscovery: true,
     reactions: {
       arisu: { lines: ["Roses in the moonlight... so romantic~", "They smell heavenly!", "Like a dream garden..."], expression: "devoted" },
