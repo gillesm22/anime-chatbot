@@ -24,9 +24,9 @@ export function VoiceToggle() {
         width: 28,
         height: 20,
         borderRadius: 99,
-        backgroundColor: enabled ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)",
-        border: `1px solid ${enabled ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)"}`,
-        color: enabled ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.3)",
+        backgroundColor: enabled ? "var(--color-toggle-bg)" : "var(--color-card-bg)",
+        border: `1px solid ${enabled ? "var(--color-progress-track)" : "var(--color-border)"}`,
+        color: enabled ? "var(--color-text-bright)" : "var(--color-toggle-knob)",
       }}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none">

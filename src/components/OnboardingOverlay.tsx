@@ -75,7 +75,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                 Welcome
               </h1>
 
-              <p className="text-sm tracking-wide" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <p className="text-sm tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
                 Enter your name to begin
               </p>
 
@@ -88,8 +88,8 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                 autoFocus
                 className="w-full max-w-xs text-sm text-white placeholder:text-white/30 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-white/20 transition-all"
                 style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "var(--color-input-bg)",
+                  border: "1px solid var(--color-input-border)",
                 }}
               />
 
@@ -100,8 +100,8 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                 style={{
                   background: name.trim()
                     ? "linear-gradient(135deg, #e53935, #7b1fa2)"
-                    : "rgba(255,255,255,0.06)",
-                  color: name.trim() ? "#fff" : "rgba(255,255,255,0.25)",
+                    : "var(--color-input-bg)",
+                  color: name.trim() ? "#fff" : "var(--color-placeholder)",
                   cursor: name.trim() ? "pointer" : "not-allowed",
                 }}
               >
@@ -122,7 +122,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                 Choose Your Class
               </h2>
 
-              <p className="text-sm tracking-wide" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <p className="text-sm tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
                 How will the world see you?
               </p>
 
@@ -137,9 +137,9 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                       style={{
                         background: selected
                           ? `${cls.theme.accent}25`
-                          : "rgba(255,255,255,0.04)",
+                          : "var(--color-hover-bg)",
                         border: `1.5px solid ${
-                          selected ? `${cls.theme.accent}60` : "rgba(255,255,255,0.06)"
+                          selected ? `${cls.theme.accent}60` : "var(--color-card-border)"
                         }`,
                         boxShadow: selected ? `0 0 20px ${cls.theme.glow}` : "none",
                       }}
@@ -148,7 +148,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                       <span
                         className="text-xs font-medium"
                         style={{
-                          color: selected ? cls.theme.accent : "rgba(255,255,255,0.5)",
+                          color: selected ? cls.theme.accent : "var(--color-text-secondary)",
                         }}
                       >
                         {cls.label}
@@ -156,7 +156,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                       <span
                         className="text-[9px] opacity-60"
                         style={{
-                          color: selected ? cls.theme.accent : "rgba(255,255,255,0.35)",
+                          color: selected ? cls.theme.accent : "var(--color-text-tertiary)",
                         }}
                       >
                         {cls.title}
@@ -175,8 +175,8 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
                     ? `linear-gradient(135deg, ${
                         HERO_CLASSES.find((c) => c.id === selectedClass)?.theme.accent ?? "#e53935"
                       }, #7b1fa2)`
-                    : "rgba(255,255,255,0.06)",
-                  color: selectedClass ? "#fff" : "rgba(255,255,255,0.25)",
+                    : "var(--color-input-bg)",
+                  color: selectedClass ? "#fff" : "var(--color-placeholder)",
                   cursor: selectedClass ? "pointer" : "not-allowed",
                 }}
               >

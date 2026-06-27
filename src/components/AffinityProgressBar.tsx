@@ -37,7 +37,7 @@ export const AffinityProgressBar = ({
         <span
           style={{
             fontSize: 10,
-            color: "rgba(255,255,255,0.4)",
+            color: "var(--color-text-secondary)",
             lineHeight: 1,
           }}
         >
@@ -49,7 +49,7 @@ export const AffinityProgressBar = ({
           width: 200,
           height: 4,
           borderRadius: 2,
-          background: "rgba(255,255,255,0.08)",
+          background: "var(--color-border)",
           overflow: "hidden",
         }}
       >

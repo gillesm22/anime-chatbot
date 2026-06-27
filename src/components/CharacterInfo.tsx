@@ -46,7 +46,7 @@ export function CharacterInfo({ character, visible, onClose }: CharacterInfoProp
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
             className="fixed top-0 right-0 h-full w-80 z-50 overflow-y-auto"
             style={{
-              backgroundColor: "rgba(13,13,18,0.92)",
+              backgroundColor: "var(--color-panel)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
             }}
@@ -55,7 +55,7 @@ export function CharacterInfo({ character, visible, onClose }: CharacterInfoProp
             <button
               onClick={onClose}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-text-secondary hover:text-text transition-colors"
-              style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
+              style={{ backgroundColor: "var(--color-border)" }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

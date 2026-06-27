@@ -45,7 +45,7 @@ export function SplashScreen() {
           alignItems: "center",
           justifyContent: "center",
           gap: 16,
-          background: "#0d0d12",
+          background: "var(--color-bg)",
           animation: fadeOut ? "splashFadeOut 0.5s ease-out forwards" : undefined,
         }}
       >
@@ -83,7 +83,7 @@ export function SplashScreen() {
             fontSize: "0.7rem",
             letterSpacing: "0.25em",
             textTransform: "uppercase",
-            color: "rgba(255,255,255,0.4)",
+            color: "var(--color-text-secondary)",
             margin: 0,
           }}
         >

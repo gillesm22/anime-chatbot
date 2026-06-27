@@ -47,19 +47,19 @@ export function ControlBar({
         onClick={onToggleAutoAdvance}
         className="flex items-center gap-2 text-sm transition-colors"
         style={{
-          color: autoAdvance ? accentColor : "rgba(255,255,255,0.5)",
+          color: autoAdvance ? accentColor : "var(--color-text-secondary)",
         }}
       >
         <div
           className="w-8 h-4 rounded-full relative transition-colors"
           style={{
-            backgroundColor: autoAdvance ? `${accentColor}40` : "rgba(255,255,255,0.1)",
+            backgroundColor: autoAdvance ? `${accentColor}40` : "var(--color-toggle-bg)",
           }}
         >
           <div
             className="absolute top-0.5 w-3 h-3 rounded-full transition-all"
             style={{
-              backgroundColor: autoAdvance ? accentColor : "rgba(255,255,255,0.3)",
+              backgroundColor: autoAdvance ? accentColor : "var(--color-toggle-knob)",
               left: autoAdvance ? "calc(100% - 14px)" : "2px",
             }}
           />

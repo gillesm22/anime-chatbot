@@ -27,9 +27,9 @@ export function LanguageToggle() {
         width: "32px",
         height: "20px",
         borderRadius: "9999px",
-        backgroundColor: "rgba(255,255,255,0.1)",
-        border: "1px solid rgba(255,255,255,0.15)",
-        color: "rgba(255,255,255,0.85)",
+        backgroundColor: "var(--color-toggle-bg)",
+        border: "1px solid var(--color-progress-track)",
+        color: "var(--color-text-bright)",
         fontSize: "10px",
         fontWeight: 600,
         display: "flex",
@@ -43,11 +43,11 @@ export function LanguageToggle() {
       }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-          "rgba(255,255,255,0.18)";
+          "var(--color-progress-track)";
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-          "rgba(255,255,255,0.1)";
+          "var(--color-toggle-bg)";
       }}
     >
       {label}

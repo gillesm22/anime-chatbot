@@ -17,8 +17,49 @@ const RARITY_STYLES: Record<Gift["rarity"], { badge: string; label: string }> = 
   legendary: { badge: "bg-yellow-500 text-black", label: "Legendary" },
 };
 
+function GiftConfetti({ accentColor }: { accentColor: string }) {
+  const particles = Array.from({ length: 18 }, (_, i) => {
+    const angle = (i / 18) * 360;
+    const dist = 40 + Math.random() * 60;
+    const size = 3 + Math.random() * 4;
+    const dur = 0.5 + Math.random() * 0.3;
+    const colors = [accentColor, "#FFD700", "#FF6B9D", "#7C4DFF", "#00E5FF"];
+    const color = colors[i % colors.length];
+    const x = Math.cos((angle * Math.PI) / 180) * dist;
+    const y = Math.sin((angle * Math.PI) / 180) * dist;
+    const isRound = i % 2 === 0;
+    return { x, y, size, dur, color, delay: Math.random() * 0.15, isRound };
+  });
+
+  const keyframes = particles.map((p, i) =>
+    `@keyframes cb${i}{0%{transform:translate(0,0) scale(0);opacity:1}70%{opacity:1}100%{transform:translate(${p.x}px,${p.y}px) scale(1);opacity:0}}`
+  ).join("\n");
+
+  return (
+    <div style={{ position: "fixed", top: "40%", left: "50%", zIndex: 60, pointerEvents: "none" }}>
+      <style>{keyframes}</style>
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            width: p.size,
+            height: p.size,
+            borderRadius: p.isRound ? "50%" : "1px",
+            background: p.color,
+            left: 0,
+            top: 0,
+            animation: `cb${i} ${p.dur}s ease-out ${p.delay}s forwards`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function GiftShop({ characterId, characterName, accentColor, onGift, onClose }: GiftShopProps) {
   const [visible, setVisible] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const catalog = getGiftCatalog();
 
   useEffect(() => {
@@ -35,8 +76,11 @@ export function GiftShop({ characterId, characterName, accentColor, onGift, onCl
   function handleGive(gift: Gift) {
     const result = giveGift(characterId, gift.id);
     if (!result) return;
-    onGift(result.gift, result.reaction);
-    handleClose();
+    setShowConfetti(true);
+    setTimeout(() => {
+      onGift(result.gift, result.reaction);
+      handleClose();
+    }, 600);
   }
 
   return (
@@ -44,6 +88,21 @@ export function GiftShop({ characterId, characterName, accentColor, onGift, onCl
       className="fixed inset-0 z-40 flex items-end justify-center"
       onClick={handleClose}
     >
+      <style>{`
+        @keyframes gift-sparkle {
+          0% { opacity: 0; transform: scale(0) rotate(0deg); }
+          50% { opacity: 1; transform: scale(1) rotate(180deg); }
+          100% { opacity: 0; transform: scale(0) rotate(360deg); }
+        }
+        .gift-item-hover:hover .gift-sparkle-1,
+        .gift-item-hover:hover .gift-sparkle-2 {
+          animation: gift-sparkle 0.7s ease-in-out;
+        }
+        .gift-item-hover:hover .gift-sparkle-2 {
+          animation-delay: 0.2s;
+        }
+      `}</style>
+      {showConfetti && <GiftConfetti accentColor={accentColor} />}
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 transition-opacity duration-300"
@@ -83,13 +142,16 @@ export function GiftShop({ characterId, characterName, accentColor, onGift, onCl
                 key={gift.id}
                 onClick={() => handleGive(gift)}
                 className={[
-                  "flex flex-col items-center gap-1 rounded-xl p-3 border transition-transform hover:scale-105 active:scale-95 text-left",
+                  "gift-item-hover flex flex-col items-center gap-1 rounded-xl p-3 border transition-transform hover:scale-105 active:scale-95 text-left relative overflow-hidden",
                   isLegendary
                     ? "border-yellow-500 bg-yellow-950/40 shadow-[0_0_12px_2px_rgba(234,179,8,0.35)]"
                     : "border-gray-700 bg-gray-800 hover:border-gray-500",
                 ].join(" ")}
                 style={isLegendary ? { boxShadow: "0 0 14px 3px rgba(234,179,8,0.3)" } : undefined}
               >
+                {/* Sparkle decorations on hover */}
+                <span className="gift-sparkle-1 absolute top-1 right-1 w-2 h-2 opacity-0 pointer-events-none" style={{ background: accentColor, borderRadius: "50%", filter: "blur(1px)" }} />
+                <span className="gift-sparkle-2 absolute bottom-2 left-1 w-1.5 h-1.5 opacity-0 pointer-events-none" style={{ background: "#FFD700", borderRadius: "50%", filter: "blur(1px)" }} />
                 <span className="text-3xl">{gift.emoji}</span>
                 <span className="text-white text-xs font-semibold text-center leading-tight">
                   {gift.name}

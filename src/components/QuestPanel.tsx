@@ -65,7 +65,7 @@ export function QuestPanel({
           background: rgba(15, 12, 28, 0.82);
           backdrop-filter: blur(20px) saturate(1.4);
           -webkit-backdrop-filter: blur(20px) saturate(1.4);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid var(--color-border);
           border-bottom: none;
           border-radius: 20px 20px 0 0;
           padding: 24px 20px 36px;
@@ -100,7 +100,7 @@ export function QuestPanel({
         }
 
         .qp-close {
-          background: rgba(255, 255, 255, 0.08);
+          background: var(--color-border);
           border: none;
           color: #aaa;
           width: 32px;
@@ -115,7 +115,7 @@ export function QuestPanel({
         }
 
         .qp-close:hover {
-          background: rgba(255, 255, 255, 0.15);
+          background: var(--color-progress-track);
           color: #fff;
         }
 
@@ -126,8 +126,8 @@ export function QuestPanel({
         }
 
         .qp-card {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.07);
+          background: var(--color-hover-bg);
+          border: 1px solid var(--color-card-border);
           border-radius: 12px;
           padding: 14px 16px;
           display: flex;
@@ -192,7 +192,7 @@ export function QuestPanel({
         .qp-progress-track {
           flex: 1;
           height: 6px;
-          background: rgba(255, 255, 255, 0.08);
+          background: var(--color-border);
           border-radius: 99px;
           overflow: hidden;
         }

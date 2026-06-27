@@ -277,15 +277,7 @@ export function recordVisit(
     // Consecutive day
     data.streak += 1;
   } else {
-    // Gap of more than one day — apply absence penalty then reset streak
-    const penaltyPercent = Math.min(data.points * 0.1, (daysAbsent - 1) * 15);
-    data.points = Math.max(0, Math.round(data.points - penaltyPercent));
-
-    // Recompute level after penalty
-    const { level, levelName } = computeLevel(data.points);
-    data.level = level;
-    data.levelName = levelName;
-
+    // Gap of more than one day — reset streak but NEVER remove points/levels
     data.streak = 1; // today starts a new streak
   }
 

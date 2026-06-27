@@ -53,15 +53,21 @@ export function OutfitCarousel({
         .outfit-carousel-scroll {
           -ms-overflow-style: none;
           scrollbar-width: none;
+          scroll-snap-type: x mandatory;
+          scroll-behavior: smooth;
         }
         .outfit-carousel-panel {
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .outfit-thumb {
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.2s ease;
+          scroll-snap-align: center;
         }
         .outfit-thumb:active {
           transform: scale(0.96);
+        }
+        .outfit-thumb-active {
+          transform: scale(1.05);
         }
       `}</style>
 
@@ -73,10 +79,10 @@ export function OutfitCarousel({
           left: 0,
           right: 0,
           zIndex: 35,
-          background: "rgba(13,13,18,0.9)",
+          background: "var(--color-panel)",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          borderTop: `1px solid rgba(255,255,255,0.08)`,
+          borderTop: `1px solid var(--color-border)`,
           padding: "12px 12px 16px",
           transform: isOpen ? "translateY(0)" : "translateY(110%)",
           pointerEvents: isOpen ? "auto" : "none",
@@ -97,7 +103,7 @@ export function OutfitCarousel({
               fontWeight: 600,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.5)",
+              color: "var(--color-text-secondary)",
             }}
           >
             Outfits
@@ -105,7 +111,7 @@ export function OutfitCarousel({
           <button
             onClick={onClose}
             style={{
-              background: "rgba(255,255,255,0.08)",
+              background: "var(--color-border)",
               border: "none",
               borderRadius: "50%",
               width: "24px",
@@ -114,7 +120,7 @@ export function OutfitCarousel({
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              color: "rgba(255,255,255,0.6)",
+              color: "var(--color-text-secondary)",
               fontSize: "14px",
               lineHeight: 1,
               padding: 0,
@@ -143,7 +149,7 @@ export function OutfitCarousel({
             return (
               <button
                 key={outfit.id}
-                className="outfit-thumb"
+                className={`outfit-thumb${isActive ? " outfit-thumb-active" : ""}`}
                 onClick={() => onSelectOutfit(outfit.id)}
                 style={{
                   flex: "0 0 auto",
@@ -168,11 +174,11 @@ export function OutfitCarousel({
                     overflow: "hidden",
                     border: isActive
                       ? `2px solid ${accentColor}`
-                      : "2px solid rgba(255,255,255,0.1)",
+                      : "2px solid var(--color-toggle-bg)",
                     boxShadow: isActive
-                      ? `0 0 10px ${accentColor}66, 0 0 20px ${accentColor}33`
+                      ? `0 0 12px ${accentColor}66, 0 0 24px ${accentColor}33, 0 0 4px ${accentColor}aa`
                       : "none",
-                    background: "rgba(255,255,255,0.04)",
+                    background: "var(--color-hover-bg)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -198,7 +204,7 @@ export function OutfitCarousel({
                 <span
                   style={{
                     fontSize: "8px",
-                    color: isActive ? accentColor : "rgba(255,255,255,0.45)",
+                    color: isActive ? accentColor : "var(--color-inactive-nav)",
                     fontWeight: isActive ? 600 : 400,
                     letterSpacing: "0.02em",
                     textAlign: "center",

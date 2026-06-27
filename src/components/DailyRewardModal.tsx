@@ -76,7 +76,7 @@ export function DailyRewardModal({
             style={{
               fontSize: "48px",
               lineHeight: 1,
-              filter: "drop-shadow(0 0 12px rgba(255,255,255,0.3))",
+              filter: "drop-shadow(0 0 12px var(--color-toggle-knob))",
             }}
             role="img"
             aria-label={reward.name}
@@ -116,7 +116,7 @@ export function DailyRewardModal({
             style={{
               margin: 0,
               fontSize: "0.9rem",
-              color: "rgba(255,255,255,0.7)",
+              color: "var(--color-text-secondary)",
               textAlign: "center",
               lineHeight: 1.5,
             }}
@@ -213,7 +213,7 @@ export function DailyRewardModal({
                     width: isCurrent ? "14px" : "10px",
                     height: isCurrent ? "14px" : "10px",
                     borderRadius: "50%",
-                    backgroundColor: isFilled || isCurrent ? accentColor : "rgba(255,255,255,0.2)",
+                    backgroundColor: isFilled || isCurrent ? accentColor : "var(--color-progress-track)",
                     border: isCurrent ? `2px solid #ffffff` : "none",
                     boxShadow: isCurrent ? `0 0 8px ${accentColor}` : "none",
                     transition: "all 200ms ease",

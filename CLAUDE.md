@@ -1,0 +1,236 @@
+# HEXXII · Anime VN Chatbot
+
+## How to Run
+
+```bash
+cd "C:/Users/G$/anime-chatbot"
+rm -rf .next
+npx next dev --webpack -p 3000
+```
+
+- **MUST use `--webpack`** flag. Turbopack crashes because the `G$` path 
+  contains `$` which breaks its persistence DB.
+- Opens at http://localhost:3000
+- `reactStrictMode: false` in next.config.ts is deliberate (avoids 
+  double-mount on audio context and animation state).
+
+## Stack
+
+Next.js 16 (App Router), React 19, Tailwind CSS v4, framer-motion v10 
+(pinned), OpenAI API (GPT-4o), @andresaya/edge-tts for voice, 
+Web Audio API for sounds/music. PWA via manifest.json + sw.js.
+
+## Env
+
+Only one required var: `OPENAI_API_KEY` in `.env.local`
+
+`@anthropic-ai/sdk` is in package.json but unused. Chat API uses OpenAI only.
+
+## Known Issues
+
+- **framer-motion v10 pinned**: v11+ breaks with React 19 JSX types. 
+  Type augmentation at `src/types/framer-motion.d.ts` bridges the gap. 
+  Do not upgrade or remove.
+- **Google Drive sync**: This repo is also synced via Drive. Drive can 
+  revert file edits. Always re-read files from disk before editing.
+- **Turbopack**: Cannot use (`$` in path breaks persistence DB). 
+  Always pass `--webpack`.
+- **nao/Suzuka mismatch**: Character ID is `nao` (used in sprite paths, 
+  localStorage keys, filenames) but display name is `Suzuka` in UI.
+- **PWA manifest outdated**: Still says "Arisu, Marin, and Nao" but 
+  Kurisu and Merrick exist now.
+- **i18n incomplete**: `t()` function has en/ja translations. 
+  LanguageToggle switches en/ja. Chat API accepts `language` param 
+  including fr-CA but no FR toggle in UI.
+- **Light mode partial**: Most pages support it via CSS variables. 
+  Some inline styles still hardcode dark colors.
+
+## Architecture
+
+### Pages
+
+| Route | Purpose |
+|-------|---------|
+| `/` (page.tsx) | Landing: character cards, HEXXII title, daily rewards, onboarding, BloodBat mascot |
+| `/chat/[characterId]` | VN chat: sprite, dialogue box, expression system, outfits, scenes, quests, confession |
+| `/gallery` | Sprite gallery: all expressions + outfits, filtered per character |
+| `/profile` | Player profile: hero class, per-character affinity, total stats |
+| `/settings` | Text speed, sound, response length, AI provider, hero config, export |
+| `/api/chat` | SSE streaming chat (OpenAI). Expression tags parsed mid-stream. 50-msg history cap |
+| `/api/tts` | Edge TTS. Per-character voices. 500-char cap. Returns audio/mpeg |
+
+### Key Components (37 total in `src/components/`)
+
+- `CharacterSprite.tsx` · Layered PNG sprite: body + face expression, 350ms crossfade transitions
+- `DialogueBox.tsx` · VN typewriter with per-character TTS, configurable speed
+- `BloodBat.tsx` · Hexx SVG bat mascot, reacts to expressions, clickable with escalating personality
+- `SceneBackground.tsx` · Parallax bg with particles (stars, sakura, rain, sparkles, fireflies)
+- `OutfitCarousel.tsx` · Horizontal outfit picker
+- `ConfessionScene.tsx` · Branching VN confession at Soulmate level
+- `QuestPanel.tsx` · Daily quests with rewards
+- `BottomNav.tsx` · Fixed bottom nav (Chat, Outfits, Gifts, Diary, More)
+- `ChatInput.tsx` · Message input bar
+- `ChatHistory.tsx` · Scrollable chat history
+- `GiftShop.tsx` · Gift giving UI
+- `DiaryView.tsx` · Character diary entries viewer
+- `SplashScreen.tsx` · Initial app loading screen
+- `OnboardingOverlay.tsx` · First-run onboarding flow
+
+### Lib Modules (`src/lib/`)
+
+**Characters & Sprites:**
+- `characters/` · Config for all 5 characters (see table below)
+- `characters/types.ts` · Expression (16 values), BodyPose, Character, ThemeColors, SpriteConfig
+- `sprites/engine.ts` · `useBlink()` hook (3-6s), `useTalkAnimation()` (120ms mouth cycle)
+- `sprites/expressions.ts` · `getSpritePaths()`, `parseExpressionTag()`, `stripExpressionTags()`
+
+**Chat Engine:**
+- `chat/reducer.ts` · Actions: SEND_MESSAGE, RECEIVE_RESPONSE, LINE_TYPED, ADVANCE_LINE, TOGGLE_AUTO_ADVANCE, LOAD_HISTORY, SET_EXPRESSION. Splits response into 2-sentence lines.
+- `chat/context.tsx` · `ChatProvider`, `useChat()`. localStorage persistence. 200-msg cap.
+- `chat/actions.ts` · Action creators
+- `api.ts` · `streamChat()` SSE client, `parseSSEChunk()`
+
+**State & Memory:**
+- `affinity.ts` · 5 levels (Stranger/Acquaintance/Friend/Close Friend/Soulmate at 0/50/150/350/600 pts). Outfit unlocks, milestones, streaks.
+- `memory.ts` · 100 entries max, 6 categories (fact/preference/emotion/moment/topic/joke). Fuzzy dedup (60% overlap). 7-day decay.
+- `mood.ts` · 4 moods derived from recent expression history
+- `heroAvatar.ts` · 6 hero classes (knight/mage/rogue/demon/angel/beast) with per-character reactions
+- `stats.ts` · Cross-character aggregate stats, play time estimation
+
+**Engagement & Narrative:**
+- `engagement.ts` · Time-of-day greetings, streak messages
+- `crosschar.ts` · Cross-character jealousy system
+- `confession.ts` · Branching dialogue at high affinity, per-character scripts
+- `diary.ts` · Character diary entries (max 30)
+- `dailyRewards.ts` · 7-day repeating reward cycle
+- `quests.ts` · Daily quest pool (laugh-3, flustered-2, messages-10, gifts-2, headpat-5)
+- `gifts.ts` · Gift catalog (4 common, 3 rare, 2 legendary). Per-character reactions.
+- `conversationStarters.ts` · 8 suggested starters per character
+- `minigames.ts` · 6 game types, casual vs intimate tiers (affinity level 3+)
+
+**Audio & FX:**
+- `sounds.ts` · Web Audio synth: typing click, send swoosh, expression change, message received
+- `ambient.ts` · Procedural ambient music in Cmaj9, two melody voices
+- `sceneSounds.ts` · Per-scene ambient audio + per-character melody themes
+- `humming.ts` · Character hums unique melodies after 30s idle
+- `speech.ts` · TTS client: `speakLine()`, `stopSpeaking()` with AbortController
+- `screenShake.ts` · Light/medium/heavy shake on `#chat-container`
+
+**UI Utilities:**
+- `parallax.ts` · Mouse/device tilt tracking
+- `useTimeTheme.ts` · Auto day/night by clock
+- `themeMode.ts` · Light/dark toggle via `data-theme` attribute
+- `i18n.ts` · en/ja translations
+- `backgrounds.ts` · 11 scenes with gradients, bg images, particle types
+- `exportChat.ts` · Text and JSON export
+- `typingReactions.ts` · Typing speed/pause tracking
+
+## Characters
+
+| ID | Display Name | Archetype | Accent | TTS Voice | Default Scene |
+|----|-------------|-----------|--------|-----------|---------------|
+| arisu | Arisu | Supportive senpai | #f472b6 pink | en-AU-NatashaNeural +6Hz -10% | sakura |
+| marin | Marin | Tanned gyaru hype queen | #fb923c orange | en-US-SaraNeural +8Hz +5% | beach |
+| nao | Suzuka | Edgy-cute chaotic genius | #a78bfa purple | en-US-AriaNeural -2Hz +0% | cyberpunk |
+| kurisu | Kurisu | Genius tsundere scientist | #e53935 red | en-US-JennyNeural +2Hz +3% | lab |
+| merrick | Merrick | Mystical vampire witch | #7b1fa2 violet | en-US-AmberNeural -4Hz -5% | moonlight |
+
+16 expressions (all characters): neutral, happy, thinking, surprised, sad, 
+smirk, laugh, angry, flustered, devoted, teasing, sleepy, excited, shy, 
+jealous, crying
+
+3 body poses: neutral, arms-crossed, leaning
+
+## Expression System
+
+AI responses must start with `[expression]` tag on line 1. The API route 
+parses this tag mid-stream and emits it as an SSE `expression` event before 
+the text content. The sprite updates immediately on expression events.
+
+## Conversation Flow
+
+1. User types message, `playSendSwoosh`, dispatch `SEND_MESSAGE`
+2. SSE stream starts. `[happy]` tag parsed on `]` or `\n`
+3. Expression event fires: sprite updates, sound effects, screen shake
+4. Text accumulates via SSE text events
+5. Stream completes: `dispatch(receiveResponse)` splits into 2-sentence lines
+6. DialogueBox types each line, calls `speakLine` per line
+7. Click-to-continue on all lines. Auto-advance with 1.5s delay.
+
+## Art Assets
+
+- **Sprites**: `public/sprites/{character}/` · `body-neutral.png` + 
+  `face-{expression}.png` x15 + outfit variants (bikini, casual, formal, 
+  school, cheerleader, maid, nurse, cow, cowgirl, demon, vampire)
+- **Hexx mascot**: `public/sprites/hexx/` · 70+ mood/emotion PNGs
+- **Hero avatars**: `public/sprites/hero/` · 6 class PNGs (manhwa style)
+- **Backgrounds**: `public/backgrounds/bg-{scene}.png` · beach, bedroom, 
+  cafe, cyberpunk, lab, rain, rooftop, sakura, starfield
+- **SVG layers**: arisu/marin/nao have eyes/eyebrows/mouth SVGs but the 
+  compositing system (`useBlink`) is not fully wired
+
+## Art Generation (ComfyUI)
+
+All scripts in `scripts/` are Node ESM `.mjs` calling ComfyUI API at 
+`localhost:8188`.
+
+- **ComfyUI Desktop**: `C:/Users/G$/AppData/Local/Programs/Comfy Desktop/`
+- **Model**: `anything-v5.safetensors`
+- **Input dir**: `C:/Users/G$/AppData/Local/Comfy-Desktop/ComfyUI-Shared/input`
+- **Canvas**: 800x1400px, Euler a / DPM++ 2M Karras, 28-35 steps, CFG 6-7
+
+Key scripts:
+- `generate-art.mjs` · Original txt2img sprite gen
+- `regen-sprites.mjs` · Consistent regen (txt2img base + img2img expressions)
+- `generate-extras.mjs` · Lab bg + hero avatars
+- `generate-outfits-img2img.mjs` · Outfit gen (low denoise ~0.45)
+- `gen-*-outfits-v2.mjs` · Per-character outfit batches
+- `remove_backgrounds.py` (root) · rembg background removal
+
+Prompt references: `docs/sprite-prompts.md`, `docs/locked-prompts.md`, 
+`docs/comfyui-art-prompts.md`
+
+## localStorage Keys
+
+```
+anime-chatbot-history-{charId}       Chat messages (max 200)
+anime-chatbot-username-{charId}      User's name per character
+anime-chatbot-memories-{charId}      Memory entries (max 100)
+anime-chatbot-summaries-{charId}     Conversation summaries (max 30)
+anime-chatbot-mood-{charId}          Current mood
+anime-chatbot-diary-{charId}         Diary entries (max 30)
+anime-chatbot-affinity-{charId}      Affinity data
+anime-chatbot-theme-mode             light | dark
+anime-chatbot-text-speed             ms per char
+anime-chatbot-sound-enabled          boolean string
+anime-chatbot-response-length        short | medium | long
+anime-chatbot-ai-provider            gpt-4o | gpt-4o-mini | gpt-3.5-turbo
+anime-chatbot-language               en | ja
+anime-chatbot-hero-config            HeroConfig JSON
+anime-chatbot-daily-reward           RewardState JSON
+anime-chatbot-daily-quests-{charId}  DailyQuestState JSON
+anime-chatbot-gifts-{charId}         GiftRecord[] JSON
+anime-chatbot-confession-{charId}    boolean (has confessed)
+```
+
+## Tests
+
+Vitest with jsdom. Tests in `__tests__/lib/`:
+- `api.test.ts` · `parseSSEChunk()`
+- `characters.test.ts` · Character definitions and `getCharacter()`
+- `chat-reducer.test.ts` · All reducer actions
+- `expressions.test.ts` · Expression tag parsing
+
+Run: `npm test` or `npm run test:watch`
+
+## GitHub
+
+- **Repo**: `gillesm22/anime-chatbot` (private)
+- **Collaborator**: gillesm22
+
+## Safety (Google Drive)
+
+This repo syncs via Google Drive. Always:
+- Re-read files from disk before editing (Drive can revert silently)
+- Make targeted edits only, never regenerate entire files
+- Preserve all existing behavior unless explicitly told to change it

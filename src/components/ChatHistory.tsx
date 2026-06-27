@@ -42,7 +42,7 @@ export function ChatHistory({
       <div
         className="flex-1 flex flex-col"
         style={{
-          background: "rgba(13, 13, 18, 0.92)",
+          background: "var(--color-panel)",
           backdropFilter: "blur(12px)",
           borderRight: `1px solid ${accentColor}20`,
         }}
@@ -123,7 +123,7 @@ export function ChatHistory({
                   <div
                     className="max-w-[85%] rounded-2xl px-4 py-2.5"
                     style={{
-                      background: "rgba(255,255,255,0.05)",
+                      background: "var(--color-card-bg)",
                       borderBottomLeftRadius: 4,
                       borderLeft: `2px solid ${accentColor}40`,
                     }}

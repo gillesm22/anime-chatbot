@@ -65,7 +65,7 @@ export function ChatInput({
             className="px-6 py-3 rounded-full text-sm font-medium transition-opacity disabled:opacity-30"
             style={{
               backgroundColor: accentColor,
-              color: "#0d0d12",
+              color: "var(--color-nameplate-text)",
             }}
           >
             Send

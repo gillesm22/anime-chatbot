@@ -124,7 +124,7 @@ export function DiaryView({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#aaa",
+              color: "var(--color-text-secondary)",
               fontSize: "1.25rem",
               lineHeight: 1,
               padding: "4px 6px",
@@ -135,7 +135,7 @@ export function DiaryView({
               ((e.currentTarget as HTMLButtonElement).style.color = accentColor)
             }
             onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.color = "#aaa")
+              ((e.currentTarget as HTMLButtonElement).style.color = "")
             }
           >
             ✕
@@ -157,7 +157,7 @@ export function DiaryView({
               style={{
                 fontFamily: "'Georgia', serif",
                 fontStyle: "italic",
-                color: "#888",
+                color: "var(--color-text-secondary)",
                 textAlign: "center",
                 marginTop: "40px",
                 lineHeight: 1.7,

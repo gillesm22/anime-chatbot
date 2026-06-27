@@ -5,11 +5,13 @@ import type { Character, Expression } from "@/lib/characters/types";
 const ALL_EXPRESSIONS: Expression[] = ["neutral", "happy", "thinking", "surprised", "sad"];
 
 describe("Character registry", () => {
-  it("exports exactly 3 characters", () => {
-    expect(Object.keys(characters)).toHaveLength(3);
+  it("exports all 5 characters", () => {
+    expect(Object.keys(characters)).toHaveLength(5);
     expect(characters.arisu).toBeDefined();
     expect(characters.marin).toBeDefined();
     expect(characters.nao).toBeDefined();
+    expect(characters.kurisu).toBeDefined();
+    expect(characters.merrick).toBeDefined();
   });
 
   it("getCharacter returns a character by id", () => {

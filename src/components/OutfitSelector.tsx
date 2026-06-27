@@ -105,7 +105,7 @@ export function OutfitSelector({ accentColor, characterId, currentOutfit, onSele
   return (
     <div
       className="absolute bottom-3 right-3 z-20 flex gap-1.5 rounded-full px-2 py-1.5"
-      style={{ backgroundColor: "rgba(13, 13, 18, 0.65)", backdropFilter: "blur(8px)" }}
+      style={{ backgroundColor: "var(--color-overlay)", backdropFilter: "blur(8px)" }}
     >
       {outfits.map(({ id, label, icon }) => {
         const isActive = currentOutfit === id;
@@ -121,7 +121,7 @@ export function OutfitSelector({ accentColor, characterId, currentOutfit, onSele
               className="w-7 h-7 flex items-center justify-center rounded-full transition-colors opacity-30 cursor-not-allowed"
               style={{
                 backgroundColor: "transparent",
-                color: "rgba(255,255,255,0.45)",
+                color: "var(--color-inactive-nav)",
                 border: "1.5px solid transparent",
               }}
             >
@@ -141,10 +141,10 @@ export function OutfitSelector({ accentColor, characterId, currentOutfit, onSele
             className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
             style={{
               backgroundColor: isActive ? `${accentColor}35` : "transparent",
-              color: isActive ? accentColor : "rgba(255,255,255,0.45)",
+              color: isActive ? accentColor : "var(--color-inactive-nav)",
               border: isActive ? `1.5px solid ${accentColor}80` : "1.5px solid transparent",
             }}
-            whileHover={{ scale: 1.15, backgroundColor: isActive ? `${accentColor}35` : "rgba(255,255,255,0.08)" }}
+            whileHover={{ scale: 1.15, backgroundColor: isActive ? `${accentColor}35` : "var(--color-border)" }}
             whileTap={{ scale: 0.92 }}
           >
             {icon}

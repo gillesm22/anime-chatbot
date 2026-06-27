@@ -208,8 +208,8 @@ export function ConfessionScene({ characterId, script, onComplete }: ConfessionS
           <div
             className="rounded-2xl px-6 py-5 min-h-[100px] flex items-center"
             style={{
-              background: isNarration ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.07)",
-              border: `1px solid ${isNarration ? "rgba(255,255,255,0.08)" : accent + "44"}`,
+              background: isNarration ? "var(--color-hover-bg)" : "var(--color-card-border)",
+              border: `1px solid ${isNarration ? "var(--color-border)" : accent + "44"}`,
               boxShadow: isNarration ? "none" : `0 0 24px ${accent}22`,
             }}
             data-expression={currentLine?.expression ?? ""}
@@ -217,7 +217,7 @@ export function ConfessionScene({ characterId, script, onComplete }: ConfessionS
             <p
               className="text-base leading-relaxed"
               style={{
-                color: isNarration ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.92)",
+                color: isNarration ? "var(--color-text-secondary)" : "var(--color-text)",
                 fontStyle: isNarration ? "italic" : "normal",
                 letterSpacing: isNarration ? "0.02em" : "normal",
               }}
@@ -249,7 +249,7 @@ export function ConfessionScene({ characterId, script, onComplete }: ConfessionS
                   style={{
                     background: `${accent}22`,
                     border: `1px solid ${accent}66`,
-                    color: "rgba(255,255,255,0.88)",
+                    color: "var(--color-text-bright)",
                   }}
                 >
                   {choice.text}

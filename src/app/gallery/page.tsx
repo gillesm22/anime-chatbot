@@ -135,8 +135,8 @@ export default function GalleryPage() {
                   style={{
                     background: isActive
                       ? `${char.color}25`
-                      : "rgba(255,255,255,0.06)",
-                    color: isActive ? char.color : "rgba(255,255,255,0.5)",
+                      : "var(--color-card-bg)",
+                    color: isActive ? char.color : "var(--color-text-secondary)",
                     border: `1.5px solid ${isActive ? `${char.color}60` : "transparent"}`,
                   }}
                 >
@@ -188,8 +188,8 @@ export default function GalleryPage() {
                             onClick={() => setLightbox({ src, label: sprite.label })}
                             className="group rounded-xl overflow-hidden aspect-square flex items-center justify-center cursor-pointer transition-all hover:scale-[1.03]"
                             style={{
-                              background: "rgba(255,255,255,0.03)",
-                              border: "1px solid rgba(255,255,255,0.06)",
+                              background: "var(--color-card-bg)",
+                              border: "1px solid var(--color-card-border)",
                             }}
                             whileHover={{
                               borderColor: `${activeChar.color}40`,

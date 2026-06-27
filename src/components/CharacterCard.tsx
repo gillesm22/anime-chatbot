@@ -7,8 +7,6 @@ import { getAffinity, type AffinityData } from "@/lib/affinity";
 import { AffinityBadge } from "./AffinityBadge";
 import { StreakBadge } from "./StreakBadge";
 
-const PREVIEW_EXPRESSIONS = ["happy", "smirk", "teasing", "excited"] as const;
-
 interface CharacterCardProps {
   character: Character;
   index: number;
@@ -18,7 +16,6 @@ interface CharacterCardProps {
 export function CharacterCard({ character, index, isFavorite }: CharacterCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [hoverExpr, setHoverExpr] = useState<string | null>(null);
   const [affinity, setAffinity] = useState<AffinityData | null>(null);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const [msgCount, setMsgCount] = useState(0);
@@ -60,25 +57,23 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
       aria-label={`Chat with ${character.name}`}
       onClick={handleNavigate}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleNavigate(); } }}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        setHoverExpr(PREVIEW_EXPRESSIONS[Math.floor(Math.random() * PREVIEW_EXPRESSIONS.length)]);
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setHoverExpr(null);
-      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsHovered(true)}
-      onBlur={() => { setIsHovered(false); setHoverExpr(null); }}
+      onBlur={() => setIsHovered(false)}
       className="relative flex flex-col items-center rounded-2xl overflow-hidden cursor-pointer group min-h-[360px] sm:min-h-[480px] outline-none focus-visible:ring-2 focus-visible:ring-white/30"
       style={{
         background: `linear-gradient(180deg, ${character.theme.tint} 0%, var(--color-bg, #0d0d12) 100%)`,
         border: `1px solid ${character.theme.accent}${isFavorite ? "60" : "30"}`,
+        boxShadow: isHovered
+          ? `0 0 20px ${character.theme.accent}40, 0 0 40px ${character.theme.accent}20, inset 0 0 1px ${character.theme.accent}60`
+          : `0 0 8px ${character.theme.accent}15, 0 0 16px ${character.theme.accent}08`,
         transform: isExiting
           ? "scale(0.95)"
           : isHovered ? "translateY(-12px) scale(1.03)" : "translateY(0) scale(1)",
         opacity: isExiting ? 0 : 1,
-        transition: "transform 300ms ease, opacity 300ms ease",
+        transition: "transform 300ms ease, opacity 300ms ease, box-shadow 400ms ease",
+        animation: `cardPulseGlow_${character.id} 3s ease-in-out infinite`,
       }}
     >
       {/* Glow effect on hover */}
@@ -87,6 +82,18 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
         style={{
           boxShadow: `inset 0 0 80px ${character.theme.glow}, 0 0 40px ${character.theme.glow}`,
           opacity: isHovered ? 1 : isFavorite ? 0.3 : 0,
+        }}
+      />
+
+      {/* Shimmer sweep on hover */}
+      <div
+        className="absolute inset-0 pointer-events-none z-30"
+        style={{
+          background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 55%, transparent 70%)",
+          backgroundSize: "200% 100%",
+          backgroundPosition: isHovered ? "200% 0" : "-200% 0",
+          transition: "background-position 0.8s ease",
+          opacity: isHovered ? 1 : 0,
         }}
       />
 
@@ -123,25 +130,10 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
           draggable={false}
           style={{
             transform: isHovered ? "translateY(-8px) scale(1.05)" : "translateY(0) scale(1)",
-            opacity: isHovered && hoverExpr ? 0 : 1,
             animation: isHovered ? "none" : "charBreathe 4s ease-in-out infinite",
             pointerEvents: "none",
           }}
         />
-        {/* Expression preview on hover */}
-        {hoverExpr && (
-          <img
-            src={`${character.sprite.basePath}/face-${hoverExpr}.png`}
-            alt={`${character.name} ${hoverExpr}`}
-            className="h-64 sm:h-96 object-contain object-bottom absolute inset-0 w-full z-20 transition-all duration-300"
-            draggable={false}
-            style={{
-              opacity: isHovered ? 1 : 0,
-              transform: isHovered ? "translateY(-8px) scale(1.05)" : "translateY(0) scale(1)",
-              pointerEvents: "none",
-            }}
-          />
-        )}
 
         {/* Reflection/glow under character */}
         <div
@@ -161,6 +153,10 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
         @keyframes newBadgePulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        @keyframes cardPulseGlow_${character.id} {
+          0%, 100% { box-shadow: 0 0 8px ${character.theme.accent}15, 0 0 16px ${character.theme.accent}08; }
+          50% { box-shadow: 0 0 12px ${character.theme.accent}25, 0 0 24px ${character.theme.accent}12; }
         }
       `}</style>
 
@@ -194,7 +190,7 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
           className="text-xs mt-2 transition-opacity duration-300"
           style={{
             color: character.theme.accent,
-            opacity: isHovered ? 0.6 : 0,
+            opacity: isHovered ? 0.6 : 0.3,
           }}
         >
           {character.archetype}

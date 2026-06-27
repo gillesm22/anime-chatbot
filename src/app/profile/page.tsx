@@ -132,7 +132,7 @@ export default function ProfilePage() {
               </div>
               <div
                 className="h-2 rounded-full overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                style={{ background: "var(--color-card-border)" }}
               >
                 <motion.div
                   className="h-full rounded-full"
@@ -152,7 +152,7 @@ export default function ProfilePage() {
             </h2>
             <div
               className="rounded-2xl p-5 grid grid-cols-2 gap-4"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <StatBox label="Total Messages" value={stats.totalMessages} />
               <StatBox label="Affinity Points" value={stats.totalAffinityPoints} />
@@ -181,7 +181,7 @@ export default function ProfilePage() {
               </h2>
               <div
                 className="rounded-2xl p-5 flex items-center gap-4"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
               >
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
@@ -204,7 +204,7 @@ export default function ProfilePage() {
             </h2>
             <div
               className="rounded-2xl p-5 space-y-4"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               {stats.characterBreakdown.map((char) => {
                 const progress = char.nextThreshold > 0
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                     </div>
                     <div
                       className="h-1.5 rounded-full overflow-hidden"
-                      style={{ background: "rgba(255,255,255,0.06)" }}
+                      style={{ background: "var(--color-card-border)" }}
                     >
                       <motion.div
                         className="h-full rounded-full"
@@ -255,7 +255,7 @@ export default function ProfilePage() {
             </h2>
             <div
               className="rounded-2xl p-5 space-y-2"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               {MILESTONES.map((m) => {
                 const earned = stats.characterBreakdown.some((c) => {
@@ -279,8 +279,8 @@ export default function ProfilePage() {
                     <div
                       className="relative w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
                       style={{
-                        background: earned ? `${classDef.theme.accent}20` : "rgba(255,255,255,0.04)",
-                        border: earned ? `1px solid ${classDef.theme.accent}40` : "1px solid rgba(255,255,255,0.06)",
+                        background: earned ? `${classDef.theme.accent}20` : "var(--color-card-bg)",
+                        border: earned ? `1px solid ${classDef.theme.accent}40` : "1px solid var(--color-card-border)",
                         overflow: "hidden",
                       }}
                     >

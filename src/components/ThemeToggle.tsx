@@ -23,8 +23,8 @@ export function ThemeToggle() {
       onClick={toggle}
       className="relative w-12 h-6 rounded-full transition-colors duration-300 flex items-center"
       style={{
-        backgroundColor: mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(251,191,36,0.25)",
-        border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.15)" : "rgba(251,191,36,0.4)"}`,
+        backgroundColor: mode === "dark" ? "var(--color-toggle-bg)" : "rgba(251,191,36,0.25)",
+        border: `1px solid ${mode === "dark" ? "var(--color-progress-track)" : "rgba(251,191,36,0.4)"}`,
       }}
       title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
