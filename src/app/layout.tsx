@@ -59,6 +59,17 @@ export default function RootLayout({
               if (typeof args[0] === 'string' && (args[0].includes('Hydration') || args[0].includes('hydrat'))) return;
               origError.apply(console, args);
             };
+            // Force refresh stale service worker and clear old caches
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(regs) {
+                regs.forEach(function(reg) { reg.update(); });
+              });
+              caches.keys().then(function(keys) {
+                keys.forEach(function(k) {
+                  if (k !== 'anime-chatbot-v4') caches.delete(k);
+                });
+              });
+            }
           }
         `}} />
         {children}
