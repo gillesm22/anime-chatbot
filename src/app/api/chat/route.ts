@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { getCharacter } from "@/lib/characters";
-import { parseExpressionTag, stripExpressionTags, parseSceneTag } from "@/lib/sprites/expressions";
+import { parseExpressionTag, stripExpressionTags, parseSceneTag, parseHexxTag } from "@/lib/sprites/expressions";
 
 const openai = new OpenAI();
 
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
-  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext } = body;
+  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext, hexxMentioned } = body;
   const history = Array.isArray(body.history) ? body.history.slice(-50) : []; // Cap history at 50 messages
 
   if (!message || typeof message !== "string") {
@@ -82,6 +82,22 @@ export async function POST(request: Request) {
   if (personalityContext) {
     systemContent += `\n\n${personalityContext}`;
   }
+  if (hexxMentioned) {
+    const hexxOpinions: Record<string, string> = {
+      arisu: "You think Hexx is absolutely adorable. You talk to her sweetly and worry about her well-being. You sometimes address her directly with gentle encouragement.",
+      marin: "You think Hexx is hilarious and treat her like your hype sidekick. You give her silly nicknames and gas her up.",
+      nao: "You respect Hexx's chaotic energy and see a kindred spirit in her. You find her fascinating and want to study her abilities.",
+      kurisu: "You pretend Hexx annoys you but you secretly think she's scientifically fascinating. You act tsundere toward her — 'It's just a bat, why would I care about it?'",
+      merrick: "You treat Hexx as a fellow creature of the night and speak to her as an equal. You respect her dark energy and consider her a kindred spirit.",
+    };
+    const opinion = hexxOpinions[characterId] || hexxOpinions.arisu;
+    systemContent += `\n\n[Hexx the Bat]
+The user has a tiny pet bat companion named Hexx who is always nearby. She's a small, chaotic, sassy blood-red bat with big personality. She's loyal to the user but mischievous.
+
+Your opinion of Hexx: ${opinion}
+
+The user mentioned Hexx in their message. Acknowledge Hexx naturally in your response. Also include a [hexx:her reaction] tag somewhere in your response — this is what Hexx says/does in reaction. Keep it short (under 10 words), sassy, and in character for a tiny chaotic bat. Examples: [hexx:*preens smugly*], [hexx:hey I heard that!], [hexx:tch, whatever]`;
+  }
   if (language && language !== "en") {
     systemContent += `\n\nIMPORTANT: The user prefers to chat in ${language === "fr" ? "French (fr-CA)" : language}. Respond in that language while staying in character.`;
   }
@@ -124,6 +140,7 @@ Only change scenes when it makes narrative sense — you suggest going somewhere
   let fullText = "";
   let expressionSent = false;
   let sceneSent = false;
+  let hexxSent = false;
 
   const readable = new ReadableStream({
     async start(controller) {
@@ -164,11 +181,28 @@ Only change scenes when it makes narrative sense — you suggest going somewhere
                 );
               }
             }
+            // Check for hexx tags in accumulated text
+            if (!hexxSent) {
+              const hexxResult = parseHexxTag(fullText);
+              if (hexxResult) {
+                hexxSent = true;
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ type: "hexx", content: hexxResult.hexxLine })}\n\n`
+                  )
+                );
+              }
+            }
             let cleaned = stripExpressionTags(delta, false);
             // Strip scene tags from text chunks
             const sceneInDelta = parseSceneTag(cleaned);
             if (sceneInDelta) {
               cleaned = sceneInDelta.text;
+            }
+            // Strip hexx tags from text chunks
+            const hexxInDelta = parseHexxTag(cleaned);
+            if (hexxInDelta) {
+              cleaned = hexxInDelta.text;
             }
             if (cleaned) {
               controller.enqueue(
