@@ -64,6 +64,8 @@ import { buildGreetingContext } from "@/lib/greetingContext";
 import { getPersonalityContext, updateUserStyle } from "@/lib/personality";
 import { saveSessionEndMood, getSessionStartMood } from "@/lib/mood";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
+import { haptic } from "@/lib/haptics";
+import { useSwipeGesture } from "@/lib/useSwipeGesture";
 
 const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
   { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
@@ -125,6 +127,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const timeTheme = useTimeTheme();
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const recentExpressionsRef = useRef<string[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const currentMoodRef = useRef<ReturnType<typeof getMood>>("neutral");
   const [outfit, setOutfit] = useState<Outfit>(() => {
     if (typeof window === "undefined") return "default";
@@ -223,6 +226,18 @@ function ChatContent({ characterId }: { characterId: string }) {
     };
   }, [characterId]);
 
+  // Dynamic theme-color for status bar
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute("content", character?.theme.tint || "#0d0d12");
+    }
+    return () => {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", "#0d0d12");
+    };
+  }, [character]);
+
   useEffect(() => {
     if (!greetingShownRef.current && state.historyLoaded && state.messages.length === 0 && character) {
       greetingShownRef.current = true;
@@ -291,6 +306,7 @@ function ChatContent({ characterId }: { characterId: string }) {
 
       resetIdleTimer();
       playSendSwoosh();
+      haptic.pulse();
       dispatch(sendMessage(message));
 
       const msgEvent = message.length > 50
@@ -302,6 +318,7 @@ function ChatContent({ characterId }: { characterId: string }) {
       }
       if (affinityResult.leveledUp && affinityResult.data.level >= 2 && affinityResult.data.level <= 4) {
         setLevelUpMilestone({ level: affinityResult.data.level, levelName: affinityResult.data.levelName });
+        haptic.success();
       }
 
       const history = state.messages.map((m) => ({
@@ -339,6 +356,7 @@ function ChatContent({ characterId }: { characterId: string }) {
                 expression = event.expression;
                 dispatch(setExpression(expression));
                 playExpressionChange();
+                haptic.expression(expression);
                 playMessageReceived();
                 if (expression === "angry" || expression === "surprised") {
                   triggerScreenShake(expression === "angry" ? "heavy" : "medium");
@@ -408,6 +426,7 @@ function ChatContent({ characterId }: { characterId: string }) {
 
   const handleGift = useCallback((gift: Gift, reaction: CharacterReaction) => {
     setGiftReaction({ gift, reaction });
+    haptic.success();
     setShowGiftShop(false);
     // Map compound expressions like "crying/devoted" to the first valid one
     const exprParts = reaction.expression.split("/");
@@ -424,6 +443,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   }, [dispatch]);
 
   const handleAdvance = useCallback(() => {
+    haptic.tick();
     dispatch(advanceLine());
   }, [dispatch]);
 
@@ -434,6 +454,20 @@ function ChatContent({ characterId }: { characterId: string }) {
     }
     prevPhaseRef.current = state.phase;
   }, [state.phase, dispatch]);
+
+  useSwipeGesture(chatContainerRef, (result) => {
+    if (result.direction === "right" && result.fromEdge && !showHistory) {
+      haptic.tick();
+      setShowHistory(true);
+    } else if (result.direction === "left") {
+      if (showHistory) { haptic.tick(); setShowHistory(false); }
+      else if (showDiary) { haptic.tick(); setShowDiary(false); }
+      else if (showGiftShop) { haptic.tick(); setShowGiftShop(false); }
+      else if (showOutfitCarousel) { haptic.tick(); setShowOutfitCarousel(false); }
+      else if (showQuestPanel) { haptic.tick(); setShowQuestPanel(false); }
+      else if (showScenePicker) { haptic.tick(); setShowScenePicker(false); }
+    }
+  });
 
   useEffect(() => {
     if (state.autoAdvance && state.phase === "speaking" && !state.isTyping) {
@@ -520,7 +554,7 @@ function ChatContent({ characterId }: { characterId: string }) {
           <div className="flex items-center gap-2 md:gap-4">
             <button
               onClick={() => router.push("/")}
-              className="flex items-center gap-1 md:gap-2 text-text-secondary hover:text-text transition-colors text-xs md:text-sm"
+              className="touch-target flex items-center gap-1 md:gap-2 text-text-secondary hover:text-text transition-colors text-xs md:text-sm"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -720,6 +754,7 @@ function ChatContent({ characterId }: { characterId: string }) {
             onHeadpat={() => {
               const r = addAffinityPoints(characterId, { type: "headpat" });
               if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
+              haptic.pet();
             }}
             onExpressionChange={(effect) => {
               setActiveEffect(effect);
@@ -735,7 +770,7 @@ function ChatContent({ characterId }: { characterId: string }) {
         </div>
 
         {/* Dialogue / input area - always visible at bottom */}
-        <div className="flex-shrink-0 relative z-10 pb-20" style={{ minHeight: showDialogue ? "120px" : undefined }}>
+        <div className="flex-shrink-0 relative z-10" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))", minHeight: showDialogue ? "120px" : undefined }}>
           {showDialogue && (
             <DialogueBox
               characterName={character.name}

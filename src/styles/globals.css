@@ -220,3 +220,58 @@ html[data-theme="light"] .cursor-vn {
 .expression-dim { animation: scene-desaturate 0.4s ease-out forwards; }
 .expression-flash { animation: sprite-flash 0.2s ease-out; }
 input, textarea, button { -webkit-appearance: none; }
+
+/* --- Mobile & PWA Polish --- */
+
+/* Fix iOS Safari 100vh bug */
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Prevent pull-to-refresh on chat page */
+#chat-container {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area padding for fixed elements */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Minimum touch targets (Apple HIG: 44x44) */
+@media (pointer: coarse) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Prevent iOS auto-zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Smooth scrolling for touch panels */
+.scroll-smooth-touch {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Scroll snap for horizontal carousels */
+.snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.snap-center {
+  scroll-snap-align: center;
+}
