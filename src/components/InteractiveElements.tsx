@@ -246,6 +246,21 @@ const STYLES = `
   0%   { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-90px) scale(0.3); opacity: 0; }
 }
+@keyframes ie-splash-drop {
+  0%   { transform: translate(var(--dx), 0) scale(1); opacity: 0.9; }
+  50%  { transform: translate(calc(var(--dx) * 1.5), var(--dy)) scale(0.8); opacity: 0.7; }
+  100% { transform: translate(calc(var(--dx) * 1.8), calc(var(--dy) + 30px)) scale(0.2); opacity: 0; }
+}
+@keyframes ie-ripple {
+  0%   { transform: scale(0); opacity: 0.6; border-width: 3px; }
+  100% { transform: scale(1); opacity: 0; border-width: 1px; }
+}
+@keyframes ie-wave-swell {
+  0%   { transform: scaleY(1) translateY(0); }
+  30%  { transform: scaleY(1.15) translateY(-4px); }
+  60%  { transform: scaleY(0.92) translateY(2px); }
+  100% { transform: scaleY(1) translateY(0); }
+}
 @keyframes ie-steam-up {
   0%   { transform: translateY(0) scale(1); opacity: 0.7; }
   100% { transform: translateY(-80px) scale(1.6); opacity: 0; }
@@ -517,6 +532,11 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
   const [moonPhase, setMoonPhase] = useState(0); // index into MOON_PHASES
   const [showLightning, setShowLightning] = useState(false);
 
+  // Splash ripples
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [waveActive, setWaveActive] = useState(false);
+  const rippleIdRef = useRef(0);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // ── helpers ──
@@ -541,14 +561,35 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
     }
   }, [spawnParticles]);
 
-  const handleBeach = useCallback(() => {
+  const handleBeachAt = useCallback((e: React.MouseEvent) => {
     playSplash();
-    const origin = relativeOrigin(0.5, 0.88);
-    const colors = ["#60b8e0", "#93d4f0", "#4aa8d4", "#b0e0f8", "#2196c8"];
-    spawnParticles(12, origin, colors[0], "ie-spray-up", 9, 900);
-    colors.slice(1).forEach((c, i) => {
-      setTimeout(() => spawnParticles(2, origin, c, "ie-spray-up", 7, 700), (i + 1) * 50);
-    });
+    const rect = containerRef.current?.getBoundingClientRect();
+    const x = rect ? e.clientX - rect.left : e.clientX;
+    const y = rect ? e.clientY - rect.top : e.clientY;
+    const origin = { x, y };
+
+    // Spray droplets in all directions from tap point
+    const dropColors = ["#60b8e0", "#93d4f0", "#4aa8d4", "#b0e0f8", "#2196c8", "#ffffff"];
+    for (let i = 0; i < 18; i++) {
+      setTimeout(() => {
+        const angle = (Math.PI * 2 * i) / 18 + (Math.random() - 0.5) * 0.4;
+        const dist = 20 + Math.random() * 50;
+        const ox = { x: origin.x + Math.cos(angle) * dist * 0.3, y: origin.y + Math.sin(angle) * dist * 0.3 };
+        spawnParticles(1, ox, dropColors[i % dropColors.length], "ie-spray-up", 4 + Math.random() * 6, 600 + Math.random() * 500);
+      }, i * 20);
+    }
+
+    // Big central spray upward
+    spawnParticles(8, origin, "#b0e0f8", "ie-spray-up", 10, 900);
+
+    // Ripple ring at tap point
+    const id = rippleIdRef.current++;
+    setRipples(prev => [...prev, { id, x, y }]);
+    setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 800);
+
+    // Wave swell
+    setWaveActive(true);
+    setTimeout(() => setWaveActive(false), 600);
   }, [spawnParticles]);
 
   const handleCyberpunk = useCallback(() => {
@@ -691,7 +732,6 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
 
   const legacySoundHandlers: Record<string, () => void> = {
     "sakura-tree": handleSakura,
-    "beach-splash": handleBeach,
     "cyberpunk-neon": handleCyberpunk,
     "cafe-coffee": handleCafe,
     "rain-thunder": handleRain,
@@ -746,10 +786,51 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
             />
           )}
 
+          {/* Ripple rings from water taps */}
+          {ripples.map((r) => (
+            <div
+              key={r.id}
+              style={{
+                position: "absolute", left: r.x - 40, top: r.y - 40,
+                width: 80, height: 80, borderRadius: "50%",
+                border: "2px solid rgba(150, 220, 255, 0.6)",
+                animation: "ie-ripple 0.8s ease-out forwards",
+                pointerEvents: "none",
+              }}
+            />
+          ))}
+
           {/* Render all visible interactables */}
           {visibleItems.map((item) => {
             const legacyHandler = legacySoundHandlers[item.id];
             const onClick = () => { legacyHandler?.(); handleDiscoveryTap(item); };
+
+            // Special: beach water — interactive splash at tap point
+            if (item.id === "beach-splash") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    left: `${item.position.x}%`, top: `${item.position.y}%`,
+                    width: `${item.position.width}%`, height: `${item.position.height}%`,
+                    borderRadius: 12,
+                    background: "transparent",
+                    cursor: "pointer",
+                    animation: waveActive ? "ie-wave-swell 0.6s ease-out" : "none",
+                  }}
+                  onClick={(e) => { handleBeachAt(e); handleDiscoveryTap(item); }}
+                  title={item.label}
+                >
+                  <span style={{
+                    fontSize: 28, display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "100%", height: "100%",
+                    filter: "drop-shadow(0 2px 4px rgba(0,80,120,0.3))",
+                  }}>🌊</span>
+                </div>
+              );
+            }
 
             // Special: neon sign — looks like an actual neon sign in the scene
             if (item.id === "cyberpunk-neon") {
