@@ -51,6 +51,9 @@ export function SceneBackground({
 }: SceneBackgroundProps) {
   const parallax = useParallax();
   const [mode, setMode] = useState<ThemeMode>("dark");
+  const [activeScene, setActiveScene] = useState(sceneId);
+  const [prevScene, setPrevScene] = useState<SceneId | null>(null);
+  const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
     // Read current theme
@@ -66,7 +69,20 @@ export function SceneBackground({
     return () => observer.disconnect();
   }, []);
 
-  const scene = SCENES[sceneId];
+  useEffect(() => {
+    if (sceneId !== activeScene) {
+      setPrevScene(activeScene);
+      setTransitioning(true);
+      const timer = setTimeout(() => {
+        setActiveScene(sceneId);
+        setTransitioning(false);
+        setPrevScene(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [sceneId, activeScene]);
+
+  const scene = SCENES[activeScene];
   const isLight = mode === "light";
   const particleType = scene.particles;
 
@@ -252,6 +268,35 @@ export function SceneBackground({
             }}
           />
         ))}
+
+      {/* Previous scene fading-out overlay during crossfade transition */}
+      {prevScene && transitioning && (() => {
+        const oldScene = SCENES[prevScene];
+        const oldGradient = isLight ? oldScene.gradientLight : oldScene.gradient;
+        return (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              opacity: 0,
+              transition: "opacity 1s ease-in-out",
+              zIndex: -1,
+            }}
+          >
+            {oldScene.bgImage ? (
+              <img
+                src={oldScene.bgImage}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{
+                  filter: isLight ? "brightness(1.1) saturate(1.15)" : "brightness(0.75) saturate(0.9)",
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0" style={{ background: oldGradient }} />
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
