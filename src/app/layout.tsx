@@ -59,16 +59,17 @@ export default function RootLayout({
               if (typeof args[0] === 'string' && (args[0].includes('Hydration') || args[0].includes('hydrat'))) return;
               origError.apply(console, args);
             };
-            // Force refresh stale service worker and clear old caches
+            // Unregister all service workers and clear all caches
+            // to prevent stale cached API responses
             if ('serviceWorker' in navigator) {
               navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(reg) { reg.update(); });
+                regs.forEach(function(reg) { reg.unregister(); });
               });
-              caches.keys().then(function(keys) {
-                keys.forEach(function(k) {
-                  if (k !== 'anime-chatbot-v4') caches.delete(k);
+              if (typeof caches !== 'undefined') {
+                caches.keys().then(function(keys) {
+                  keys.forEach(function(k) { caches.delete(k); });
                 });
-              });
+              }
             }
           }
         `}} />
