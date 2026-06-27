@@ -1,8 +1,122 @@
+import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { getCharacter } from "@/lib/characters";
 import { parseExpressionTag, stripExpressionTags, parseSceneTag, parseHexxTag } from "@/lib/sprites/expressions";
 
-const openai = new OpenAI();
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
+
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
+// Anthropic models to try in order (newest → oldest)
+const CLAUDE_MODELS = [
+  "claude-sonnet-4-20250514",
+  "claude-3-5-sonnet-20241022",
+  "claude-3-haiku-20240307",
+];
+
+// OpenAI models to try in order
+const OPENAI_MODELS = [
+  "gpt-4o",
+  "gpt-4o-mini",
+  "gpt-3.5-turbo",
+];
+
+// ---------------------------------------------------------------------------
+// Stream helpers
+// ---------------------------------------------------------------------------
+
+type StreamResult = {
+  iterate: () => AsyncIterable<string>;
+};
+
+async function tryAnthropicStream(
+  systemContent: string,
+  messages: Array<{ role: "user" | "assistant"; content: string }>,
+  maxTokens: number
+): Promise<StreamResult> {
+  if (!anthropic) throw new Error("No Anthropic key");
+
+  let lastError: Error | null = null;
+  for (const model of CLAUDE_MODELS) {
+    try {
+      // Use create (not stream) to catch 404 before streaming starts
+      const response = await anthropic.messages.create({
+        model,
+        max_tokens: maxTokens,
+        system: systemContent,
+        messages,
+        stream: true,
+      });
+      // If we get here, the model is valid. Wrap the stream.
+      return {
+        iterate: async function* () {
+          for await (const event of response) {
+            if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+              yield event.delta.text;
+            }
+          }
+        },
+      };
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const status = (error as { status?: number })?.status;
+      // 404 = model not available, 529 = overloaded, 429 = rate limit — try next
+      if (status !== 404 && status !== 529 && status !== 429) throw error;
+    }
+  }
+  throw lastError || new Error("All Claude models unavailable");
+}
+
+async function tryOpenAIStream(
+  systemContent: string,
+  messages: Array<{ role: "user" | "assistant"; content: string }>,
+  userMessage: string,
+  maxTokens: number
+): Promise<StreamResult> {
+  if (!openai) throw new Error("No OpenAI key");
+
+  let lastError: Error | null = null;
+  for (const model of OPENAI_MODELS) {
+    try {
+      const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
+        { role: "system", content: systemContent },
+        ...messages.map((msg) => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+        })),
+        { role: "user", content: userMessage },
+      ];
+      const stream = await openai.chat.completions.create({
+        model,
+        max_tokens: maxTokens,
+        messages: openaiMessages,
+        stream: true,
+      });
+      return {
+        iterate: async function* () {
+          for await (const chunk of stream) {
+            const delta = chunk.choices[0]?.delta?.content;
+            if (delta) yield delta;
+          }
+        },
+      };
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const status = (error as { status?: number })?.status;
+      // 429 = quota exceeded, try next model. 404 = model not available, try next.
+      if (status !== 429 && status !== 404) throw error;
+    }
+  }
+  throw lastError || new Error("All OpenAI models unavailable");
+}
+
+// ---------------------------------------------------------------------------
+// Route
+// ---------------------------------------------------------------------------
 
 export async function POST(request: Request) {
   let body;
@@ -12,15 +126,12 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
-  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext, hexxMentioned, discoveryContext } = body;
-  const history = Array.isArray(body.history) ? body.history.slice(-50) : []; // Cap history at 50 messages
+  const { message, characterId, userName, memories, responseLength, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext, hexxMentioned, discoveryContext } = body;
+  const history = Array.isArray(body.history) ? body.history.slice(-50) : [];
 
   if (!message || typeof message !== "string") {
     return new Response(JSON.stringify({ error: "Missing message" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
-
-  const validModels = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"];
-  const model = validModels.includes(provider) ? provider : "gpt-4o";
 
   const character = getCharacter(characterId);
   if (!character) {
@@ -122,35 +233,47 @@ Only change scenes when it makes narrative sense — you suggest going somewhere
     medium: 1024,
     long: 2048,
   };
+  const maxTokens = maxTokensMap[lengthKey] || 1024;
 
-  const messages: OpenAI.ChatCompletionMessageParam[] = [
-    { role: "system", content: systemContent },
+  const chatMessages = [
     ...history.map((msg: { role: string; content: string }) => ({
       role: msg.role as "user" | "assistant",
       content: msg.content,
     })),
-    { role: "user", content: message },
+    { role: "user" as const, content: message },
   ];
 
-  let stream;
-  try {
-    stream = await openai.chat.completions.create({
-      model,
-      max_tokens: maxTokensMap[lengthKey] || 512,
-      messages,
-      stream: true,
-    });
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : "API call failed";
-    const status = (error as { status?: number })?.status;
-    const userMsg = status === 429
-      ? "API quota exceeded — please check your OpenAI billing."
-      : `Chat API error: ${msg}`;
-    return new Response(JSON.stringify({ error: userMsg }), {
-      status: status || 500,
+  // Try providers in order: Anthropic → OpenAI
+  let streamResult: StreamResult | null = null;
+  const errors: string[] = [];
+
+  if (anthropic) {
+    try {
+      streamResult = await tryAnthropicStream(systemContent, chatMessages, maxTokens);
+    } catch (error) {
+      errors.push(`Claude: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  if (!streamResult && openai) {
+    try {
+      streamResult = await tryOpenAIStream(systemContent, chatMessages, message, maxTokens);
+    } catch (error) {
+      errors.push(`OpenAI: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  if (!streamResult) {
+    const msg = errors.length > 0
+      ? `All AI providers failed:\n${errors.join("\n")}`
+      : "No API keys configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY in .env.local";
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 503,
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  // ── SSE stream processing (same for both providers) ──
 
   const encoder = new TextEncoder();
   let fullText = "";
@@ -161,102 +284,55 @@ Only change scenes when it makes narrative sense — you suggest going somewhere
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          const delta = chunk.choices[0]?.delta?.content;
-          if (!delta) continue;
-
+        for await (const delta of streamResult!.iterate()) {
           fullText += delta;
 
           if (!expressionSent && (fullText.includes("\n") || (fullText.includes("]") && fullText.length > 15))) {
             const { expression, text } = parseExpressionTag(fullText);
             expressionSent = true;
-
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({ type: "expression", expression })}\n\n`
-              )
-            );
-
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "expression", expression })}\n\n`));
             if (text) {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ type: "text", content: text })}\n\n`
-                )
-              );
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", content: text })}\n\n`));
             }
           } else if (expressionSent) {
-            // Check for scene tags in accumulated text
             if (!sceneSent) {
               const sceneResult = parseSceneTag(fullText);
               if (sceneResult) {
                 sceneSent = true;
-                controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({ type: "scene", sceneId: sceneResult.sceneId })}\n\n`
-                  )
-                );
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "scene", sceneId: sceneResult.sceneId })}\n\n`));
               }
             }
-            // Check for hexx tags in accumulated text
             if (!hexxSent) {
               const hexxResult = parseHexxTag(fullText);
               if (hexxResult) {
                 hexxSent = true;
-                controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({ type: "hexx", content: hexxResult.hexxLine })}\n\n`
-                  )
-                );
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "hexx", content: hexxResult.hexxLine })}\n\n`));
               }
             }
             let cleaned = stripExpressionTags(delta, false);
-            // Strip scene tags from text chunks
             const sceneInDelta = parseSceneTag(cleaned);
-            if (sceneInDelta) {
-              cleaned = sceneInDelta.text;
-            }
-            // Strip hexx tags from text chunks
+            if (sceneInDelta) cleaned = sceneInDelta.text;
             const hexxInDelta = parseHexxTag(cleaned);
-            if (hexxInDelta) {
-              cleaned = hexxInDelta.text;
-            }
+            if (hexxInDelta) cleaned = hexxInDelta.text;
             if (cleaned) {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ type: "text", content: cleaned })}\n\n`
-                )
-              );
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", content: cleaned })}\n\n`));
             }
           }
         }
 
         if (!expressionSent) {
           const { expression, text } = parseExpressionTag(fullText);
-          controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({ type: "expression", expression })}\n\n`
-            )
-          );
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "expression", expression })}\n\n`));
           if (text) {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({ type: "text", content: text })}\n\n`
-              )
-            );
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", content: text })}\n\n`));
           }
         }
 
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-        );
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`));
         controller.close();
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
-        controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({ type: "error", message: msg })}\n\n`
-          )
-        );
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", message: msg })}\n\n`));
         controller.close();
       }
     },
