@@ -1,6 +1,19 @@
 "use client";
 
 import React, { useState, useCallback, useRef } from "react";
+import {
+  getInteractablesForScene,
+  getVisibleInteractables,
+  recordTap,
+  getReactionLine,
+  buildDiscoveryContext,
+  type VisibleInteractable,
+} from "@/lib/discoveries";
+import { getAffinity, addAffinityPoints } from "@/lib/affinity";
+import { updateQuestProgress } from "@/lib/quests";
+import { addDiaryEntry } from "@/lib/diary";
+import { playDiscoveryChime } from "@/lib/sounds";
+import { haptic } from "@/lib/haptics";
 
 // ─── Web Audio helpers ────────────────────────────────────────────────────────
 
@@ -257,6 +270,10 @@ const STYLES = `
   0%   { opacity: 0.8; }
   100% { opacity: 0; }
 }
+@keyframes ie-shimmer {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.3; }
+}
 `;
 
 function injectStyles() {
@@ -277,9 +294,12 @@ const MOON_PHASES = ["🌑", "🌒", "🌓", "🌔", "🌕"];
 export interface InteractiveElementsProps {
   sceneId: string;
   accentColor: string;
+  characterId?: string;
+  onReaction?: (line: string, expression: string) => void;
+  onDiscoveryContext?: (context: string) => void;
 }
 
-export function InteractiveElements({ sceneId, accentColor }: InteractiveElementsProps) {
+export function InteractiveElements({ sceneId, accentColor, characterId, onReaction, onDiscoveryContext }: InteractiveElementsProps) {
   injectStyles();
 
   const { particles, spawnParticles } = useParticles();
@@ -406,251 +426,78 @@ export function InteractiveElements({ sceneId, accentColor }: InteractiveElement
     ));
   }
 
-  // ── scene definitions ──
+  // ── discovery tap handler ──
 
-  function renderScene() {
-    switch (sceneId) {
-      case "sakura":
-        return (
-          <>
-            {/* tree hotspot top-left */}
-            <div
-              className="ie-hotspot"
-              style={{ ...hotspot, left: "6%", top: "6%", width: 100, height: 100, background: "#ff8fab18" }}
-              onClick={handleSakura}
-              title="Shake the sakura tree"
-            >
-              <span style={{ fontSize: 42, lineHeight: "100px", display: "block", textAlign: "center" }}>🌸</span>
-            </div>
-          </>
-        );
+  const handleDiscoveryTap = useCallback((item: VisibleInteractable) => {
+    if (!characterId) return;
+    const result = recordTap(characterId, item.id, item.cooldown);
 
-      case "beach":
-        return (
-          <>
-            {/* water area bottom */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                left: "20%",
-                bottom: "5%",
-                width: "60%",
-                height: 60,
-                borderRadius: 12,
-                background: "#4aa8d418",
-              }}
-              onClick={handleBeach}
-              title="Splash the water"
-            >
-              <span style={{ fontSize: 28, lineHeight: "60px", display: "block", textAlign: "center" }}>🌊</span>
-            </div>
-          </>
-        );
-
-      case "cyberpunk":
-        return (
-          <>
-            {/* neon sign top-right */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                right: "6%",
-                top: "5%",
-                width: 120,
-                height: 56,
-                borderRadius: 8,
-                background: neonOn ? "#ff00ff22" : "#33003322",
-                animation: neonOn
-                  ? "ie-neon-flicker 6s infinite, ie-hotspot-pulse 2.5s ease-in-out infinite"
-                  : "ie-hotspot-pulse 2.5s ease-in-out infinite",
-                boxShadow: neonOn ? `0 0 18px 4px #ff00ffaa` : "none",
-                transition: "all 0.3s ease",
-              }}
-              onClick={handleCyberpunk}
-              title="Toggle neon sign"
-            >
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  letterSpacing: 2,
-                  color: neonOn ? "#ff88ff" : "#663366",
-                  lineHeight: "56px",
-                  display: "block",
-                  textAlign: "center",
-                  textShadow: neonOn ? "0 0 8px #ff00ff" : "none",
-                }}
-              >
-                NEON BAR
-              </span>
-            </div>
-          </>
-        );
-
-      case "cafe":
-        return (
-          <>
-            {/* cup bottom-right */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                right: "8%",
-                bottom: "12%",
-                width: 80,
-                height: 80,
-                background: "#c8a06018",
-              }}
-              onClick={handleCafe}
-              title="Tap the coffee cup"
-            >
-              <span style={{ fontSize: 40, lineHeight: "80px", display: "block", textAlign: "center" }}>☕</span>
-            </div>
-          </>
-        );
-
-      case "rain":
-        return (
-          <>
-            {/* window center */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                left: "35%",
-                top: "20%",
-                width: "30%",
-                height: "45%",
-                borderRadius: 10,
-                background: "#a0c8e818",
-              }}
-              onClick={handleRain}
-              title="Tap the window"
-            >
-              <span
-                style={{
-                  fontSize: 36,
-                  display: "block",
-                  textAlign: "center",
-                  lineHeight: "calc(45vh * 0.45)",
-                  paddingTop: "20%",
-                }}
-              >
-                🌩️
-              </span>
-            </div>
-            {showLightning && (
-              <div
-                style={{
-                  position: "fixed",
-                  inset: 0,
-                  background: "white",
-                  opacity: 0,
-                  animation: "ie-lightning-flash 150ms ease-out forwards",
-                  pointerEvents: "none",
-                  zIndex: 999,
-                }}
-              />
-            )}
-          </>
-        );
-
-      case "night_sky":
-        return (
-          <>
-            {/* sky area top */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                left: "10%",
-                top: "2%",
-                width: "80%",
-                height: "35%",
-                borderRadius: 16,
-                background: "#1a1a4018",
-              }}
-              onClick={handleNightSky}
-              title="Make a shooting star"
-            >
-              <span style={{ fontSize: 28, display: "block", textAlign: "center", paddingTop: "8%" }}>✨</span>
-            </div>
-          </>
-        );
-
-      case "cozy_room":
-        return (
-          <>
-            {/* fire glow overlay */}
-            {fireOn && (
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background:
-                    "radial-gradient(ellipse 50% 40% at 50% 100%, rgba(255,120,20,0.28) 0%, transparent 70%)",
-                  animation: "ie-fire-glow 2s ease-in-out infinite",
-                  pointerEvents: "none",
-                  borderRadius: "inherit",
-                }}
-              />
-            )}
-            {/* fireplace bottom-center */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                left: "38%",
-                bottom: "5%",
-                width: "24%",
-                height: 70,
-                borderRadius: 10,
-                background: fireOn ? "#ff8c0028" : "#33220018",
-                boxShadow: fireOn ? "0 0 20px 6px #ff6600aa" : "none",
-                transition: "all 0.4s ease",
-              }}
-              onClick={handleCozyRoom}
-              title={fireOn ? "Extinguish the fire" : "Light the fire"}
-            >
-              <span style={{ fontSize: 34, lineHeight: "70px", display: "block", textAlign: "center" }}>
-                {fireOn ? "🔥" : "🪵"}
-              </span>
-            </div>
-          </>
-        );
-
-      case "moonlight":
-        return (
-          <>
-            {/* moon top-center */}
-            <div
-              className="ie-hotspot"
-              style={{
-                ...hotspot,
-                left: "42%",
-                top: "4%",
-                width: 90,
-                height: 90,
-                background: "#fffbe018",
-                boxShadow: moonPhase === 4 ? "0 0 30px 10px #fffbe088" : "none",
-                transition: "box-shadow 0.5s ease",
-              }}
-              onClick={handleMoonlight}
-              title="Cycle moon phases"
-            >
-              <span style={{ fontSize: 50, lineHeight: "90px", display: "block", textAlign: "center" }}>
-                {MOON_PHASES[moonPhase]}
-              </span>
-            </div>
-          </>
-        );
-
-      default:
-        return null;
+    // Play discovery chime + sparkle for first-time hidden discoveries
+    if (result.isFirstDiscovery && item.type === "hidden") {
+      playDiscoveryChime();
+      haptic.success();
+      const origin = relativeOrigin(
+        (item.position.x + item.position.width / 2) / 100,
+        (item.position.y + item.position.height / 2) / 100
+      );
+      spawnParticles(8, origin, accentColor, "ie-star-streak", 6, 800);
     }
-  }
+
+    // Affinity
+    if (result.affinityEarned) {
+      addAffinityPoints(characterId, { type: "message_sent" }, item.affinityPerTap);
+    }
+
+    // Quest progress
+    updateQuestProgress(characterId, "interact");
+
+    // First-time rewards
+    if (result.isFirstDiscovery) {
+      const reward = item.reward;
+      if (reward.type === "affinity") {
+        addAffinityPoints(characterId, { type: "message_sent" }, Number(reward.value));
+      } else if (reward.type === "diary" && typeof reward.value === "string") {
+        addDiaryEntry(characterId, reward.value, "happy", ["discovery", item.label]);
+      }
+      if (reward.type === "outfit" || reward.type === "scene") {
+        addAffinityPoints(characterId, { type: "message_sent" }, 10);
+      }
+
+      // AI-generated reaction for first discovery of hidden elements
+      if (item.aiOnFirstDiscovery && item.type === "hidden") {
+        onDiscoveryContext?.(buildDiscoveryContext(item));
+      }
+    }
+
+    // Character reaction (pre-written) — skip if AI will handle it
+    if (!result.isFirstDiscovery || !item.aiOnFirstDiscovery) {
+      const reaction = getReactionLine(item, characterId);
+      if (reaction) {
+        onReaction?.(reaction.line, reaction.expression);
+      }
+    }
+  }, [characterId, accentColor, spawnParticles, onReaction, onDiscoveryContext]);
+
+  // ── legacy sound handlers mapped by interactable ID ──
+
+  const legacySoundHandlers: Record<string, () => void> = {
+    "sakura-tree": handleSakura,
+    "beach-splash": handleBeach,
+    "cyberpunk-neon": handleCyberpunk,
+    "cafe-coffee": handleCafe,
+    "rain-thunder": handleRain,
+    "nightsky-star": handleNightSky,
+    "cozy-fire": handleCozyRoom,
+    "moonlight-moon": handleMoonlight,
+  };
+
+  // ── data-driven rendering ──
+
+  const affinityLevel = (typeof window !== "undefined" && characterId) ? getAffinity(characterId).level : 1;
+  const sceneInteractables = getInteractablesForScene(sceneId);
+  const visibleItems = characterId
+    ? getVisibleInteractables(sceneInteractables, affinityLevel, characterId)
+    : sceneInteractables.filter(i => i.type === "visible").map(i => ({ ...i, displayMode: "full" as const }));
 
   return (
     <>
@@ -661,12 +508,167 @@ export function InteractiveElements({ sceneId, accentColor }: InteractiveElement
           position: "absolute",
           inset: 0,
           pointerEvents: "none",
-          zIndex: 5, // above background, below character sprite
+          zIndex: 5,
         }}
       >
-        {/* hotspots need pointer events */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>{renderScene()}</div>
-        {/* particles always on top of hotspots, no pointer events */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
+          {/* Fire glow overlay */}
+          {sceneId === "cozy_room" && fireOn && (
+            <div
+              style={{
+                position: "absolute", inset: 0, pointerEvents: "none",
+                background: "radial-gradient(ellipse 50% 40% at 50% 100%, rgba(255,120,20,0.28) 0%, transparent 70%)",
+                animation: "ie-fire-glow 2s ease-in-out infinite",
+                borderRadius: "inherit",
+              }}
+            />
+          )}
+          {/* Lightning flash */}
+          {showLightning && (
+            <div
+              style={{
+                position: "fixed", inset: 0, background: "white", opacity: 0,
+                animation: "ie-lightning-flash 150ms ease-out forwards",
+                pointerEvents: "none", zIndex: 999,
+              }}
+            />
+          )}
+
+          {/* Render all visible interactables */}
+          {visibleItems.map((item) => {
+            const legacyHandler = legacySoundHandlers[item.id];
+            const onClick = () => { legacyHandler?.(); handleDiscoveryTap(item); };
+
+            // Special: neon sign (text instead of emoji)
+            if (item.id === "cyberpunk-neon") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    right: "6%", top: "5%", width: 120, height: 56, borderRadius: 8,
+                    background: neonOn ? "#ff00ff22" : "#33003322",
+                    animation: neonOn
+                      ? "ie-neon-flicker 6s infinite, ie-hotspot-pulse 2.5s ease-in-out infinite"
+                      : "ie-hotspot-pulse 2.5s ease-in-out infinite",
+                    boxShadow: neonOn ? "0 0 18px 4px #ff00ffaa" : "none",
+                    transition: "all 0.3s ease",
+                  }}
+                  onClick={onClick}
+                  title={item.label}
+                >
+                  <span style={{
+                    fontSize: 14, fontWeight: 700, letterSpacing: 2,
+                    color: neonOn ? "#ff88ff" : "#663366",
+                    lineHeight: "56px", display: "block", textAlign: "center",
+                    textShadow: neonOn ? "0 0 8px #ff00ff" : "none",
+                  }}>NEON BAR</span>
+                </div>
+              );
+            }
+
+            // Special: fireplace toggle
+            if (item.id === "cozy-fire") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    left: `${item.position.x}%`, bottom: "5%",
+                    width: `${item.position.width}%`, height: 70,
+                    borderRadius: 10,
+                    background: fireOn ? "#ff8c0028" : "#33220018",
+                    boxShadow: fireOn ? "0 0 20px 6px #ff6600aa" : "none",
+                    transition: "all 0.4s ease",
+                  }}
+                  onClick={onClick}
+                  title={fireOn ? "Extinguish the fire" : "Light the fire"}
+                >
+                  <span style={{ fontSize: 34, lineHeight: "70px", display: "block", textAlign: "center" }}>
+                    {fireOn ? "🔥" : "🪵"}
+                  </span>
+                </div>
+              );
+            }
+
+            // Special: moonlight moon (cycles phases)
+            if (item.id === "moonlight-moon") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    left: `${item.position.x}%`, top: `${item.position.y}%`,
+                    width: 90, height: 90,
+                    background: "#fffbe018",
+                    boxShadow: moonPhase === 4 ? "0 0 30px 10px #fffbe088" : "none",
+                    transition: "box-shadow 0.5s ease",
+                  }}
+                  onClick={onClick}
+                  title={item.label}
+                >
+                  <span style={{ fontSize: 50, lineHeight: "90px", display: "block", textAlign: "center" }}>
+                    {MOON_PHASES[moonPhase]}
+                  </span>
+                </div>
+              );
+            }
+
+            // Shimmer mode — subtle glow hint, no emoji
+            if (item.displayMode === "shimmer") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    left: `${item.position.x}%`, top: `${item.position.y}%`,
+                    width: `${item.position.width}%`, height: `${item.position.height}%`,
+                    background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
+                    animation: "ie-shimmer 5s ease-in-out infinite",
+                    border: "none",
+                  }}
+                  onClick={onClick}
+                  title=""
+                />
+              );
+            }
+
+            // Dim mode — low opacity emoji hint
+            const isDim = item.displayMode === "dim";
+
+            // Default rendering for all other interactables
+            return (
+              <div
+                key={item.id}
+                className="ie-hotspot"
+                style={{
+                  ...hotspot,
+                  left: `${item.position.x}%`, top: `${item.position.y}%`,
+                  width: `${item.position.width}%`, height: `${item.position.height}%`,
+                  background: `${accentColor}${isDim ? "08" : "18"}`,
+                  opacity: isDim ? 0.4 : 1,
+                }}
+                onClick={onClick}
+                title={item.label}
+              >
+                {item.emoji && (
+                  <span style={{
+                    fontSize: Math.max(20, Math.min(42, item.position.height * 4)),
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "100%", height: "100%",
+                    opacity: isDim ? 0.5 : 1,
+                  }}>
+                    {item.emoji}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>{renderParticles()}</div>
       </div>
     </>
