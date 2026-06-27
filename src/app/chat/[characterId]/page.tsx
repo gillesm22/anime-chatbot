@@ -167,6 +167,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [activeEffect, setActiveEffect] = useState<ExpressionEffect | null>(null);
   const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
   const [hexxPhrase, setHexxPhrase] = useState<string | null>(null);
+  const [pendingDiscoveryContext, setPendingDiscoveryContext] = useState<string | null>(null);
 
   // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
   // useEffect cleanup is NOT reliable on tab/app close — these events are.
@@ -349,10 +350,12 @@ function ChatContent({ characterId }: { characterId: string }) {
         : undefined;
       const personalityCtx = getPersonalityContext(characterId) || undefined;
       const hexxMentioned = message.toLowerCase().includes("hexx");
+      const discoveryCtx = pendingDiscoveryContext;
+      if (discoveryCtx) setPendingDiscoveryContext(null);
 
       try {
         await streamChat(
-          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx, hexxMentioned },
+          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx, hexxMentioned, discoveryContext: discoveryCtx || undefined },
           (event) => {
             switch (event.type) {
               case "expression":
@@ -443,6 +446,10 @@ function ChatContent({ characterId }: { characterId: string }) {
     if (result.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...result.newMilestones]);
     setTimeout(() => setGiftReaction(null), 5000);
   }, [characterId, dispatch]);
+
+  const handleDiscoveryReaction = useCallback((line: string, expression: string) => {
+    dispatch(receiveResponse(line, expression as Expression));
+  }, [dispatch]);
 
   const handleTypeComplete = useCallback(() => {
     // Prefetch the NEXT line's audio so it's ready when the user advances
@@ -552,7 +559,13 @@ function ChatContent({ characterId }: { characterId: string }) {
             background: "rgba(255,255,255,0.15)",
           }} />
         )}
-        <InteractiveElements sceneId={currentScene} accentColor={character.theme.accent} />
+        <InteractiveElements
+          sceneId={currentScene}
+          accentColor={character.theme.accent}
+          characterId={characterId}
+          onReaction={handleDiscoveryReaction}
+          onDiscoveryContext={(ctx) => setPendingDiscoveryContext(ctx)}
+        />
         {currentMilestone && character && (
           <MilestoneToast
             milestone={currentMilestone}
