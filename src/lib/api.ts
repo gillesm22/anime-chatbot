@@ -56,7 +56,13 @@ export async function streamChat(
   });
 
   if (!response.ok) {
-    onEvent({ type: "error", message: `API error: ${response.status}` });
+    let errorDetail = `${response.status}`;
+    try {
+      const body = await response.json();
+      errorDetail = body.error || errorDetail;
+    } catch {}
+    console.error("[streamChat] API error:", errorDetail);
+    onEvent({ type: "error", message: errorDetail });
     return;
   }
 

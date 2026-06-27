@@ -381,6 +381,7 @@ function ChatContent({ characterId }: { characterId: string }) {
                 setHexxPhrase(event.content);
                 break;
               case "error":
+                console.error("[chat] SSE error:", event.message);
                 fullText = "I'm sorry, something went wrong. Please try again.";
                 break;
             }
