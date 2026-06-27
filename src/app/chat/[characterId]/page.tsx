@@ -59,6 +59,10 @@ import { AffinityProgressBar } from "@/components/AffinityProgressBar";
 import { MoodIndicator } from "@/components/MoodIndicator";
 import { getHeroAppearanceForPrompt, getHeroClassReactionForPrompt } from "@/lib/heroAvatar";
 import { BloodBat } from "@/components/BloodBat";
+import { buildGreetingContext } from "@/lib/greetingContext";
+import { getPersonalityContext, updateUserStyle } from "@/lib/personality";
+import { saveSessionEndMood, getSessionStartMood } from "@/lib/mood";
+import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
 
 const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
   { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
@@ -155,6 +159,14 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [showMoreControls, setShowMoreControls] = useState(false);
   const [giftReaction, setGiftReaction] = useState<{ gift: Gift; reaction: CharacterReaction } | null>(null);
   const [starters, setStarters] = useState<string[]>([]);
+  const [activeEffect, setActiveEffect] = useState<ExpressionEffect | null>(null);
+  const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
+
+  useEffect(() => {
+    return () => {
+      saveSessionEndMood(characterId, currentMoodRef.current);
+    };
+  }, [characterId]);
 
   useEffect(() => {
     currentMoodRef.current = getMood(characterId);
@@ -205,8 +217,11 @@ function ChatContent({ characterId }: { characterId: string }) {
       if (newMilestones.length > 0) {
         setMilestoneQueue((prev) => [...prev, ...newMilestones]);
       }
-      const greeting = getEngagementGreeting(characterId, daysAbsent);
       const affinityData = getAffinity(characterId);
+      const { mood: startMood } = getSessionStartMood(characterId, daysAbsent, affinityData.streak);
+      if (startMood === "cheerful") dispatch(setExpression("happy"));
+      else if (startMood === "thoughtful") dispatch(setExpression("thinking"));
+      const greeting = getEngagementGreeting(characterId, daysAbsent);
       const streakMsg = getStreakMessage(affinityData.streak, characterId);
       const fullGreeting = streakMsg ? `${greeting} ${streakMsg}` : greeting;
       dispatch(receiveResponse(fullGreeting, daysAbsent >= 4 ? "sad" : "happy"));
@@ -272,6 +287,9 @@ function ChatContent({ characterId }: { characterId: string }) {
       if (affinityResult.newMilestones.length > 0) {
         setMilestoneQueue((prev) => [...prev, ...affinityResult.newMilestones]);
       }
+      if (affinityResult.leveledUp && affinityResult.data.level >= 2 && affinityResult.data.level <= 4) {
+        setLevelUpMilestone({ level: affinityResult.data.level, levelName: affinityResult.data.levelName });
+      }
 
       const history = state.messages.map((m) => ({
         role: m.role,
@@ -294,9 +312,14 @@ function ChatContent({ characterId }: { characterId: string }) {
 
       const typingHint = typingTrackerRef.current.getReactionHint();
 
+      const greetingCtx = state.messages.length === 0
+        ? buildGreetingContext(characterId, 0, getAffinity(characterId).streak)
+        : undefined;
+      const personalityCtx = getPersonalityContext(characterId) || undefined;
+
       try {
         await streamChat(
-          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en" },
+          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx },
           (event) => {
             switch (event.type) {
               case "expression":
@@ -310,6 +333,11 @@ function ChatContent({ characterId }: { characterId: string }) {
                 break;
               case "text":
                 fullText += event.content;
+                break;
+              case "scene":
+                if (event.sceneId) {
+                  setCurrentScene(event.sceneId as SceneId);
+                }
                 break;
               case "error":
                 fullText = "I'm sorry, something went wrong. Please try again.";
@@ -346,6 +374,11 @@ function ChatContent({ characterId }: { characterId: string }) {
         recentExpressionsRef.current = recentExpressionsRef.current.slice(-10);
       }
       currentMoodRef.current = updateMood(characterId, recentExpressionsRef.current);
+
+      updateUserStyle(characterId, {
+        expressionTriggered: expression,
+        messageLength: message.length,
+      });
 
       if (expression === "laugh") {
         const r = addAffinityPoints(characterId, { type: "made_her_laugh" });
@@ -410,6 +443,26 @@ function ChatContent({ characterId }: { characterId: string }) {
 
   return (
     <PageTransition>
+      <style>{`
+        .send-btn-micro {
+          transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+        .send-ripple {
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.4);
+          transform: translate(-50%, -50%) scale(0);
+          animation: send-ripple-anim 0.5s ease-out forwards;
+          pointer-events: none;
+        }
+        @keyframes send-ripple-anim {
+          to { transform: translate(-50%, -50%) scale(12); opacity: 0; }
+        }
+      `}</style>
       <div
         id="chat-container"
         className="h-screen flex flex-col overflow-hidden"
@@ -426,7 +479,7 @@ function ChatContent({ characterId }: { characterId: string }) {
           />
         )}
         {/* Control bar */}
-        <div className="flex items-center justify-between px-3 py-2 md:px-6 md:py-3 relative z-20" style={{ background: "rgba(13,13,18,0.4)", backdropFilter: "blur(8px)" }}>
+        <div className="flex items-center justify-between px-3 py-2 md:px-6 md:py-3 relative z-20" style={{ background: "var(--color-overlay)", backdropFilter: "blur(8px)" }}>
           {/* Left - essential controls always visible */}
           <div className="flex items-center gap-2 md:gap-4">
             <button
@@ -443,7 +496,7 @@ function ChatContent({ characterId }: { characterId: string }) {
             <button
               onClick={() => setShowHistory((prev) => !prev)}
               className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm transition-colors"
-              style={{ color: showHistory ? character.theme.accent : "rgba(255,255,255,0.5)" }}
+              style={{ color: showHistory ? character.theme.accent : "var(--color-text-secondary)" }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -456,7 +509,7 @@ function ChatContent({ characterId }: { characterId: string }) {
               onClick={() => setShowMoreControls((prev) => !prev)}
               className="md:hidden flex items-center justify-center w-6 h-6 rounded-full transition-colors text-xs"
               style={{
-                color: showMoreControls ? character.theme.accent : "rgba(255,255,255,0.5)",
+                color: showMoreControls ? character.theme.accent : "var(--color-text-secondary)",
                 background: showMoreControls ? `${character.theme.accent}20` : "transparent",
               }}
               title="More actions"
@@ -536,7 +589,7 @@ function ChatContent({ characterId }: { characterId: string }) {
               <button
                 onClick={() => setShowScenePicker((prev) => !prev)}
                 className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-                style={{ color: showScenePicker ? character.theme.accent : "rgba(255,255,255,0.5)" }}
+                style={{ color: showScenePicker ? character.theme.accent : "var(--color-text-secondary)" }}
                 title="Change scene"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -570,16 +623,16 @@ function ChatContent({ characterId }: { characterId: string }) {
           <button
             onClick={() => dispatch(toggleAutoAdvance())}
             className="flex items-center gap-1 md:gap-2 text-xs md:text-sm transition-colors"
-            style={{ color: state.autoAdvance ? character.theme.accent : "rgba(255,255,255,0.5)" }}
+            style={{ color: state.autoAdvance ? character.theme.accent : "var(--color-text-secondary)" }}
           >
             <div
               className="w-8 h-4 rounded-full relative transition-colors"
-              style={{ backgroundColor: state.autoAdvance ? `${character.theme.accent}40` : "rgba(255,255,255,0.1)" }}
+              style={{ backgroundColor: state.autoAdvance ? `${character.theme.accent}40` : "var(--color-toggle-bg)" }}
             >
               <div
                 className="absolute top-0.5 w-3 h-3 rounded-full transition-all"
                 style={{
-                  backgroundColor: state.autoAdvance ? character.theme.accent : "rgba(255,255,255,0.3)",
+                  backgroundColor: state.autoAdvance ? character.theme.accent : "var(--color-toggle-knob)",
                   left: state.autoAdvance ? "calc(100% - 14px)" : "2px",
                 }}
               />
@@ -697,8 +750,22 @@ function ChatContent({ characterId }: { characterId: string }) {
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 md:px-6 md:py-3 rounded-full text-sm font-medium flex-shrink-0"
-                style={{ backgroundColor: character.theme.accent, color: "#0d0d12" }}
+                className="px-4 py-2.5 md:px-6 md:py-3 rounded-full text-sm font-medium flex-shrink-0 send-btn-micro"
+                style={{ backgroundColor: character.theme.accent, color: "var(--color-nameplate-text)" }}
+                onClick={(e) => {
+                  const btn = e.currentTarget;
+                  btn.style.transform = "scale(0.9)";
+                  setTimeout(() => { btn.style.transform = "scale(1.05)"; }, 100);
+                  setTimeout(() => { btn.style.transform = "scale(1)"; }, 250);
+                  // Ripple
+                  const ripple = document.createElement("span");
+                  ripple.className = "send-ripple";
+                  const rect = btn.getBoundingClientRect();
+                  ripple.style.left = `${e.clientX - rect.left}px`;
+                  ripple.style.top = `${e.clientY - rect.top}px`;
+                  btn.appendChild(ripple);
+                  setTimeout(() => ripple.remove(), 500);
+                }}
               >
                 Send
               </button>
@@ -724,9 +791,9 @@ function ChatContent({ characterId }: { characterId: string }) {
             left: 0,
             right: 0,
             zIndex: 35,
-            background: "rgba(13,13,18,0.9)",
+            background: "var(--color-panel)",
             backdropFilter: "blur(14px)",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
+            borderTop: "1px solid var(--color-border)",
             padding: "12px 12px 16px",
             transform: showScenePicker ? "translateY(0)" : "translateY(110%)",
             transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -734,12 +801,12 @@ function ChatContent({ characterId }: { characterId: string }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+            <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-secondary)" }}>
               Scenes
             </span>
             <button
               onClick={() => setShowScenePicker(false)}
-              style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: 1, padding: 0 }}
+              style={{ background: "var(--color-border)", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-secondary)", fontSize: "14px", lineHeight: 1, padding: 0 }}
               aria-label="Close scene picker"
             >
               ✕
@@ -772,12 +839,12 @@ function ChatContent({ characterId }: { characterId: string }) {
                       height: "40px",
                       borderRadius: "8px",
                       overflow: "hidden",
-                      border: isActive ? `2px solid ${character.theme.accent}` : "2px solid rgba(255,255,255,0.1)",
+                      border: isActive ? `2px solid ${character.theme.accent}` : "2px solid var(--color-toggle-bg)",
                       boxShadow: isActive ? `0 0 10px ${character.theme.accent}66` : "none",
                       background: scene.gradient,
                     }}
                   />
-                  <span style={{ fontSize: "8px", color: isActive ? character.theme.accent : "rgba(255,255,255,0.45)", fontWeight: isActive ? 600 : 400, textAlign: "center", maxWidth: "60px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span style={{ fontSize: "8px", color: isActive ? character.theme.accent : "var(--color-inactive-nav)", fontWeight: isActive ? 600 : 400, textAlign: "center", maxWidth: "60px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {scene.name}
                   </span>
                 </button>
@@ -860,10 +927,58 @@ function ChatContent({ characterId }: { characterId: string }) {
   );
 }
 
+function LoadingSkeleton() {
+  return (
+    <div className="h-screen bg-bg flex flex-col items-center justify-center overflow-hidden relative">
+      <style>{`
+        @keyframes skeleton-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes skeleton-pulse-outline {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.4; }
+        }
+        .skeleton-silhouette {
+          width: 180px;
+          height: 320px;
+          border-radius: 24px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.8s ease-in-out infinite;
+          position: relative;
+        }
+        .skeleton-silhouette::after {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 26px;
+          border: 2px solid rgba(255,255,255,0.2);
+          animation: skeleton-pulse-outline 2s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .skeleton-bar {
+          height: 12px;
+          border-radius: 6px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.8s ease-in-out infinite;
+        }
+      `}</style>
+      <div className="skeleton-silhouette" />
+      <div style={{ marginTop: 32, width: 220, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div className="skeleton-bar" style={{ width: "60%" }} />
+        <div className="skeleton-bar" style={{ width: "90%" }} />
+        <div className="skeleton-bar" style={{ width: "40%" }} />
+      </div>
+    </div>
+  );
+}
+
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="h-screen bg-bg" />;
+  if (!mounted) return <LoadingSkeleton />;
   return <>{children}</>;
 }
 

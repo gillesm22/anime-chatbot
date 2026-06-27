@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { getCharacter } from "@/lib/characters";
-import { parseExpressionTag, stripExpressionTags } from "@/lib/sprites/expressions";
+import { parseExpressionTag, stripExpressionTags, parseSceneTag } from "@/lib/sprites/expressions";
 
 const openai = new OpenAI();
 
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
-  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language } = body;
+  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext } = body;
   const history = Array.isArray(body.history) ? body.history.slice(-50) : []; // Cap history at 50 messages
 
   if (!message || typeof message !== "string") {
@@ -76,9 +76,19 @@ export async function POST(request: Request) {
   if (typingHint) {
     systemContent += `\n\nObservation about the user right now: ${typingHint}`;
   }
+  if (greetingContext) {
+    systemContent += `\n\n${greetingContext}`;
+  }
+  if (personalityContext) {
+    systemContent += `\n\n${personalityContext}`;
+  }
   if (language && language !== "en") {
     systemContent += `\n\nIMPORTANT: The user prefers to chat in ${language === "fr" ? "French (fr-CA)" : language}. Respond in that language while staying in character.`;
   }
+
+  systemContent += `\n\n[Scene Changes]
+You can change the scene by including a [scene:ID] tag anywhere in your response. Available scenes: sakura, beach, cafe, cyberpunk, lab, rain, night_sky, sunset, morning, cozy_room, moonlight.
+Only change scenes when it makes narrative sense — you suggest going somewhere, the mood shifts dramatically, or a location is relevant to the conversation. Maximum one scene change per conversation, and only when it feels natural. Do not change scenes just because you can.`;
 
   const lengthInstructions: Record<string, string> = {
     short: "Keep responses to 2-3 sentences but make every word count. Dense with meaning.",
@@ -113,6 +123,7 @@ export async function POST(request: Request) {
   const encoder = new TextEncoder();
   let fullText = "";
   let expressionSent = false;
+  let sceneSent = false;
 
   const readable = new ReadableStream({
     async start(controller) {
@@ -141,7 +152,24 @@ export async function POST(request: Request) {
               );
             }
           } else if (expressionSent) {
-            const cleaned = stripExpressionTags(delta, false);
+            // Check for scene tags in accumulated text
+            if (!sceneSent) {
+              const sceneResult = parseSceneTag(fullText);
+              if (sceneResult) {
+                sceneSent = true;
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ type: "scene", sceneId: sceneResult.sceneId })}\n\n`
+                  )
+                );
+              }
+            }
+            let cleaned = stripExpressionTags(delta, false);
+            // Strip scene tags from text chunks
+            const sceneInDelta = parseSceneTag(cleaned);
+            if (sceneInDelta) {
+              cleaned = sceneInDelta.text;
+            }
             if (cleaned) {
               controller.enqueue(
                 encoder.encode(

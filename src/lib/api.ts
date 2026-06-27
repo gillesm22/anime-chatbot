@@ -3,6 +3,7 @@ import type { Expression } from "@/lib/characters/types";
 export type SSEEvent =
   | { type: "expression"; expression: Expression }
   | { type: "text"; content: string }
+  | { type: "scene"; sceneId: string }
   | { type: "done" }
   | { type: "error"; message: string };
 
@@ -37,6 +38,8 @@ export interface SendMessageParams {
   miniGamePrompt?: string;
   typingHint?: string | null;
   language?: string;
+  greetingContext?: string;
+  personalityContext?: string;
 }
 
 export async function streamChat(
