@@ -648,6 +648,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
     userSelect: "none",
     WebkitUserSelect: "none",
     border: "none",
+    pointerEvents: "auto",
   };
 
   const hotspotHoverStyle = `
@@ -763,7 +764,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
           zIndex: 15, // above sprite (z-10), below control bar (z-20)
         }}
       >
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           {/* Fire glow overlay */}
           {sceneId === "cozy_room" && fireOn && (
             <div
