@@ -271,8 +271,8 @@ const STYLES = `
   100% { opacity: 0; }
 }
 @keyframes ie-shimmer {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 0.15; transform: scale(0.95); }
+  50% { opacity: 0.6; transform: scale(1.05); }
 }
 `;
 
@@ -631,7 +631,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
               : { top: `${item.position.y}%` };
             const posX = { left: `${item.position.x}%` };
 
-            // Shimmer mode — subtle glow hint, no emoji
+            // Shimmer mode — glowing hint, tappable but no emoji visible
             if (item.displayMode === "shimmer") {
               return (
                 <div
@@ -641,20 +641,31 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     ...hotspot,
                     ...posX, ...posY,
                     width: elWidth, height: elHeight,
-                    background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
-                    animation: "ie-shimmer 5s ease-in-out infinite",
-                    border: "none",
+                    borderRadius: isLargeArea ? 12 : "50%",
+                    background: `radial-gradient(circle, ${accentColor}30 0%, ${accentColor}08 60%, transparent 100%)`,
+                    animation: "ie-shimmer 3s ease-in-out infinite",
+                    border: `1px dashed ${accentColor}30`,
                   }}
                   onClick={onClick}
-                  title=""
-                />
+                  title="???"
+                >
+                  <span style={{
+                    fontSize: emojiSize * 0.7,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "100%", height: "100%",
+                    opacity: 0.3,
+                    filter: "blur(2px)",
+                  }}>
+                    {item.emoji}
+                  </span>
+                </div>
               );
             }
 
-            // Dim mode — low opacity emoji hint
+            // Dim mode — visible emoji hint, slightly transparent, inviting tap
             const isDim = item.displayMode === "dim";
 
-            // Default rendering for all other interactables
+            // Default rendering for all interactables
             return (
               <div
                 key={item.id}
@@ -664,8 +675,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   ...posX, ...posY,
                   width: elWidth, height: elHeight,
                   borderRadius: isLargeArea ? 12 : "50%",
-                  background: `${accentColor}${isDim ? "08" : "18"}`,
-                  opacity: isDim ? 0.4 : 1,
+                  background: `${accentColor}${isDim ? "15" : "18"}`,
+                  opacity: isDim ? 0.7 : 1,
                 }}
                 onClick={onClick}
                 title={item.label}
@@ -675,7 +686,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     fontSize: emojiSize,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     width: "100%", height: "100%",
-                    opacity: isDim ? 0.5 : 1,
+                    opacity: isDim ? 0.7 : 1,
                   }}>
                     {item.emoji}
                   </span>

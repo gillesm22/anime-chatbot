@@ -106,10 +106,13 @@ export function getVisibleInteractables(
     const discovered = isDiscovered(characterId, item.id);
 
     if (discovered) {
+      // Already found — full visibility
       result.push({ ...item, displayMode: "full" });
-    } else if (affinityLevel >= item.revealAt + 1) {
-      result.push({ ...item, displayMode: "dim" });
     } else if (affinityLevel >= item.revealAt) {
+      // At or above reveal level — show as dim hint (tappable, visible emoji)
+      result.push({ ...item, displayMode: "dim" });
+    } else {
+      // Below reveal level — show as shimmer (subtle glow, no emoji)
       result.push({ ...item, displayMode: "shimmer" });
     }
   }

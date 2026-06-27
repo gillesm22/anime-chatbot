@@ -69,23 +69,24 @@ describe("isDiscovered", () => {
 });
 
 describe("getVisibleInteractables", () => {
-  it("returns only visible elements at level 1", () => {
+  it("returns all elements — visible as full, hidden as shimmer at level 1", () => {
     const items: Interactable[] = [
       { id: "a", sceneId: "sakura", type: "visible", revealAt: 0, position: { x: 6, y: 6, width: 10, height: 10 }, emoji: "🌸", label: "Tree", affinityPerTap: 2, cooldown: 30, reward: { type: "affinity", value: 5 }, aiOnFirstDiscovery: false, reactions: {} },
       { id: "b", sceneId: "sakura", type: "hidden", revealAt: 2, position: { x: 50, y: 50, width: 8, height: 8 }, emoji: "🦋", label: "Butterfly", affinityPerTap: 2, cooldown: 30, reward: { type: "diary", value: "butterfly" }, aiOnFirstDiscovery: true, reactions: {} },
     ];
     const result = getVisibleInteractables(items, 1, "arisu");
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("a");
+    expect(result).toHaveLength(2);
+    expect(result[0].displayMode).toBe("full");
+    expect(result[1].displayMode).toBe("shimmer");
   });
 
-  it("shows shimmer for hidden elements at matching level", () => {
+  it("shows dim for hidden elements at matching reveal level", () => {
     const items: Interactable[] = [
       { id: "b", sceneId: "sakura", type: "hidden", revealAt: 2, position: { x: 50, y: 50, width: 8, height: 8 }, emoji: "🦋", label: "Butterfly", affinityPerTap: 2, cooldown: 30, reward: { type: "diary", value: "butterfly" }, aiOnFirstDiscovery: true, reactions: {} },
     ];
     const result = getVisibleInteractables(items, 2, "arisu");
     expect(result).toHaveLength(1);
-    expect(result[0].displayMode).toBe("shimmer");
+    expect(result[0].displayMode).toBe("dim");
   });
 
   it("shows full emoji for discovered hidden elements", () => {
@@ -97,7 +98,7 @@ describe("getVisibleInteractables", () => {
     expect(result[0].displayMode).toBe("full");
   });
 
-  it("shows dim emoji for lower-level hidden elements at higher levels", () => {
+  it("shows dim for hidden elements at higher levels when not discovered", () => {
     const items: Interactable[] = [
       { id: "b", sceneId: "sakura", type: "hidden", revealAt: 2, position: { x: 50, y: 50, width: 8, height: 8 }, emoji: "🦋", label: "Butterfly", affinityPerTap: 2, cooldown: 30, reward: { type: "diary", value: "butterfly" }, aiOnFirstDiscovery: true, reactions: {} },
     ];
