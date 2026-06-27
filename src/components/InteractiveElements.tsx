@@ -274,6 +274,25 @@ const STYLES = `
   0%, 100% { opacity: 0.15; transform: scale(0.95); }
   50% { opacity: 0.6; transform: scale(1.05); }
 }
+@keyframes ie-crab-scuttle {
+  0%   { transform: translateX(0) scaleX(1); }
+  15%  { transform: translateX(12px) scaleX(1) rotate(-3deg); }
+  30%  { transform: translateX(8px) scaleX(1) rotate(2deg); }
+  45%  { transform: translateX(16px) scaleX(1) rotate(-2deg); }
+  50%  { transform: translateX(16px) scaleX(-1); }
+  65%  { transform: translateX(4px) scaleX(-1) rotate(3deg); }
+  80%  { transform: translateX(-4px) scaleX(-1) rotate(-2deg); }
+  95%  { transform: translateX(0) scaleX(-1) rotate(1deg); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+@keyframes ie-crab-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes ie-crab-bubble {
+  0% { transform: translateY(0) scale(1); opacity: 0.8; }
+  100% { transform: translateY(-14px) scale(0.3); opacity: 0; }
+}
 `;
 
 function injectStyles() {
@@ -286,6 +305,140 @@ function injectStyles() {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
+
+function KawaiiCrab({ size = 48 }: { size?: number }) {
+  const s = size;
+  const bodyW = s * 0.7;
+  const bodyH = s * 0.45;
+  const eyeR = s * 0.07;
+  const clawS = s * 0.22;
+
+  return (
+    <div style={{
+      width: s, height: s, position: "relative",
+      animation: "ie-crab-scuttle 4s ease-in-out infinite",
+    }}>
+      {/* Body */}
+      <div style={{
+        position: "absolute",
+        left: "50%", top: "45%",
+        transform: "translate(-50%, -50%)",
+        width: bodyW, height: bodyH,
+        borderRadius: "50% 50% 45% 45%",
+        background: "linear-gradient(180deg, #ff6b4a 0%, #e54525 60%, #cc3b1d 100%)",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,180,150,0.3)",
+      }}>
+        {/* Eyes */}
+        <div style={{
+          position: "absolute", top: "30%", left: "28%",
+          width: eyeR * 2.4, height: eyeR * 2.4,
+          borderRadius: "50%", background: "white",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+        }}>
+          <div style={{
+            position: "absolute", top: "25%", left: "30%",
+            width: eyeR * 1.4, height: eyeR * 1.4,
+            borderRadius: "50%", background: "#1a1a2e",
+            animation: "ie-crab-blink 4s ease-in-out infinite",
+          }}>
+            <div style={{
+              position: "absolute", top: "15%", left: "20%",
+              width: eyeR * 0.5, height: eyeR * 0.5,
+              borderRadius: "50%", background: "white",
+            }} />
+          </div>
+        </div>
+        <div style={{
+          position: "absolute", top: "30%", right: "28%",
+          width: eyeR * 2.4, height: eyeR * 2.4,
+          borderRadius: "50%", background: "white",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+        }}>
+          <div style={{
+            position: "absolute", top: "25%", left: "30%",
+            width: eyeR * 1.4, height: eyeR * 1.4,
+            borderRadius: "50%", background: "#1a1a2e",
+            animation: "ie-crab-blink 4s ease-in-out infinite 0.1s",
+          }}>
+            <div style={{
+              position: "absolute", top: "15%", left: "20%",
+              width: eyeR * 0.5, height: eyeR * 0.5,
+              borderRadius: "50%", background: "white",
+            }} />
+          </div>
+        </div>
+        {/* Mouth - kawaii smile */}
+        <div style={{
+          position: "absolute", bottom: "22%", left: "50%",
+          transform: "translateX(-50%)",
+          width: s * 0.12, height: s * 0.05,
+          borderRadius: "0 0 50% 50%",
+          border: "1.5px solid #a02010",
+          borderTop: "none",
+        }} />
+        {/* Cheek blush */}
+        <div style={{
+          position: "absolute", top: "52%", left: "12%",
+          width: s * 0.1, height: s * 0.06,
+          borderRadius: "50%", background: "rgba(255,150,150,0.5)",
+        }} />
+        <div style={{
+          position: "absolute", top: "52%", right: "12%",
+          width: s * 0.1, height: s * 0.06,
+          borderRadius: "50%", background: "rgba(255,150,150,0.5)",
+        }} />
+      </div>
+      {/* Left claw */}
+      <div style={{
+        position: "absolute", left: "2%", top: "30%",
+        width: clawS, height: clawS * 0.8,
+        borderRadius: "60% 20% 50% 30%",
+        background: "linear-gradient(135deg, #ff7b5a 0%, #e54525 100%)",
+        transform: "rotate(-20deg)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+      }} />
+      {/* Right claw */}
+      <div style={{
+        position: "absolute", right: "2%", top: "30%",
+        width: clawS, height: clawS * 0.8,
+        borderRadius: "20% 60% 30% 50%",
+        background: "linear-gradient(225deg, #ff7b5a 0%, #e54525 100%)",
+        transform: "rotate(20deg)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+      }} />
+      {/* Legs - 3 per side */}
+      {[-1, 1].map((side) =>
+        [0, 1, 2].map((i) => (
+          <div
+            key={`leg-${side}-${i}`}
+            style={{
+              position: "absolute",
+              [side === -1 ? "left" : "right"]: "18%",
+              top: `${48 + i * 12}%`,
+              width: s * 0.14, height: 2,
+              background: "#cc3b1d",
+              borderRadius: 1,
+              transform: `rotate(${side * (15 + i * 12)}deg)`,
+            }}
+          />
+        ))
+      )}
+      {/* Tiny bubbles */}
+      <div style={{
+        position: "absolute", top: "10%", right: "25%",
+        width: 4, height: 4, borderRadius: "50%",
+        border: "1px solid rgba(255,255,255,0.5)",
+        animation: "ie-crab-bubble 3s ease-out infinite",
+      }} />
+      <div style={{
+        position: "absolute", top: "15%", right: "20%",
+        width: 3, height: 3, borderRadius: "50%",
+        border: "1px solid rgba(255,255,255,0.4)",
+        animation: "ie-crab-bubble 3s ease-out 1.2s infinite",
+      }} />
+    </div>
+  );
+}
 
 const MOON_PHASES = ["🌑", "🌒", "🌓", "🌔", "🌕"];
 
@@ -616,6 +769,30 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   <span style={{ fontSize: 50, lineHeight: "90px", display: "block", textAlign: "center" }}>
                     {MOON_PHASES[moonPhase]}
                   </span>
+                </div>
+              );
+            }
+
+            // Special: kawaii crab with scuttle animation
+            if (item.id === "beach-crab") {
+              return (
+                <div
+                  key={item.id}
+                  className="ie-hotspot"
+                  style={{
+                    ...hotspot,
+                    left: `${item.position.x}%`, top: `${item.position.y}%`,
+                    width: 64, height: 64,
+                    background: "transparent",
+                    border: "none",
+                    animation: "none",
+                    opacity: item.displayMode === "shimmer" ? 0.4 : item.displayMode === "dim" ? 0.7 : 1,
+                    filter: item.displayMode === "shimmer" ? "blur(1.5px)" : "none",
+                  }}
+                  onClick={onClick}
+                  title={item.label}
+                >
+                  <KawaiiCrab size={52} />
                 </div>
               );
             }
