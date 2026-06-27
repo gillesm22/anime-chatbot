@@ -1,4 +1,4 @@
-const CACHE_NAME = "anime-chatbot-v3";
+const CACHE_NAME = "anime-chatbot-v4";
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
@@ -28,31 +28,19 @@ self.addEventListener("fetch", (event) => {
 
   // API calls: network first, fall back to cached offline response
   if (url.pathname.startsWith("/api/")) {
+    // Never cache API calls — always go to network.
+    // POST requests (chat, tts) should never be served from cache.
     event.respondWith(
       fetch(event.request)
-        .then((response) => {
-          // Cache successful API responses
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          return response;
-        })
         .catch(() => {
-          // Offline: return cached response or generate offline message
-          return caches.match(event.request).then((cached) => {
-            if (cached) return cached;
-            // For chat API: return a generic offline response
-            if (url.pathname === "/api/chat") {
-              const offlineResponse = JSON.stringify({
-                type: "text",
-                content: "I'm offline right now, but I'll be here when you're back online!"
-              });
-              return new Response(
-                `data: {"type":"expression","expression":"sad"}\n\ndata: {"type":"text","content":"I can't connect right now... but I'm still here with you. We can talk again when you're back online!"}\n\ndata: {"type":"done"}\n\n`,
-                { headers: { "Content-Type": "text/event-stream" } }
-              );
-            }
-            return new Response("Offline", { status: 503 });
-          });
+          // Offline fallback for chat API only
+          if (url.pathname === "/api/chat") {
+            return new Response(
+              `data: {"type":"expression","expression":"sad"}\n\ndata: {"type":"text","content":"I can't connect right now... but I'm still here with you. We can talk again when you're back online!"}\n\ndata: {"type":"done"}\n\n`,
+              { headers: { "Content-Type": "text/event-stream" } }
+            );
+          }
+          return new Response("Offline", { status: 503 });
         })
     );
     return;
