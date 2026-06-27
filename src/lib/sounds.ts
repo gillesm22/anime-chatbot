@@ -9,12 +9,12 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-export function playTypingClick() {
+export function playTypingClick(pitchMultiplier: number = 1) {
   const ctx = getAudioContext();
   if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.frequency.value = 800;
+  osc.frequency.value = 800 * pitchMultiplier;
   osc.type = "sine";
   gain.gain.value = 0.05;
   osc.connect(gain);

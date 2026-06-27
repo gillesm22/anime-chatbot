@@ -5,6 +5,7 @@ import type { Character, Expression, BodyPose } from "@/lib/characters/types";
 import type { Outfit } from "./OutfitSelector";
 import { CharacterGlow } from "./CharacterGlow";
 import { useParallax } from "@/lib/parallax";
+import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
 
 interface CharacterSpriteProps {
   character: Character;
@@ -13,6 +14,7 @@ interface CharacterSpriteProps {
   pose?: BodyPose;
   outfit?: Outfit;
   onHeadpat?: () => void;
+  onExpressionChange?: (effect: ExpressionEffect) => void;
 }
 
 export function CharacterSprite({
@@ -22,6 +24,7 @@ export function CharacterSprite({
   pose,
   outfit = "default",
   onHeadpat,
+  onExpressionChange,
 }: CharacterSpriteProps) {
   const parallax = useParallax();
   const showBack = outfit === "back" || outfit === "bikini-back";
@@ -77,6 +80,10 @@ export function CharacterSprite({
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setFadeIn(true);
+          const effect = getExpressionEffect(visibleExpr, expression);
+          if (effect) {
+            onExpressionChange?.(effect);
+          }
         });
       });
       if (fadeTimer.current) clearTimeout(fadeTimer.current);

@@ -43,6 +43,7 @@ import { TypingTracker } from "@/lib/typingReactions";
 import { startIdleTimer, resetIdleTimer, stopHumming } from "@/lib/humming";
 import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession";
 import { ConfessionScene } from "@/components/ConfessionScene";
+import { MilestoneScene } from "@/components/MilestoneScene";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { VoiceToggle } from "@/components/VoiceToggle";
 import { addDiaryEntry } from "@/lib/diary";
@@ -470,6 +471,29 @@ function ChatContent({ characterId }: { characterId: string }) {
         suppressHydrationWarning
       >
         <SceneBackground sceneId={currentScene} characterAccent={character.theme.accent} />
+        {activeEffect?.type === "sparkle" && (
+          <div className="expression-sparkle absolute inset-0 pointer-events-none z-30" style={{
+            background: `radial-gradient(circle at 50% 40%, ${character.theme.accent}40 0%, transparent 60%)`,
+          }} />
+        )}
+        {activeEffect?.type === "shake" && (
+          <div className="expression-shake-vignette absolute inset-0 pointer-events-none z-30" style={{
+            background: "radial-gradient(ellipse at center, transparent 50%, rgba(239,68,68,0.2) 100%)",
+          }} />
+        )}
+        {activeEffect?.type === "blush" && (
+          <div className="expression-blush absolute inset-0 pointer-events-none z-30" style={{
+            background: "radial-gradient(circle at 50% 35%, rgba(244,114,182,0.3) 0%, transparent 50%)",
+          }} />
+        )}
+        {activeEffect?.type === "dim" && (
+          <div className="expression-dim absolute inset-0 pointer-events-none z-30" />
+        )}
+        {activeEffect?.type === "flash" && (
+          <div className="expression-flash absolute inset-0 pointer-events-none z-30" style={{
+            background: "rgba(255,255,255,0.15)",
+          }} />
+        )}
         <InteractiveElements sceneId={currentScene} accentColor={character.theme.accent} />
         {currentMilestone && character && (
           <MilestoneToast
@@ -685,6 +709,10 @@ function ChatContent({ characterId }: { characterId: string }) {
               const r = addAffinityPoints(characterId, { type: "headpat" });
               if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
             }}
+            onExpressionChange={(effect) => {
+              setActiveEffect(effect);
+              setTimeout(() => setActiveEffect(null), effect.durationMs);
+            }}
           />
           <OutfitSelector
             accentColor={character.theme.accent}
@@ -707,6 +735,7 @@ function ChatContent({ characterId }: { characterId: string }) {
               onTypeComplete={handleTypeComplete}
               showAdvance={showAdvanceIndicator}
               typeSpeed={textSpeed}
+              expression={state.currentExpression}
             />
           )}
           {starters.length > 0 && showInput && (
@@ -879,6 +908,17 @@ function ChatContent({ characterId }: { characterId: string }) {
             markConfessed(characterId);
             setShowConfession(false);
           }}
+        />
+      )}
+
+      {levelUpMilestone && character && (
+        <MilestoneScene
+          characterId={characterId}
+          characterName={character.name}
+          accentColor={character.theme.accent}
+          level={levelUpMilestone.level}
+          levelName={levelUpMilestone.levelName}
+          onComplete={() => setLevelUpMilestone(null)}
         />
       )}
 
