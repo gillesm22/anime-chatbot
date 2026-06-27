@@ -617,6 +617,20 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
               );
             }
 
+            // For small elements (<=15% wide), use fixed pixel sizes for consistent
+            // tap targets across screen sizes. Large areas (like night sky) stay percentage.
+            const isLargeArea = item.position.width > 15;
+            const elWidth = isLargeArea ? `${item.position.width}%` : `${Math.max(60, item.position.width * 8)}px`;
+            const elHeight = isLargeArea ? `${item.position.height}%` : `${Math.max(60, item.position.height * 8)}px`;
+            const emojiSize = isLargeArea ? Math.min(36, item.position.height * 1.2) : Math.max(28, Math.min(42, item.position.height * 5));
+
+            // Bottom-anchored elements (y > 70) use bottom positioning for better layout
+            const useBottom = item.position.y > 70;
+            const posY = useBottom
+              ? { bottom: `${100 - item.position.y - item.position.height}%` }
+              : { top: `${item.position.y}%` };
+            const posX = { left: `${item.position.x}%` };
+
             // Shimmer mode — subtle glow hint, no emoji
             if (item.displayMode === "shimmer") {
               return (
@@ -625,8 +639,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   className="ie-hotspot"
                   style={{
                     ...hotspot,
-                    left: `${item.position.x}%`, top: `${item.position.y}%`,
-                    width: `${item.position.width}%`, height: `${item.position.height}%`,
+                    ...posX, ...posY,
+                    width: elWidth, height: elHeight,
                     background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
                     animation: "ie-shimmer 5s ease-in-out infinite",
                     border: "none",
@@ -647,8 +661,9 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                 className="ie-hotspot"
                 style={{
                   ...hotspot,
-                  left: `${item.position.x}%`, top: `${item.position.y}%`,
-                  width: `${item.position.width}%`, height: `${item.position.height}%`,
+                  ...posX, ...posY,
+                  width: elWidth, height: elHeight,
+                  borderRadius: isLargeArea ? 12 : "50%",
                   background: `${accentColor}${isDim ? "08" : "18"}`,
                   opacity: isDim ? 0.4 : 1,
                 }}
@@ -657,7 +672,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
               >
                 {item.emoji && (
                   <span style={{
-                    fontSize: Math.max(20, Math.min(42, item.position.height * 4)),
+                    fontSize: emojiSize,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     width: "100%", height: "100%",
                     opacity: isDim ? 0.5 : 1,
