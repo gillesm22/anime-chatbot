@@ -1,7 +1,7 @@
 {
-  "name": "Anime Chatbot",
-  "short_name": "ChatBot",
-  "description": "Chat with Arisu, Marin, and Nao",
+  "name": "HEXXII",
+  "short_name": "HEXXII",
+  "description": "Chat with Arisu, Marin, Suzuka, Kurisu, and Merrick",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0d0d12",

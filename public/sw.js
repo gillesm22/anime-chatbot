@@ -1,4 +1,4 @@
-const CACHE_NAME = "anime-chatbot-v2";
+const CACHE_NAME = "anime-chatbot-v3";
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
@@ -59,7 +59,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Sprites/backgrounds: cache first (they never change)
-  if (url.pathname.startsWith("/sprites/") || url.pathname.startsWith("/backgrounds/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith("/sprites/") || url.pathname.startsWith("/backgrounds/") || url.pathname.startsWith("/icons/") || url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached;
