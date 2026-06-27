@@ -142,14 +142,13 @@ function computeLevel(points: number): { level: number; levelName: string } {
   return { level, levelName };
 }
 
-function computeOutfits(level: number): string[] {
-  const outfits: string[] = [];
-  if (level >= 1) { outfits.push("casual", "school"); }
-  if (level >= 2) { outfits.push("back", "formal", "cheerleader"); }
-  if (level >= 3) { outfits.push("bikini-front", "bikini-back", "maid", "vampire", "nurse", "cowgirl"); }
-  if (level >= 4) { outfits.push("school-skimpy", "cheer-extreme", "cheer-extreme-back", "cow"); }
-  if (level >= 5) { outfits.push("demon"); }
-  return outfits;
+function computeOutfits(_level: number): string[] {
+  // All outfits available from the start
+  return [
+    "casual", "school", "back", "formal", "cheerleader",
+    "bikini-front", "bikini-back", "maid", "vampire", "nurse", "cowgirl",
+    "school-skimpy", "cheer-extreme", "cheer-extreme-back", "cow", "demon",
+  ];
 }
 
 function checkNewMilestones(data: AffinityData): string[] {
