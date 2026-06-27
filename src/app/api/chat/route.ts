@@ -132,12 +132,25 @@ Only change scenes when it makes narrative sense — you suggest going somewhere
     { role: "user", content: message },
   ];
 
-  const stream = await openai.chat.completions.create({
-    model,
-    max_tokens: maxTokensMap[lengthKey] || 512,
-    messages,
-    stream: true,
-  });
+  let stream;
+  try {
+    stream = await openai.chat.completions.create({
+      model,
+      max_tokens: maxTokensMap[lengthKey] || 512,
+      messages,
+      stream: true,
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "API call failed";
+    const status = (error as { status?: number })?.status;
+    const userMsg = status === 429
+      ? "API quota exceeded — please check your OpenAI billing."
+      : `Chat API error: ${msg}`;
+    return new Response(JSON.stringify({ error: userMsg }), {
+      status: status || 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const encoder = new TextEncoder();
   let fullText = "";
