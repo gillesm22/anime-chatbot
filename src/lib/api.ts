@@ -4,6 +4,7 @@ export type SSEEvent =
   | { type: "expression"; expression: Expression }
   | { type: "text"; content: string }
   | { type: "scene"; sceneId: string }
+  | { type: "hexx"; content: string }
   | { type: "done" }
   | { type: "error"; message: string };
 
@@ -40,6 +41,7 @@ export interface SendMessageParams {
   language?: string;
   greetingContext?: string;
   personalityContext?: string;
+  hexxMentioned?: boolean;
 }
 
 export async function streamChat(
