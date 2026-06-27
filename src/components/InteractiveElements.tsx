@@ -821,14 +821,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     animation: waveActive ? "ie-wave-swell 0.6s ease-out" : "none",
                   }}
                   onClick={(e) => { handleBeachAt(e); handleDiscoveryTap(item); }}
-                  title={item.label}
-                >
-                  <span style={{
-                    fontSize: 28, display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "100%", height: "100%",
-                    filter: "drop-shadow(0 2px 4px rgba(0,80,120,0.3))",
-                  }}>🌊</span>
-                </div>
+                  title=""
+                />
               );
             }
 
@@ -846,7 +840,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     transition: "all 0.3s ease",
                   }}
                   onClick={onClick}
-                  title={item.label}
+                  title=""
                 >
                   <span style={{
                     fontSize: 14, fontWeight: 700, letterSpacing: 2,
@@ -875,7 +869,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     transition: "all 0.4s ease",
                   }}
                   onClick={onClick}
-                  title={fireOn ? "Extinguish the fire" : "Light the fire"}
+                  title=""
                 >
                   <span style={{ fontSize: 34, lineHeight: "70px", display: "block", textAlign: "center" }}>
                     {fireOn ? "🔥" : "🪵"}
@@ -899,7 +893,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     transition: "filter 0.5s ease",
                   }}
                   onClick={onClick}
-                  title={item.label}
+                  title=""
                 >
                   <span style={{ fontSize: 50, lineHeight: "90px", display: "block", textAlign: "center" }}>
                     {MOON_PHASES[moonPhase]}
@@ -925,7 +919,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     filter: item.displayMode === "shimmer" ? "blur(1.5px)" : "none",
                   }}
                   onClick={onClick}
-                  title={item.label}
+                  title=""
                 >
                   <KawaiiCrab size={52} />
                 </div>
@@ -960,40 +954,13 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
             };
             const idleAnim = idleAnimations[item.id];
 
-            // Shimmer mode — mysterious environmental hint
-            if (item.displayMode === "shimmer") {
-              return (
-                <div
-                  key={item.id}
-                  className="ie-hotspot"
-                  style={{
-                    ...hotspot,
-                    ...posX, ...posY,
-                    width: elWidth, height: elHeight,
-                    borderRadius: isLargeArea ? 12 : "50%",
-                    background: "transparent",
-                    animation: idleAnim || "ie-shimmer 3s ease-in-out infinite",
-                  }}
-                  onClick={onClick}
-                  title=""
-                >
-                  <span style={{
-                    fontSize: emojiSize,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "100%", height: "100%",
-                    opacity: 0.25,
-                    filter: "blur(2px) saturate(0.5)",
-                  }}>
-                    {item.emoji}
-                  </span>
-                </div>
-              );
-            }
-
-            // Dim mode — visible but blends into scene
+            // All generic elements render as invisible tap zones.
+            // The environment art IS the visual — emoji would clash with the
+            // painted style. Feedback comes from particles, sounds, and
+            // character reactions on tap.
             const isDim = item.displayMode === "dim";
+            const isShimmer = item.displayMode === "shimmer";
 
-            // Default: no background, just the emoji sitting in the scene
             return (
               <div
                 key={item.id}
@@ -1004,24 +971,20 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   width: elWidth, height: elHeight,
                   borderRadius: isLargeArea ? 12 : "50%",
                   background: "transparent",
-                  opacity: isDim ? 0.65 : 1,
                   animation: idleAnim || "none",
+                  // Shimmer: faint pulsing glow hints something is here
+                  ...(isShimmer ? {
+                    boxShadow: `0 0 12px 4px ${accentColor}15`,
+                    animation: "ie-shimmer 3s ease-in-out infinite",
+                  } : {}),
+                  // Dim: very subtle static glow
+                  ...(isDim ? {
+                    boxShadow: `0 0 8px 2px ${accentColor}10`,
+                  } : {}),
                 }}
                 onClick={onClick}
-                title={item.label}
-              >
-                {item.emoji && (
-                  <span style={{
-                    fontSize: emojiSize,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "100%", height: "100%",
-                    filter: isDim ? "saturate(0.7)" : "none",
-                    transition: "filter 0.3s ease",
-                  }}>
-                    {item.emoji}
-                  </span>
-                )}
-              </div>
+                title=""
+              />
             );
           })}
         </div>
