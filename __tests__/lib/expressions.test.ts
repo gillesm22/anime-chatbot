@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSpritePaths, parseExpressionTag, parseSceneTag } from "@/lib/sprites/expressions";
+import { getSpritePaths, parseExpressionTag, parseSceneTag, parseHexxTag, stripHexxTag } from "@/lib/sprites/expressions";
 import { arisu } from "@/lib/characters/arisu";
 
 describe("getSpritePaths", () => {
@@ -77,5 +77,36 @@ describe("parseSceneTag", () => {
   it("only extracts the first scene tag", () => {
     const result = parseSceneTag("[scene:cafe] Let's move. [scene:beach]");
     expect(result!.sceneId).toBe("cafe");
+  });
+});
+
+describe("parseHexxTag", () => {
+  it("extracts hexx tag from text", () => {
+    const result = parseHexxTag("She's cute! [hexx:*preens smugly*] Don't you think?");
+    expect(result).toEqual({ hexxLine: "*preens smugly*", text: "She's cute! Don't you think?" });
+  });
+
+  it("returns null when no hexx tag", () => {
+    expect(parseHexxTag("Just a normal message.")).toBeNull();
+  });
+
+  it("handles hexx tag at end of text", () => {
+    const result = parseHexxTag("Your little bat is staring at me. [hexx:what? no I'm not]");
+    expect(result).toEqual({ hexxLine: "what? no I'm not", text: "Your little bat is staring at me." });
+  });
+
+  it("handles hexx tag at start of text", () => {
+    const result = parseHexxTag("[hexx:hey!] Oh, is Hexx here too?");
+    expect(result).toEqual({ hexxLine: "hey!", text: "Oh, is Hexx here too?" });
+  });
+});
+
+describe("stripHexxTag", () => {
+  it("removes hexx tag from text", () => {
+    expect(stripHexxTag("Hello [hexx:yo] world")).toBe("Hello world");
+  });
+
+  it("returns original text when no tag", () => {
+    expect(stripHexxTag("No tag here")).toBe("No tag here");
   });
 });

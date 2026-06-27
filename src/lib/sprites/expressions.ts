@@ -65,3 +65,26 @@ export function parseSceneTag(
     .trim();
   return { sceneId, text: stripped };
 }
+
+const HEXX_TAG_SINGLE = /\[hexx:([^\]]+)\]/;
+const HEXX_TAG_GLOBAL = /\[hexx:[^\]]+\]/g;
+
+export function parseHexxTag(
+  text: string
+): { hexxLine: string; text: string } | null {
+  const match = text.match(HEXX_TAG_SINGLE);
+  if (!match) return null;
+  const hexxLine = match[1];
+  const stripped = text
+    .replace(HEXX_TAG_GLOBAL, " ")
+    .replace(/  +/g, " ")
+    .trim();
+  return { hexxLine, text: stripped };
+}
+
+export function stripHexxTag(text: string): string {
+  return text
+    .replace(HEXX_TAG_GLOBAL, " ")
+    .replace(/  +/g, " ")
+    .trim();
+}
