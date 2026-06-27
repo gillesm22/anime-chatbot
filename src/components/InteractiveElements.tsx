@@ -275,33 +275,63 @@ const STYLES = `
   50% { opacity: 0.6; transform: scale(1.05); }
 }
 @keyframes ie-crab-scuttle {
-  0%   { transform: translateX(0) scaleX(1); }
-  15%  { transform: translateX(12px) scaleX(1) rotate(-3deg); }
-  30%  { transform: translateX(8px) scaleX(1) rotate(2deg); }
-  45%  { transform: translateX(16px) scaleX(1) rotate(-2deg); }
-  50%  { transform: translateX(16px) scaleX(-1); }
-  65%  { transform: translateX(4px) scaleX(-1) rotate(3deg); }
-  80%  { transform: translateX(-4px) scaleX(-1) rotate(-2deg); }
-  95%  { transform: translateX(0) scaleX(-1) rotate(1deg); }
-  100% { transform: translateX(0) scaleX(1); }
+  0%   { transform: translateX(0) translateY(0) rotate(0deg); }
+  5%   { transform: translateX(8px) translateY(-3px) rotate(-4deg); }
+  10%  { transform: translateX(18px) translateY(0) rotate(3deg); }
+  15%  { transform: translateX(28px) translateY(-2px) rotate(-3deg); }
+  20%  { transform: translateX(40px) translateY(0) rotate(4deg); }
+  25%  { transform: translateX(50px) translateY(-3px) rotate(-2deg); }
+  30%  { transform: translateX(55px) translateY(0) rotate(0deg); }
+  35%  { transform: translateX(50px) translateY(-2px) rotate(3deg); }
+  40%  { transform: translateX(38px) translateY(0) rotate(-4deg); }
+  45%  { transform: translateX(25px) translateY(-3px) rotate(3deg); }
+  50%  { transform: translateX(10px) translateY(0) rotate(-2deg); }
+  55%  { transform: translateX(0) translateY(-2px) rotate(0deg); }
+  60%  { transform: translateX(-12px) translateY(0) rotate(3deg); }
+  65%  { transform: translateX(-25px) translateY(-3px) rotate(-4deg); }
+  70%  { transform: translateX(-35px) translateY(0) rotate(3deg); }
+  75%  { transform: translateX(-40px) translateY(-2px) rotate(-2deg); }
+  80%  { transform: translateX(-35px) translateY(0) rotate(4deg); }
+  85%  { transform: translateX(-22px) translateY(-3px) rotate(-3deg); }
+  90%  { transform: translateX(-10px) translateY(0) rotate(2deg); }
+  95%  { transform: translateX(-3px) translateY(-2px) rotate(-1deg); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg); }
 }
 @keyframes ie-crab-blink {
-  0%, 90%, 100% { transform: scaleY(1); }
-  95% { transform: scaleY(0.1); }
+  0%, 85%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(0.1); }
+  92% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+@keyframes ie-crab-claw-snip-l {
+  0%, 80%, 100% { transform: rotate(-20deg); }
+  85% { transform: rotate(-35deg); }
+  90% { transform: rotate(-10deg); }
+  95% { transform: rotate(-30deg); }
+}
+@keyframes ie-crab-claw-snip-r {
+  0%, 80%, 100% { transform: rotate(20deg); }
+  85% { transform: rotate(35deg); }
+  90% { transform: rotate(10deg); }
+  95% { transform: rotate(30deg); }
 }
 @keyframes ie-crab-bubble {
-  0% { transform: translateY(0) scale(1); opacity: 0.8; }
-  100% { transform: translateY(-14px) scale(0.3); opacity: 0; }
+  0% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-18px) scale(0.8); opacity: 0.5; }
+  100% { transform: translateY(-30px) scale(0.2); opacity: 0; }
 }
 `;
 
 function injectStyles() {
   if (typeof document === "undefined") return;
-  if (document.getElementById("ie-keyframes")) return;
-  const el = document.createElement("style");
-  el.id = "ie-keyframes";
+  // Always update styles so new animations are available
+  let el = document.getElementById("ie-keyframes") as HTMLStyleElement | null;
+  if (!el) {
+    el = document.createElement("style");
+    el.id = "ie-keyframes";
+    document.head.appendChild(el);
+  }
   el.textContent = STYLES;
-  document.head.appendChild(el);
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -316,7 +346,7 @@ function KawaiiCrab({ size = 48 }: { size?: number }) {
   return (
     <div style={{
       width: s, height: s, position: "relative",
-      animation: "ie-crab-scuttle 4s ease-in-out infinite",
+      animation: "ie-crab-scuttle 6s linear infinite",
     }}>
       {/* Body */}
       <div style={{
@@ -394,7 +424,8 @@ function KawaiiCrab({ size = 48 }: { size?: number }) {
         width: clawS, height: clawS * 0.8,
         borderRadius: "60% 20% 50% 30%",
         background: "linear-gradient(135deg, #ff7b5a 0%, #e54525 100%)",
-        transform: "rotate(-20deg)",
+        animation: "ie-crab-claw-snip-l 3s ease-in-out infinite",
+        transformOrigin: "right center",
         boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
       }} />
       {/* Right claw */}
@@ -403,7 +434,8 @@ function KawaiiCrab({ size = 48 }: { size?: number }) {
         width: clawS, height: clawS * 0.8,
         borderRadius: "20% 60% 30% 50%",
         background: "linear-gradient(225deg, #ff7b5a 0%, #e54525 100%)",
-        transform: "rotate(20deg)",
+        animation: "ie-crab-claw-snip-r 3s ease-in-out infinite 0.15s",
+        transformOrigin: "left center",
         boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
       }} />
       {/* Legs - 3 per side */}
@@ -423,18 +455,27 @@ function KawaiiCrab({ size = 48 }: { size?: number }) {
           />
         ))
       )}
-      {/* Tiny bubbles */}
+      {/* Bubbles */}
       <div style={{
-        position: "absolute", top: "10%", right: "25%",
-        width: 4, height: 4, borderRadius: "50%",
-        border: "1px solid rgba(255,255,255,0.5)",
-        animation: "ie-crab-bubble 3s ease-out infinite",
+        position: "absolute", top: "5%", right: "22%",
+        width: 6, height: 6, borderRadius: "50%",
+        background: "rgba(255,255,255,0.15)",
+        border: "1.5px solid rgba(255,255,255,0.5)",
+        animation: "ie-crab-bubble 2.5s ease-out infinite",
       }} />
       <div style={{
-        position: "absolute", top: "15%", right: "20%",
-        width: 3, height: 3, borderRadius: "50%",
+        position: "absolute", top: "12%", right: "15%",
+        width: 4, height: 4, borderRadius: "50%",
+        background: "rgba(255,255,255,0.1)",
         border: "1px solid rgba(255,255,255,0.4)",
-        animation: "ie-crab-bubble 3s ease-out 1.2s infinite",
+        animation: "ie-crab-bubble 2.5s ease-out 0.8s infinite",
+      }} />
+      <div style={{
+        position: "absolute", top: "8%", right: "32%",
+        width: 5, height: 5, borderRadius: "50%",
+        background: "rgba(255,255,255,0.12)",
+        border: "1px solid rgba(255,255,255,0.45)",
+        animation: "ie-crab-bubble 3s ease-out 1.5s infinite",
       }} />
     </div>
   );
