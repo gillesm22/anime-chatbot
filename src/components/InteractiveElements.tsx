@@ -320,6 +320,19 @@ const STYLES = `
   50% { transform: translateY(-18px) scale(0.8); opacity: 0.5; }
   100% { transform: translateY(-30px) scale(0.2); opacity: 0; }
 }
+@keyframes ie-gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes ie-gentle-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes ie-gentle-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(1deg); }
+  75% { transform: translateY(1px) rotate(-1deg); }
+}
 `;
 
 function injectStyles() {
@@ -584,19 +597,21 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
 
   // ── hotspot style ──
 
+  // Base style: invisible tap target — no borders, no pulse, no glow
+  // Elements feel like part of the scene, not UI buttons
   const hotspot: React.CSSProperties = {
     position: "absolute",
     cursor: "pointer",
     borderRadius: "50%",
-    animation: "ie-hotspot-pulse 2.5s ease-in-out infinite",
-    transition: "filter 0.15s ease",
+    transition: "transform 0.2s ease, filter 0.2s ease",
     userSelect: "none",
     WebkitUserSelect: "none",
-    border: `1.5px solid ${accentColor}44`,
+    border: "none",
   };
 
   const hotspotHoverStyle = `
-    .ie-hotspot:hover { filter: brightness(1.4) drop-shadow(0 0 8px ${accentColor}99) !important; }
+    .ie-hotspot:hover { transform: scale(1.08); filter: brightness(1.15); }
+    .ie-hotspot:active { transform: scale(0.95); }
   `;
 
   // ── render helpers ──
@@ -736,7 +751,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
             const legacyHandler = legacySoundHandlers[item.id];
             const onClick = () => { legacyHandler?.(); handleDiscoveryTap(item); };
 
-            // Special: neon sign (text instead of emoji)
+            // Special: neon sign — looks like an actual neon sign in the scene
             if (item.id === "cyberpunk-neon") {
               return (
                 <div
@@ -745,11 +760,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   style={{
                     ...hotspot,
                     right: "6%", top: "5%", width: 120, height: 56, borderRadius: 8,
-                    background: neonOn ? "#ff00ff22" : "#33003322",
-                    animation: neonOn
-                      ? "ie-neon-flicker 6s infinite, ie-hotspot-pulse 2.5s ease-in-out infinite"
-                      : "ie-hotspot-pulse 2.5s ease-in-out infinite",
-                    boxShadow: neonOn ? "0 0 18px 4px #ff00ffaa" : "none",
+                    background: "transparent",
+                    animation: neonOn ? "ie-neon-flicker 6s infinite" : "none",
                     transition: "all 0.3s ease",
                   }}
                   onClick={onClick}
@@ -757,15 +769,16 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                 >
                   <span style={{
                     fontSize: 14, fontWeight: 700, letterSpacing: 2,
-                    color: neonOn ? "#ff88ff" : "#663366",
+                    color: neonOn ? "#ff88ff" : "#44224488",
                     lineHeight: "56px", display: "block", textAlign: "center",
-                    textShadow: neonOn ? "0 0 8px #ff00ff" : "none",
+                    textShadow: neonOn ? "0 0 12px #ff00ff, 0 0 24px #ff00ff66" : "none",
+                    transition: "all 0.3s ease",
                   }}>NEON BAR</span>
                 </div>
               );
             }
 
-            // Special: fireplace toggle
+            // Special: fireplace — warm glow when on
             if (item.id === "cozy-fire") {
               return (
                 <div
@@ -776,8 +789,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     left: `${item.position.x}%`, top: `${item.position.y}%`,
                     width: `${item.position.width}%`, height: 70,
                     borderRadius: 10,
-                    background: fireOn ? "#ff8c0028" : "#33220018",
-                    boxShadow: fireOn ? "0 0 20px 6px #ff6600aa" : "none",
+                    background: "transparent",
+                    filter: fireOn ? "brightness(1.1)" : "brightness(0.8)",
                     transition: "all 0.4s ease",
                   }}
                   onClick={onClick}
@@ -790,7 +803,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
               );
             }
 
-            // Special: moonlight moon (cycles phases)
+            // Special: moon — natural glow on full moon
             if (item.id === "moonlight-moon") {
               return (
                 <div
@@ -800,9 +813,9 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     ...hotspot,
                     left: `${item.position.x}%`, top: `${item.position.y}%`,
                     width: 90, height: 90,
-                    background: "#fffbe018",
-                    boxShadow: moonPhase === 4 ? "0 0 30px 10px #fffbe088" : "none",
-                    transition: "box-shadow 0.5s ease",
+                    background: "transparent",
+                    filter: moonPhase === 4 ? `drop-shadow(0 0 20px rgba(255,252,220,0.6))` : "none",
+                    transition: "filter 0.5s ease",
                   }}
                   onClick={onClick}
                   title={item.label}
@@ -848,7 +861,25 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
             const posY = { top: `${item.position.y}%` };
             const posX = { left: `${item.position.x}%` };
 
-            // Shimmer mode — glowing hint, tappable but no emoji visible
+            // Ambient idle animations per element — makes the world feel alive
+            const idleAnimations: Record<string, string> = {
+              "sakura-butterfly": "ie-gentle-float 3s ease-in-out infinite",
+              "sakura-windchime": "ie-gentle-sway 4s ease-in-out infinite",
+              "beach-shell": "ie-gentle-bob 5s ease-in-out infinite",
+              "cafe-cat": "ie-gentle-float 4s ease-in-out infinite 1s",
+              "rain-frog": "ie-gentle-bob 3s ease-in-out infinite",
+              "rain-umbrella": "ie-gentle-sway 5s ease-in-out infinite",
+              "nightsky-ufo": "ie-gentle-float 3s ease-in-out infinite",
+              "moonlight-owl": "ie-gentle-bob 4s ease-in-out infinite",
+              "moonlight-rose": "ie-gentle-sway 6s ease-in-out infinite",
+              "morning-bird": "ie-gentle-float 2.5s ease-in-out infinite",
+              "sunset-musician": "ie-gentle-sway 4s ease-in-out infinite",
+              "lab-flask": "ie-gentle-bob 3s ease-in-out infinite",
+              "cozy-teddy": "ie-gentle-float 5s ease-in-out infinite",
+            };
+            const idleAnim = idleAnimations[item.id];
+
+            // Shimmer mode — mysterious environmental hint
             if (item.displayMode === "shimmer") {
               return (
                 <div
@@ -859,19 +890,18 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     ...posX, ...posY,
                     width: elWidth, height: elHeight,
                     borderRadius: isLargeArea ? 12 : "50%",
-                    background: `radial-gradient(circle, ${accentColor}30 0%, ${accentColor}08 60%, transparent 100%)`,
-                    animation: "ie-shimmer 3s ease-in-out infinite",
-                    border: `1px dashed ${accentColor}30`,
+                    background: "transparent",
+                    animation: idleAnim || "ie-shimmer 3s ease-in-out infinite",
                   }}
                   onClick={onClick}
-                  title="???"
+                  title=""
                 >
                   <span style={{
-                    fontSize: emojiSize * 0.7,
+                    fontSize: emojiSize,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     width: "100%", height: "100%",
-                    opacity: 0.3,
-                    filter: "blur(2px)",
+                    opacity: 0.25,
+                    filter: "blur(2px) saturate(0.5)",
                   }}>
                     {item.emoji}
                   </span>
@@ -879,10 +909,10 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
               );
             }
 
-            // Dim mode — visible emoji hint, slightly transparent, inviting tap
+            // Dim mode — visible but blends into scene
             const isDim = item.displayMode === "dim";
 
-            // Default rendering for all interactables
+            // Default: no background, just the emoji sitting in the scene
             return (
               <div
                 key={item.id}
@@ -892,8 +922,9 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                   ...posX, ...posY,
                   width: elWidth, height: elHeight,
                   borderRadius: isLargeArea ? 12 : "50%",
-                  background: `${accentColor}${isDim ? "15" : "18"}`,
-                  opacity: isDim ? 0.7 : 1,
+                  background: "transparent",
+                  opacity: isDim ? 0.65 : 1,
+                  animation: idleAnim || "none",
                 }}
                 onClick={onClick}
                 title={item.label}
@@ -903,7 +934,8 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     fontSize: emojiSize,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     width: "100%", height: "100%",
-                    opacity: isDim ? 0.7 : 1,
+                    filter: isDim ? "saturate(0.7)" : "none",
+                    transition: "filter 0.3s ease",
                   }}>
                     {item.emoji}
                   </span>
