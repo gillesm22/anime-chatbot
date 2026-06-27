@@ -511,6 +511,7 @@ function ChatContent({ characterId }: { characterId: string }) {
         }
       `}</style>
       <div
+        ref={chatContainerRef}
         id="chat-container"
         className="h-screen flex flex-col overflow-hidden"
         style={{ position: "relative" }}

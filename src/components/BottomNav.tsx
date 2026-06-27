@@ -1,3 +1,5 @@
+import { haptic } from "@/lib/haptics";
+
 export interface BottomNavProps {
   characterId: string;
   accentColor: string;
@@ -23,7 +25,10 @@ interface NavButtonProps {
 function NavButton({ label, active, accentColor, onClick, icon }: NavButtonProps) {
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        haptic.tick();
+        onClick();
+      }}
       style={{
         display: "flex",
         flexDirection: "column",

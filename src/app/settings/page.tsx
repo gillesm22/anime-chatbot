@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [textSpeed, setTextSpeed] = useState(12);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [responseLength, setResponseLength] = useState<"short" | "medium" | "long">("medium");
   const [aiProvider, setAiProvider] = useState("gpt-4o");
   const [cleared, setCleared] = useState<string | null>(null);
@@ -51,6 +52,9 @@ export default function SettingsPage() {
 
     const savedProvider = localStorage.getItem(`${LS_PREFIX}ai-provider`);
     if (savedProvider) setAiProvider(savedProvider);
+
+    const savedHaptics = localStorage.getItem(`${LS_PREFIX}haptics-enabled`);
+    if (savedHaptics !== null) setHapticsEnabled(savedHaptics !== "false");
   }, []);
 
   const handleSpeedChange = (value: number) => {
@@ -72,6 +76,12 @@ export default function SettingsPage() {
     const next = !soundEnabled;
     setSoundEnabled(next);
     localStorage.setItem(`${LS_PREFIX}sound-enabled`, String(next));
+  };
+
+  const handleHapticsToggle = () => {
+    const next = !hapticsEnabled;
+    setHapticsEnabled(next);
+    localStorage.setItem(`${LS_PREFIX}haptics-enabled`, String(next));
   };
 
   const handleClassSelect = (classId: HeroClassId) => {
@@ -184,7 +194,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5 space-y-5"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <div>
                 <label className="text-xs text-text-secondary block mb-2">Your Name</label>
@@ -196,8 +206,8 @@ export default function SettingsPage() {
                   maxLength={24}
                   className="w-full px-4 py-2.5 rounded-xl text-sm text-text placeholder:text-text-secondary/40 outline-none transition-colors"
                   style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "var(--color-card-border)",
+                    border: "1px solid var(--color-border)",
                   }}
                 />
               </div>
@@ -212,21 +222,21 @@ export default function SettingsPage() {
                         onClick={() => handleClassSelect(cls.id)}
                         className="relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-all duration-200"
                         style={{
-                          background: selected ? `${cls.theme.accent}25` : "rgba(255,255,255,0.04)",
-                          border: `1.5px solid ${selected ? `${cls.theme.accent}60` : "rgba(255,255,255,0.06)"}`,
+                          background: selected ? `${cls.theme.accent}25` : "var(--color-hover-bg)",
+                          border: `1.5px solid ${selected ? `${cls.theme.accent}60` : "var(--color-card-border)"}`,
                           boxShadow: selected ? `0 0 20px ${cls.theme.glow}` : "none",
                         }}
                       >
                         <span className="text-xl">{cls.icon}</span>
                         <span
                           className="text-xs font-medium"
-                          style={{ color: selected ? cls.theme.accent : "rgba(255,255,255,0.5)" }}
+                          style={{ color: selected ? cls.theme.accent : "var(--color-text-secondary)" }}
                         >
                           {cls.label}
                         </span>
                         <span
                           className="text-[9px] opacity-60"
-                          style={{ color: selected ? cls.theme.accent : "rgba(255,255,255,0.35)" }}
+                          style={{ color: selected ? cls.theme.accent : "var(--color-text-tertiary)" }}
                         >
                           {cls.title}
                         </span>
@@ -292,7 +302,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-text-secondary">Slow</span>
@@ -307,7 +317,7 @@ export default function SettingsPage() {
                 onChange={(e) => handleSpeedChange(Number(e.target.value))}
                 className="w-full accent-[#a78bfa] h-1 bg-surface rounded-full appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #a78bfa ${((textSpeed - 5) / 45) * 100}%, rgba(255,255,255,0.08) ${((textSpeed - 5) / 45) * 100}%)`,
+                  background: `linear-gradient(to right, #a78bfa ${((textSpeed - 5) / 45) * 100}%, var(--color-border) ${((textSpeed - 5) / 45) * 100}%)`,
                 }}
               />
               <p className="text-xs text-text-secondary mt-2 opacity-60">
@@ -323,7 +333,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <div className="flex gap-2">
                 {(["short", "medium", "long"] as const).map((option) => (
@@ -332,8 +342,8 @@ export default function SettingsPage() {
                     onClick={() => handleLengthChange(option)}
                     className="flex-1 py-2 rounded-full text-sm font-medium capitalize transition-colors"
                     style={{
-                      background: responseLength === option ? "rgba(167, 139, 250, 0.25)" : "rgba(255,255,255,0.06)",
-                      color: responseLength === option ? "#a78bfa" : "rgba(255,255,255,0.5)",
+                      background: responseLength === option ? "rgba(167, 139, 250, 0.25)" : "var(--color-card-border)",
+                      color: responseLength === option ? "#a78bfa" : "var(--color-text-secondary)",
                       border: `1.5px solid ${responseLength === option ? "rgba(167, 139, 250, 0.4)" : "transparent"}`,
                     }}
                   >
@@ -354,7 +364,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <div className="flex gap-2">
                 {([
@@ -367,8 +377,8 @@ export default function SettingsPage() {
                     onClick={() => handleProviderChange(option.value)}
                     className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
                     style={{
-                      background: aiProvider === option.value ? "rgba(167, 139, 250, 0.25)" : "rgba(255,255,255,0.06)",
-                      color: aiProvider === option.value ? "#a78bfa" : "rgba(255,255,255,0.5)",
+                      background: aiProvider === option.value ? "rgba(167, 139, 250, 0.25)" : "var(--color-card-border)",
+                      color: aiProvider === option.value ? "#a78bfa" : "var(--color-text-secondary)",
                       border: `1.5px solid ${aiProvider === option.value ? "rgba(167, 139, 250, 0.4)" : "transparent"}`,
                     }}
                   >
@@ -389,7 +399,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5 flex items-center justify-between"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <div>
                 <p className="text-sm text-text">Sound Effects</p>
@@ -401,14 +411,48 @@ export default function SettingsPage() {
                 onClick={handleSoundToggle}
                 className="relative w-11 h-6 rounded-full transition-colors duration-200"
                 style={{
-                  backgroundColor: soundEnabled ? "rgba(167, 139, 250, 0.4)" : "rgba(255,255,255,0.1)",
+                  backgroundColor: soundEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
                 }}
               >
                 <motion.div
                   className="absolute top-1 w-4 h-4 rounded-full"
                   animate={{
                     left: soundEnabled ? "calc(100% - 20px)" : "4px",
-                    backgroundColor: soundEnabled ? "#a78bfa" : "rgba(255,255,255,0.3)",
+                    backgroundColor: soundEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              </button>
+            </div>
+          </motion.section>
+
+          {/* Haptic Feedback */}
+          <motion.section variants={itemVariants} className="mb-8">
+            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
+              Haptic Feedback
+            </h2>
+            <div
+              className="rounded-2xl p-5 flex items-center justify-between"
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
+            >
+              <div>
+                <p className="text-sm text-text">Haptic Feedback</p>
+                <p className="text-xs text-text-secondary mt-0.5 opacity-60">
+                  Enable vibration on tap and interactions
+                </p>
+              </div>
+              <button
+                onClick={handleHapticsToggle}
+                className="relative w-11 h-6 rounded-full transition-colors duration-200"
+                style={{
+                  backgroundColor: hapticsEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
+                }}
+              >
+                <motion.div
+                  className="absolute top-1 w-4 h-4 rounded-full"
+                  animate={{
+                    left: hapticsEnabled ? "calc(100% - 20px)" : "4px",
+                    backgroundColor: hapticsEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
                   }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
@@ -423,7 +467,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5 space-y-3"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               {CHARACTER_IDS.map((charId) => {
                 const { name, color } = CHARACTER_LABELS[charId];
@@ -441,8 +485,8 @@ export default function SettingsPage() {
                       onClick={() => clearCharacterHistory(charId)}
                       className="text-xs px-3 py-1.5 rounded-full transition-colors"
                       style={{
-                        background: isCleared ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                        color: isCleared ? "#4ade80" : "rgba(255,255,255,0.5)",
+                        background: isCleared ? "rgba(74,222,128,0.15)" : "var(--color-card-border)",
+                        color: isCleared ? "#4ade80" : "var(--color-text-secondary)",
                       }}
                     >
                       {isCleared ? "Cleared" : "Clear"}
@@ -460,7 +504,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5 space-y-3"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
               <p className="text-xs text-text-secondary opacity-60 mb-3">
                 Download your chat history as a text or JSON file.
@@ -496,12 +540,91 @@ export default function SettingsPage() {
                 }}
                 className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
                 style={{
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.5)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "var(--color-card-border)",
+                  color: "var(--color-text-secondary)",
+                  border: "1px solid var(--color-border)",
                 }}
               >
                 Export All Chats (JSON)
+              </button>
+            </div>
+          </motion.section>
+
+          {/* Backup & Restore Progress */}
+          <motion.section variants={itemVariants} className="mb-8">
+            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
+              Backup &amp; Restore Progress
+            </h2>
+            <div
+              className="rounded-2xl p-5 space-y-3"
+              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
+            >
+              <p className="text-xs text-text-secondary opacity-60 mb-3">
+                Save all your affinity, memories, diary, quests, and settings to a file. Restore anytime to recover lost progress.
+              </p>
+              <button
+                onClick={() => {
+                  const backup: Record<string, string> = {};
+                  for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith("anime-chatbot-")) {
+                      backup[key] = localStorage.getItem(key) || "";
+                    }
+                  }
+                  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `hexxii-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                style={{
+                  background: "rgba(74,222,128,0.1)",
+                  color: "#4ade80",
+                  border: "1px solid rgba(74,222,128,0.2)",
+                }}
+              >
+                Backup All Progress
+              </button>
+              <button
+                onClick={() => {
+                  const input = document.createElement("input");
+                  input.type = "file";
+                  input.accept = ".json";
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      try {
+                        const backup = JSON.parse(reader.result as string);
+                        let count = 0;
+                        for (const [key, value] of Object.entries(backup)) {
+                          if (typeof key === "string" && key.startsWith("anime-chatbot-") && typeof value === "string") {
+                            localStorage.setItem(key, value);
+                            count++;
+                          }
+                        }
+                        alert(`Restored ${count} entries. Reloading...`);
+                        window.location.reload();
+                      } catch {
+                        alert("Invalid backup file.");
+                      }
+                    };
+                    reader.readAsText(file);
+                  };
+                  input.click();
+                }}
+                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                style={{
+                  background: "var(--color-card-border)",
+                  color: "var(--color-text-secondary)",
+                  border: "1px solid var(--color-border)",
+                }}
+              >
+                Restore from Backup
               </button>
             </div>
           </motion.section>
@@ -513,7 +636,7 @@ export default function SettingsPage() {
             </h2>
             <div
               className="rounded-2xl p-5"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(239,68,68,0.15)" }}
+              style={{ background: "var(--color-card-bg)", border: "1px solid rgba(239,68,68,0.15)" }}
             >
               <p className="text-xs text-text-secondary mb-3 opacity-60">
                 This will clear all settings and chat history for every character.

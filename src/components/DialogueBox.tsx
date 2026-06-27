@@ -6,6 +6,7 @@ import { playTypingClick } from "@/lib/sounds";
 import { ClickToContinue } from "./ClickToContinue";
 import { getDialogueEffect, DIALOGUE_EFFECT_STYLES } from "@/lib/dialogueEffects";
 import type { Expression } from "@/lib/characters/types";
+import { haptic } from "@/lib/haptics";
 
 interface DialogueBoxProps {
   characterName: string;
@@ -120,6 +121,7 @@ export function DialogueBox({
       setIsTypewriting(false);
       onTypeComplete?.();
     } else if (showAdvance) {
+      haptic.tick();
       onAdvance();
     }
   }, [isTypewriting, showAdvance, onAdvance, line, onTypeComplete]);
