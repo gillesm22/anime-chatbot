@@ -6,7 +6,7 @@ export interface Quest {
   description: string;
   target: number;
   reward: number;
-  type: "laugh" | "flustered" | "messages" | "gifts" | "headpat";
+  type: "laugh" | "flustered" | "messages" | "gifts" | "headpat" | "interact";
 }
 
 export interface QuestProgress {
@@ -93,6 +93,22 @@ export const QUEST_POOL: Quest[] = [
     target: 5,
     reward: 35,
     type: "flustered",
+  },
+  {
+    id: "interact-3",
+    title: "Explore 3 scene elements",
+    description: "Interact with objects in your scene.",
+    target: 3,
+    reward: 12,
+    type: "interact",
+  },
+  {
+    id: "interact-5",
+    title: "Explore 5 scene elements",
+    description: "Discover what your scene has to offer.",
+    target: 5,
+    reward: 20,
+    type: "interact",
   },
   {
     id: "headpat-10",
