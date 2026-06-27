@@ -83,8 +83,28 @@ const HEXX_PHRASES: Record<HexxMood, string[]> = {
   nature: ["peaceful", "*butterfly*", "so pretty", "I love it here"],
 };
 
+// Idle activities — Hexx does random things when nobody's chatting
+const IDLE_ACTIVITIES: Array<{ mood: HexxMood; phrases: string[]; durationMs: number }> = [
+  { mood: "sleepy", phrases: ["zzz", "...zzz", "*snore*", "*curls up*", "5 more min..."], durationMs: 8000 },
+  { mood: "curious", phrases: ["hmm?", "what's over there...", "*sniff sniff*", "is that a bug?", "*peeks around*"], durationMs: 5000 },
+  { mood: "playful", phrases: ["*does a loop*", "wheee~", "*barrel roll*", "catch me~", "*zooms*"], durationMs: 4000 },
+  { mood: "cozy", phrases: ["*snuggle*", "so warm...", "*nuzzle*", "perfect spot", "*purrs*"], durationMs: 6000 },
+  { mood: "wizard", phrases: ["*casts spell*", "abracadabra~", "*magic sparkle*", "hocus pocus!"], durationMs: 4000 },
+  { mood: "detective", phrases: ["suspicious...", "*investigates*", "clue found!", "elementary~"], durationMs: 5000 },
+  { mood: "dj", phrases: ["*wub wub*", "drop the bass!", "this is my jam~", "*headbob*"], durationMs: 4000 },
+  { mood: "chef", phrases: ["*chef's kiss*", "needs more garlic", "bon appetit~", "*taste test*"], durationMs: 5000 },
+  { mood: "guitar", phrases: ["*shreds*", "anyway here's wonderwall", "rock on~", "*air guitar*"], durationMs: 4000 },
+  { mood: "nature", phrases: ["*butterfly!*", "so peaceful...", "pretty flower~", "*deep breath*"], durationMs: 6000 },
+  { mood: "cool", phrases: ["B)", "too cool", "deal with it", "*sunglasses on*"], durationMs: 4000 },
+  { mood: "lol", phrases: ["HAHA", "I can't—", "LMAOOO", "stop I'm dying"], durationMs: 3000 },
+  { mood: "edgy", phrases: ["...", "you wouldn't understand", "*broods*", "darkness is my ally"], durationMs: 6000 },
+  { mood: "proud", phrases: ["I'm the best", "you're welcome", "as expected", "*flexes tiny wing*"], durationMs: 4000 },
+  { mood: "neutral", phrases: ["...", "*yawn*", "*wing stretch*", "bored", "meh"], durationMs: 5000 },
+];
+
 function getHexxMood(expression?: Expression, isIdle?: boolean): HexxMood {
-  if (isIdle) return "sleepy";
+  // Don't force sleepy for idle — the idle activity system handles it
+  if (!expression && !isIdle) return "neutral";
   if (!expression) return "neutral";
   switch (expression) {
     case "happy": case "laugh": return "happy";
@@ -233,6 +253,37 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
     }, 12000);
     return () => clearInterval(interval);
   }, [landingMode]);
+
+  // Idle activity loop — Hexx does random things when nobody's chatting
+  useEffect(() => {
+    if (!isIdle || landingMode) return;
+
+    let timeout: ReturnType<typeof setTimeout>;
+    let active = true;
+
+    function doRandomActivity() {
+      if (!active) return;
+      const activity = IDLE_ACTIVITIES[Math.floor(Math.random() * IDLE_ACTIVITIES.length)];
+      setMood(activity.mood);
+      const line = activity.phrases[Math.floor(Math.random() * activity.phrases.length)];
+      setPhrase(line);
+
+      // Clear phrase partway through, then schedule next activity
+      if (phraseTimer.current) clearTimeout(phraseTimer.current);
+      phraseTimer.current = setTimeout(() => setPhrase(null), Math.min(activity.durationMs - 1000, 3000));
+
+      timeout = setTimeout(doRandomActivity, activity.durationMs + Math.random() * 4000);
+    }
+
+    // Start first activity after a short delay
+    timeout = setTimeout(doRandomActivity, 2000 + Math.random() * 3000);
+
+    return () => {
+      active = false;
+      clearTimeout(timeout);
+      if (phraseTimer.current) clearTimeout(phraseTimer.current);
+    };
+  }, [isIdle, landingMode]);
 
   // Chat-generated Hexx phrase (from AI when user mentions Hexx)
   useEffect(() => {
