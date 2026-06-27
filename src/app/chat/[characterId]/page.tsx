@@ -168,6 +168,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
   const [hexxPhrase, setHexxPhrase] = useState<string | null>(null);
   const [pendingDiscoveryContext, setPendingDiscoveryContext] = useState<string | null>(null);
+  const [discoveryToast, setDiscoveryToast] = useState<{ line: string; expression: string } | null>(null);
 
   // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
   // useEffect cleanup is NOT reliable on tab/app close — these events are.
@@ -448,7 +449,10 @@ function ChatContent({ characterId }: { characterId: string }) {
   }, [characterId, dispatch]);
 
   const handleDiscoveryReaction = useCallback((line: string, expression: string) => {
-    dispatch(receiveResponse(line, expression as Expression));
+    // Show as ephemeral toast — doesn't enter chat history or block the dialogue
+    dispatch(setExpression(expression as Expression));
+    setDiscoveryToast({ line, expression });
+    setTimeout(() => setDiscoveryToast(null), 3500);
   }, [dispatch]);
 
   const handleTypeComplete = useCallback(() => {
@@ -566,6 +570,35 @@ function ChatContent({ characterId }: { characterId: string }) {
           onReaction={handleDiscoveryReaction}
           onDiscoveryContext={(ctx) => setPendingDiscoveryContext(ctx)}
         />
+        {/* Discovery reaction toast — ephemeral, doesn't block chat */}
+        {discoveryToast && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 140,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 25,
+              maxWidth: "85%",
+              padding: "10px 20px",
+              borderRadius: 16,
+              background: "var(--color-surface-alpha, rgba(10,10,16,0.88))",
+              backdropFilter: "blur(10px)",
+              border: `1px solid ${character.theme.accent}30`,
+              color: "var(--color-dialogue-text, #e8e0e8)",
+              fontSize: "14px",
+              fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)",
+              textAlign: "center",
+              animation: "fadeIn 0.3s ease-out, fadeIn 0.3s ease-in 3s reverse forwards",
+              pointerEvents: "none",
+            }}
+          >
+            <span style={{ color: character.theme.accent, fontWeight: 600, fontSize: "11px", letterSpacing: "0.05em", marginRight: 6 }}>
+              {character.name}:
+            </span>
+            {discoveryToast.line}
+          </div>
+        )}
         {currentMilestone && character && (
           <MilestoneToast
             milestone={currentMilestone}
