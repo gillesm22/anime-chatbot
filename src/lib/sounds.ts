@@ -81,3 +81,23 @@ export function playMessageReceived() {
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + 0.1);
 }
+
+export function playDiscoveryChime(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const freqs = [523, 659, 784, 1047]; // C5, E5, G5, C6 — ascending major arpeggio
+  freqs.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + i * 0.1;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.25, t + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+    osc.start(t);
+    osc.stop(t + 0.4);
+  });
+}
