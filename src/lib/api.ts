@@ -42,6 +42,7 @@ export interface SendMessageParams {
   greetingContext?: string;
   personalityContext?: string;
   hexxMentioned?: boolean;
+  discoveryContext?: string;
 }
 
 export async function streamChat(

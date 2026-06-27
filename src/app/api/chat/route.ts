@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
-  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext, hexxMentioned } = body;
+  const { message, characterId, userName, memories, responseLength, provider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt, miniGamePrompt, typingHint, language, greetingContext, personalityContext, hexxMentioned, discoveryContext } = body;
   const history = Array.isArray(body.history) ? body.history.slice(-50) : []; // Cap history at 50 messages
 
   if (!message || typeof message !== "string") {
@@ -97,6 +97,9 @@ The user has a tiny pet bat companion named Hexx who is always nearby. She's a s
 Your opinion of Hexx: ${opinion}
 
 The user mentioned Hexx in their message. Acknowledge Hexx naturally in your response. Also include a [hexx:her reaction] tag somewhere in your response — this is what Hexx says/does in reaction. Keep it short (under 10 words), sassy, and in character for a tiny chaotic bat. Examples: [hexx:*preens smugly*], [hexx:hey I heard that!], [hexx:tch, whatever]`;
+  }
+  if (discoveryContext) {
+    systemContent += `\n\n[Scene Discovery]\n${discoveryContext}`;
   }
   if (language && language !== "en") {
     systemContent += `\n\nIMPORTANT: The user prefers to chat in ${language === "fr" ? "French (fr-CA)" : language}. Respond in that language while staying in character.`;
