@@ -651,6 +651,12 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
     pointerEvents: "auto",
   };
 
+  // Wrap click handlers to stop propagation — prevents sprite flustered
+  // reaction from firing when tapping interactive elements
+  function wrapClick(handler: (e: React.MouseEvent) => void) {
+    return (e: React.MouseEvent) => { e.stopPropagation(); handler(e); };
+  }
+
   const hotspotHoverStyle = `
     .ie-hotspot:hover { transform: scale(1.08); filter: brightness(1.15); }
     .ie-hotspot:active { transform: scale(0.95); }
@@ -804,7 +810,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
           {/* Render all visible interactables */}
           {visibleItems.map((item) => {
             const legacyHandler = legacySoundHandlers[item.id];
-            const onClick = () => { legacyHandler?.(); handleDiscoveryTap(item); };
+            const onClick = wrapClick(() => { legacyHandler?.(); handleDiscoveryTap(item); });
 
             // Special: beach water — interactive splash at tap point
             if (item.id === "beach-splash") {
@@ -821,7 +827,7 @@ export function InteractiveElements({ sceneId, accentColor, characterId, onReact
                     cursor: "pointer",
                     animation: waveActive ? "ie-wave-swell 0.6s ease-out" : "none",
                   }}
-                  onClick={(e) => { handleBeachAt(e); handleDiscoveryTap(item); }}
+                  onClick={wrapClick((e) => { handleBeachAt(e); handleDiscoveryTap(item); })}
                   title=""
                 />
               );
