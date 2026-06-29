@@ -10,6 +10,7 @@ export interface BottomNavProps {
   onShowScreenshot: () => void;
   onShowOutfits: () => void;
   onShowQuests: () => void;
+  onSave?: () => void;
 }
 
 export type BottomNavTab = "chat" | "outfits" | "gifts" | "diary" | "more";
@@ -124,6 +125,16 @@ function DotsIcon() {
   );
 }
 
+function SaveIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+      <polyline points="17 21 17 13 7 13 7 21" />
+      <polyline points="7 3 7 8 15 8" />
+    </svg>
+  );
+}
+
 export function BottomNav({
   accentColor,
   activeTab: activeTabProp,
@@ -133,6 +144,7 @@ export function BottomNav({
   onShowScreenshot,
   onShowOutfits,
   onShowQuests,
+  onSave,
 }: BottomNavProps) {
   const activeTab = activeTabProp ?? "chat";
 
@@ -185,6 +197,13 @@ export function BottomNav({
         accentColor={accentColor}
         onClick={onShowDiary}
         icon={<BookIcon />}
+      />
+      <NavButton
+        label="Save"
+        active={false}
+        accentColor={accentColor}
+        onClick={() => onSave?.()}
+        icon={<SaveIcon />}
       />
       <NavButton
         label="More"

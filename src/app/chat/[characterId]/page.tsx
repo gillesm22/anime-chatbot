@@ -67,6 +67,8 @@ import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffe
 import { haptic } from "@/lib/haptics";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import { prefetchSpeech } from "@/lib/speech";
+import { initSaveSystem, saveSnapshot, exportFullBackup } from "@/lib/saveSystem";
+import { SaveToast } from "@/components/SaveToast";
 
 const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
   { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
@@ -169,6 +171,8 @@ function ChatContent({ characterId }: { characterId: string }) {
   const [hexxPhrase, setHexxPhrase] = useState<string | null>(null);
   const [pendingDiscoveryContext, setPendingDiscoveryContext] = useState<string | null>(null);
   const [discoveryToast, setDiscoveryToast] = useState<{ line: string; expression: string } | null>(null);
+  const [saveToast, setSaveToast] = useState<{ message: string; type: "save" | "restore" } | null>(null);
+  const saveInitialized = useRef(false);
 
   // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
   // useEffect cleanup is NOT reliable on tab/app close — these events are.
@@ -229,6 +233,17 @@ function ChatContent({ characterId }: { characterId: string }) {
       stopHumming();
     };
   }, [characterId]);
+
+  // Save system initialization
+  useEffect(() => {
+    if (saveInitialized.current) return;
+    saveInitialized.current = true;
+    initSaveSystem().then(({ restored }) => {
+      if (restored) {
+        setSaveToast({ message: "Progress restored from backup", type: "restore" });
+      }
+    }).catch(() => {});
+  }, []);
 
   // Dynamic theme-color for status bar
   useEffect(() => {
@@ -302,6 +317,13 @@ function ChatContent({ characterId }: { characterId: string }) {
     router.replace("/");
     return null;
   }
+
+  const handleSave = useCallback(async () => {
+    haptic.tick();
+    await saveSnapshot();
+    exportFullBackup();
+    setSaveToast({ message: "Progress saved!", type: "save" });
+  }, []);
 
   const handleSend = useCallback(
     async (message: string) => {
@@ -605,6 +627,13 @@ function ChatContent({ characterId }: { characterId: string }) {
             milestone={currentMilestone}
             accentColor={character.theme.accent}
             onDone={() => setCurrentMilestone(null)}
+          />
+        )}
+        {saveToast && (
+          <SaveToast
+            message={saveToast.message}
+            type={saveToast.type}
+            onDone={() => setSaveToast(null)}
           />
         )}
         {/* Control bar */}
@@ -998,6 +1027,7 @@ function ChatContent({ characterId }: { characterId: string }) {
           onShowScreenshot={() => setShowScreenshot(true)}
           onShowOutfits={() => { setShowOutfitCarousel(prev => !prev); setShowDiary(false); setShowGiftShop(false); setShowQuestPanel(false); setShowScenePicker(false); }}
           onShowQuests={() => { setShowQuestPanel(true); setShowDiary(false); setShowGiftShop(false); setShowOutfitCarousel(false); setShowScenePicker(false); }}
+          onSave={handleSave}
         />
         <BloodBat
           expression={state.currentExpression}
