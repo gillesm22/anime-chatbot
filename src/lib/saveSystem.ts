@@ -238,3 +238,66 @@ export async function restoreFromIndexedDB(): Promise<boolean> {
   }
   return true;
 }
+
+// ---------------------------------------------------------------------------
+// Module-level state for save system lifecycle
+// ---------------------------------------------------------------------------
+
+let saveInterval: ReturnType<typeof setInterval> | null = null;
+let lastSaveTimestamp: number | null = null;
+
+/** Returns the timestamp of the last successful save, or null. */
+export function getLastSaveTime(): number | null {
+  return lastSaveTimestamp;
+}
+
+/**
+ * Initialize the save system:
+ * 1. Attempt restore from IndexedDB (only if localStorage is empty)
+ * 2. Take an initial snapshot
+ * 3. Set up auto-save every 5 minutes (only when page is visible)
+ * 4. Save on page hide (visibilitychange)
+ */
+export async function initSaveSystem(): Promise<{ restored: boolean }> {
+  const restored = await restoreFromIndexedDB();
+
+  // Initial snapshot
+  await saveSnapshot();
+  lastSaveTimestamp = Date.now();
+
+  // Auto-save every 5 minutes, but only when page is visible
+  if (saveInterval) clearInterval(saveInterval);
+  saveInterval = setInterval(async () => {
+    if (document.visibilityState === "visible") {
+      await saveSnapshot();
+      lastSaveTimestamp = Date.now();
+    }
+  }, 300_000);
+
+  // Save when the user navigates away / switches tabs
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "hidden") {
+      await saveSnapshot();
+      lastSaveTimestamp = Date.now();
+    }
+  });
+
+  return { restored };
+}
+
+/**
+ * Export all anime-chatbot-* localStorage data as a downloadable JSON file.
+ * Filename: hexxii-save-YYYY-MM-DD.json
+ */
+export function exportFullBackup(): void {
+  const data = getAllLocalStorageData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `hexxii-save-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
