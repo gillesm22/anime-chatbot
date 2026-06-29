@@ -13,7 +13,9 @@
   "dependencies": {
     "@andresaya/edge-tts": "^1.8.0",
     "@anthropic-ai/sdk": "^0.52.0",
+    "@elevenlabs/elevenlabs-js": "^2.54.0",
     "bufferutil": "^4.1.0",
+    "elevenlabs": "^1.59.0",
     "framer-motion": "^10.18.0",
     "next": "16.2.9",
     "openai": "^5.8.2",
@@ -32,6 +34,7 @@
     "@vitejs/plugin-react": "^4.5.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^26.1.0",
     "tailwindcss": "^4",
     "typescript": "^5",
