@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "@/styles/globals.css";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `
+        <Script id="theme-init" strategy="beforeInteractive">{`
           (function() {
             try {
               var stored = localStorage.getItem("anime-chatbot-theme-mode");
@@ -34,7 +35,7 @@ export default function RootLayout({
               }
             } catch(e) {}
           })();
-        `}} />
+        `}</Script>
         <link
           href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
           rel="stylesheet"
@@ -51,16 +52,13 @@ export default function RootLayout({
       <body className="min-h-screen bg-bg text-text antialiased" suppressHydrationWarning>
         <SplashScreen />
         <OfflineIndicator />
-        <script dangerouslySetInnerHTML={{ __html: `
-          // Suppress hydration error overlay in dev
+        <Script id="dev-init" strategy="beforeInteractive">{`
           if (typeof window !== 'undefined') {
-            const origError = console.error;
-            console.error = function(...args) {
-              if (typeof args[0] === 'string' && (args[0].includes('Hydration') || args[0].includes('hydrat'))) return;
-              origError.apply(console, args);
+            var origError = console.error;
+            console.error = function() {
+              if (typeof arguments[0] === 'string' && (arguments[0].includes('Hydration') || arguments[0].includes('hydrat'))) return;
+              origError.apply(console, arguments);
             };
-            // Unregister all service workers and clear all caches
-            // to prevent stale cached API responses
             if ('serviceWorker' in navigator) {
               navigator.serviceWorker.getRegistrations().then(function(regs) {
                 regs.forEach(function(reg) { reg.unregister(); });
@@ -72,7 +70,7 @@ export default function RootLayout({
               }
             }
           }
-        `}} />
+        `}</Script>
         {children}
       </body>
     </html>
