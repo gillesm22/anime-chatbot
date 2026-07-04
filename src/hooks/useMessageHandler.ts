@@ -183,9 +183,13 @@ export function useMessageHandler({
                   triggerScreenShake(expression === "angry" ? "heavy" : "medium");
                 }
                 break;
-              case "text":
-                fullText += event.content;
+              case "text": {
+                // Guard against duplicate tail content from SSE chunking
+                const chunk = event.content;
+                if (chunk.length > 3 && fullText.endsWith(chunk)) break;
+                fullText += chunk;
                 break;
+              }
               case "scene":
                 if (event.sceneId) onSceneChange(event.sceneId as SceneId);
                 break;
