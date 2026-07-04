@@ -444,17 +444,19 @@ function ChatContent({ characterId }: { characterId: string }) {
             />
             <button
               type="submit"
-              className="flex-shrink-0 rounded-full flex items-center justify-center"
+              className="flex-shrink-0 flex items-center justify-center transition-transform active:scale-90"
               style={{
-                width: 40, height: 40,
+                width: 36, height: 36,
+                borderRadius: 12,
                 background: `${accent}`,
                 color: "#fff",
+                border: "none",
+                cursor: "pointer",
               }}
               aria-label="Send"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94l18.04-8.01a.75.75 0 000-1.36L3.478 2.405z" />
               </svg>
             </button>
           </form>

@@ -152,9 +152,10 @@ export function VNMenu({ accentColor, onSelect, onSave }: VNMenuProps) {
     }
   }
 
-  // Trigger button sits at fixed bottom-right; we need to know its center
-  // for arc positioning. Items are positioned relative to trigger.
-  // Trigger: right=20, bottom=20+safeArea. We offset from trigger center.
+  // Trigger sits above the chat bar (bottom: 80px, right: 16px via CSS).
+  // Arc items are positioned absolute within the vn-viewport.
+  const triggerRight = 16 + 24; // right offset + half trigger width
+  const triggerBottom = 80 + 24; // bottom offset + half trigger height
 
   return (
     <>
@@ -169,7 +170,7 @@ export function VNMenu({ accentColor, onSelect, onSave }: VNMenuProps) {
             transition={{ duration: 0.15 }}
             onClick={close}
             style={{
-              position: "fixed",
+              position: "absolute",
               inset: 0,
               zIndex: 24,
               background: "rgba(0,0,0,0.35)",
@@ -183,31 +184,28 @@ export function VNMenu({ accentColor, onSelect, onSave }: VNMenuProps) {
       <AnimatePresence>
         {isOpen && MENU_ITEMS.map((item, i) => {
           const pos = getArcPosition(i, MENU_ITEMS.length);
-          // Trigger center is approximately at (right=44px, bottom=44px) from viewport edge
-          // Items are positioned fixed relative to that anchor
-          const right = 20 + 24 + (-pos.x); // 24 = half trigger width
-          const bottom = 20 + 24 + (-pos.y); // 24 = half trigger height
+          const right = triggerRight + (-pos.x);
+          const bottom = triggerBottom + (-pos.y);
 
           return (
             <motion.div
               key={item.label}
-              initial={{ scale: 0.3, opacity: 0, right: 20 + 24, bottom: 20 + 24 }}
+              initial={{ scale: 0.3, opacity: 0, right: triggerRight, bottom: triggerBottom }}
               animate={{ scale: 1, opacity: 1, right, bottom }}
-              exit={{ scale: 0.3, opacity: 0, right: 20 + 24, bottom: 20 + 24 }}
+              exit={{ scale: 0.3, opacity: 0, right: triggerRight, bottom: triggerBottom }}
               transition={{
                 duration: 0.22,
                 delay: i * 0.03,
                 ease: [0.34, 1.56, 0.64, 1],
               }}
               style={{
-                position: "fixed",
+                position: "absolute",
                 zIndex: 26,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "4px",
                 pointerEvents: "auto",
-                // offset so item center aligns on arc point
                 marginRight: "-22px",
                 marginBottom: "-22px",
               }}
@@ -268,7 +266,7 @@ export function VNMenu({ accentColor, onSelect, onSave }: VNMenuProps) {
       <motion.button
         className="vn-menu-trigger"
         onClick={isOpen ? close : open}
-        style={{ zIndex: 27, pointerEvents: "auto" }}
+        style={{ zIndex: 27, pointerEvents: "auto", position: "absolute" }}
         whileTap={{ scale: 0.9 }}
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
