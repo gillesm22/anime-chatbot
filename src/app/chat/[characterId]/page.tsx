@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { ChatProvider, useChat } from "@/lib/chat/context";
 import { receiveResponse, setExpression } from "@/lib/chat/actions";
 import { useCharacterSession } from "@/hooks/useCharacterSession";
@@ -29,7 +29,7 @@ import { BloodBat } from "@/components/BloodBat";
 import { ScreenshotMode } from "@/components/ScreenshotMode";
 import { VoiceToggle } from "@/components/VoiceToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { BottomNav } from "@/components/BottomNav";
+
 import { getStarters } from "@/lib/conversationStarters";
 import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
 import { getSessionStartMood } from "@/lib/mood";
@@ -375,19 +375,6 @@ function ChatContent({ characterId }: { characterId: string }) {
             lastLine={[...state.messages].reverse().find((m) => m.role === "assistant")?.content || ""}
             visible={panels.isOpen("screenshot")}
             onClose={panels.closePanel}
-          />
-
-          <BottomNav
-            characterId={characterId}
-            accentColor={accent}
-            activeTab={panels.isOpen("outfits") ? "outfits" : panels.isOpen("gifts") ? "gifts" : panels.isOpen("diary") ? "diary" : panels.isOpen("quests") ? "more" : "chat"}
-            onShowDiary={() => panels.openPanel("diary")}
-            onShowGifts={() => panels.openPanel("gifts")}
-            onShowHistory={() => panels.togglePanel("history")}
-            onShowScreenshot={() => panels.openPanel("screenshot")}
-            onShowOutfits={() => panels.togglePanel("outfits")}
-            onShowQuests={() => panels.openPanel("quests")}
-            onSave={session.handleSave}
           />
 
           <BloodBat
