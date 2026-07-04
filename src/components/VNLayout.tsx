@@ -124,6 +124,16 @@ export function VNLayout({
   headerLeft,
   headerRight,
 }: VNLayoutProps) {
+  // Set --vh to actual visible viewport height (accounts for OS taskbar, browser chrome)
+  useEffect(() => {
+    function setVH() {
+      document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+    }
+    setVH();
+    window.addEventListener("resize", setVH);
+    return () => window.removeEventListener("resize", setVH);
+  }, []);
+
   return (
     <div className="vn-viewport" ref={containerRef} id="chat-container">
       {/* Layer 1: Scene background */}
