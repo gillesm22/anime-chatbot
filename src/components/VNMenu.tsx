@@ -155,7 +155,7 @@ export function VNMenu({ accentColor, onSelect, onSave }: VNMenuProps) {
   // Trigger sits above the chat bar (bottom: 80px, right: 16px via CSS).
   // Arc items are positioned absolute within the vn-viewport.
   const triggerRight = 16 + 24; // right offset + half trigger width
-  const triggerBottom = 80 + 24; // bottom offset + half trigger height
+  const triggerBottom = 120 + 24; // bottom offset + half trigger height
 
   return (
     <>
