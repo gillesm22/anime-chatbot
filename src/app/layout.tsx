@@ -49,7 +49,7 @@ export default function RootLayout({
           content="black-translucent"
         />
       </head>
-      <body className="min-h-screen bg-bg text-text antialiased" suppressHydrationWarning>
+      <body className="bg-bg text-text antialiased overflow-hidden" suppressHydrationWarning>
         <SplashScreen />
         <OfflineIndicator />
         <Script id="dev-init" strategy="beforeInteractive">{`

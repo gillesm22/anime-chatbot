@@ -278,16 +278,10 @@ input, textarea, button { -webkit-appearance: none; }
 
 /* ===== VN Layout System ===== */
 .vn-viewport {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  inset: 0;
   overflow: hidden;
   background: #000;
-}
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
 }
 
 .vn-sprite-zone {
