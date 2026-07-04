@@ -162,11 +162,11 @@ export function VNLayout({
         <div className="vn-header__right">{headerRight}</div>
       </header>
 
-      {/* Layer 6: Bottom zone — dialogue + input */}
-      <div className="vn-bottom-zone">{children}</div>
-
-      {/* Layer 7: Overlays — panels, modals, menus */}
+      {/* Layer 6: Overlays — panels, modals, menus */}
       {overlays}
+
+      {/* Layer 7: Bottom zone — dialogue + input (last so clicks work) */}
+      <div className="vn-bottom-zone">{children}</div>
     </div>
   );
 }
