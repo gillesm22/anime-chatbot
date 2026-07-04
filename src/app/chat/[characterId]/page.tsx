@@ -304,9 +304,9 @@ function ChatContent({ characterId }: { characterId: string }) {
           {/* Scene picker */}
           <div
             style={{
-              position: "fixed", bottom: "65px", left: 0, right: 0, zIndex: 35,
-              background: "var(--color-panel)", backdropFilter: "blur(14px)",
-              borderTop: "1px solid var(--color-border)", padding: "12px 12px 16px",
+              position: "fixed", bottom: "70px", left: 0, right: 0, zIndex: 35,
+              background: "rgba(10,10,16,0.92)", backdropFilter: "blur(14px)",
+              borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 12px 16px",
               transform: panels.isOpen("scenes") ? "translateY(0)" : "translateY(110%)",
               transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               pointerEvents: panels.isOpen("scenes") ? "auto" : "none",
