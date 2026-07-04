@@ -194,12 +194,16 @@ export function useMessageHandler({
                 break;
               case "error":
                 console.error("[chat] SSE error:", event.message);
-                fullText = "I'm sorry, something went wrong. Please try again.";
+                // Only show error if we got NO text at all
+                if (!fullText) {
+                  fullText = "I'm sorry, something went wrong. Please try again.";
+                }
                 break;
             }
           }
         );
-      } catch {
+      } catch (err) {
+        console.error("[handleSend] stream error:", err);
         fullText = fullText || "Connection lost. Please try again.";
       }
 
