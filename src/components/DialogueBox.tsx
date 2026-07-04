@@ -165,18 +165,8 @@ export function DialogueBox({
         onClick={handleClick}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
         key={lineKeyRef.current}
-        className={`relative w-full cursor-pointer select-none mx-2 md:mx-4 outline-none dialogue-box-enter${isTypewriting ? " dialogue-box-typing-glow" : ""}`}
+        className={`vn-dialogue relative cursor-pointer select-none outline-none dialogue-box-enter${isTypewriting ? " dialogue-box-typing-glow" : ""}`}
         style={{
-          background: "var(--color-surface-alpha)",
-          backdropFilter: "blur(12px)",
-          borderRadius: 16,
-          border: `1px solid ${
-            expression === "angry" || expression === "excited" || expression === "flustered"
-              ? `${accentColor}50`
-              : `${accentColor}20`
-          }`,
-          marginBottom: 4,
-          boxShadow: `0 -4px 30px rgba(0,0,0,0.4), inset 0 1px 0 ${accentColor}10`,
           "--db-accent10": `${accentColor}10`,
           "--db-accent15": `${accentColor}15`,
           "--db-accent30": `${accentColor}30`,
@@ -184,37 +174,18 @@ export function DialogueBox({
       >
       {/* Name plate */}
       <div
-        className="absolute -top-3 left-6 px-4 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
+        className="vn-dialogue__nameplate"
         style={{
-          background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+          background: `${accentColor}dd`,
           color: "var(--color-nameplate-text)",
-          boxShadow: `0 2px 10px ${accentColor}40`,
         }}
       >
         {characterName}
       </div>
 
-      {/* Decorative accent corners */}
-      <div
-        className="absolute top-0 left-0 w-8 h-8 pointer-events-none"
-        style={{
-          borderTop: `2px solid ${accentColor}40`,
-          borderLeft: `2px solid ${accentColor}40`,
-          borderTopLeftRadius: 16,
-        }}
-      />
-      <div
-        className="absolute top-0 right-0 w-8 h-8 pointer-events-none"
-        style={{
-          borderTop: `2px solid ${accentColor}40`,
-          borderRight: `2px solid ${accentColor}40`,
-          borderTopRightRadius: 16,
-        }}
-      />
-
       {/* Text area */}
       <div
-        className="px-4 pt-6 pb-4 md:px-8 md:pt-8 md:pb-5 min-h-[70px] md:min-h-[90px]"
+        className="vn-dialogue__text"
         style={{ fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)" }}
       >
         <p className="text-sm md:text-base leading-relaxed tracking-wide" style={{ color: "var(--color-dialogue-text)" }}>
