@@ -9,13 +9,14 @@ import { exportAsText, exportAsJSON } from "@/lib/exportChat";
 import type { ChatMessage } from "@/lib/chat/types";
 import { getHeroConfig, saveHeroConfig, selectHeroClass, HERO_CLASSES, type HeroClassId } from "@/lib/heroAvatar";
 
-const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
+const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick", "ticia"] as const;
 const CHARACTER_LABELS: Record<string, { name: string; color: string }> = {
   arisu: { name: "Arisu", color: "#f472b6" },
   marin: { name: "Marin", color: "#fb923c" },
   nao: { name: "Suzuka", color: "#a78bfa" },
   kurisu: { name: "Kurisu", color: "#e53935" },
   merrick: { name: "Merrick", color: "#7b1fa2" },
+  ticia: { name: "Ticia", color: "#1a1a1a" },
 };
 
 const LS_PREFIX = "anime-chatbot-";
@@ -26,7 +27,6 @@ export default function SettingsPage() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [responseLength, setResponseLength] = useState<"short" | "medium" | "long">("medium");
-  const [aiProvider, setAiProvider] = useState("gpt-4o");
   const [cleared, setCleared] = useState<string | null>(null);
   const [heroName, setHeroName] = useState("");
   const [heroClassId, setHeroClassId] = useState<HeroClassId>("knight");
@@ -50,9 +50,6 @@ export default function SettingsPage() {
     const savedLength = localStorage.getItem(`${LS_PREFIX}response-length`);
     if (savedLength) setResponseLength(savedLength as "short" | "medium" | "long");
 
-    const savedProvider = localStorage.getItem(`${LS_PREFIX}ai-provider`);
-    if (savedProvider) setAiProvider(savedProvider);
-
     const savedHaptics = localStorage.getItem(`${LS_PREFIX}haptics-enabled`);
     if (savedHaptics !== null) setHapticsEnabled(savedHaptics !== "false");
   }, []);
@@ -65,11 +62,6 @@ export default function SettingsPage() {
   const handleLengthChange = (value: "short" | "medium" | "long") => {
     setResponseLength(value);
     localStorage.setItem(`${LS_PREFIX}response-length`, value);
-  };
-
-  const handleProviderChange = (value: string) => {
-    setAiProvider(value);
-    localStorage.setItem(`${LS_PREFIX}ai-provider`, value);
   };
 
   const handleSoundToggle = () => {
@@ -295,363 +287,323 @@ export default function SettingsPage() {
             </div>
           </motion.section>
 
-          {/* Text Speed */}
+          {/* Conversation */}
           <motion.section variants={itemVariants} className="mb-8">
             <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Text Speed
+              Conversation
             </h2>
             <div
-              className="rounded-2xl p-5"
+              className="rounded-2xl p-5 space-y-6"
               style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-text-secondary">Slow</span>
-                <span className="text-sm text-text font-medium">{textSpeed}ms</span>
-                <span className="text-xs text-text-secondary">Fast</span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={50}
-                value={textSpeed}
-                onChange={(e) => handleSpeedChange(Number(e.target.value))}
-                className="w-full accent-[#a78bfa] h-1 bg-surface rounded-full appearance-none cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, #a78bfa ${((textSpeed - 5) / 45) * 100}%, var(--color-border) ${((textSpeed - 5) / 45) * 100}%)`,
-                }}
-              />
-              <p className="text-xs text-text-secondary mt-2 opacity-60">
-                Controls the typing speed in the dialogue box. Lower is faster.
-              </p>
-            </div>
-          </motion.section>
-
-          {/* Response Length */}
-          <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Response Length
-            </h2>
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
-            >
-              <div className="flex gap-2">
-                {(["short", "medium", "long"] as const).map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleLengthChange(option)}
-                    className="flex-1 py-2 rounded-full text-sm font-medium capitalize transition-colors"
-                    style={{
-                      background: responseLength === option ? "rgba(167, 139, 250, 0.25)" : "var(--color-card-border)",
-                      color: responseLength === option ? "#a78bfa" : "var(--color-text-secondary)",
-                      border: `1.5px solid ${responseLength === option ? "rgba(167, 139, 250, 0.4)" : "transparent"}`,
-                    }}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-text-secondary mt-2 opacity-60">
-                Controls how long character responses will be.
-              </p>
-            </div>
-          </motion.section>
-
-          {/* AI Provider */}
-          <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              AI Provider
-            </h2>
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
-            >
-              <div className="flex gap-2">
-                {([
-                  { value: "gpt-4o", label: "GPT-4o" },
-                  { value: "gpt-4o-mini", label: "GPT-4o-mini" },
-                  { value: "gpt-3.5-turbo", label: "GPT-3.5" },
-                ] as const).map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleProviderChange(option.value)}
-                    className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
-                    style={{
-                      background: aiProvider === option.value ? "rgba(167, 139, 250, 0.25)" : "var(--color-card-border)",
-                      color: aiProvider === option.value ? "#a78bfa" : "var(--color-text-secondary)",
-                      border: `1.5px solid ${aiProvider === option.value ? "rgba(167, 139, 250, 0.4)" : "transparent"}`,
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-text-secondary mt-2 opacity-60">
-                Choose which AI model powers character responses.
-              </p>
-            </div>
-          </motion.section>
-
-          {/* Sound */}
-          <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Sound
-            </h2>
-            <div
-              className="rounded-2xl p-5 flex items-center justify-between"
-              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
-            >
+              {/* Text Speed */}
               <div>
-                <p className="text-sm text-text">Sound Effects</p>
-                <p className="text-xs text-text-secondary mt-0.5 opacity-60">
-                  Enable typing and UI sounds
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs text-text-secondary">Slow</span>
+                  <span className="text-sm text-text font-medium">{textSpeed}ms</span>
+                  <span className="text-xs text-text-secondary">Fast</span>
+                </div>
+                <input
+                  type="range"
+                  min={5}
+                  max={50}
+                  value={textSpeed}
+                  onChange={(e) => handleSpeedChange(Number(e.target.value))}
+                  className="w-full accent-[#a78bfa] h-1 bg-surface rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #a78bfa ${((textSpeed - 5) / 45) * 100}%, var(--color-border) ${((textSpeed - 5) / 45) * 100}%)`,
+                  }}
+                />
+                <p className="text-xs text-text-secondary mt-2 opacity-60">
+                  Controls the typing speed in the dialogue box. Lower is faster.
                 </p>
               </div>
-              <button
-                onClick={handleSoundToggle}
-                className="relative w-11 h-6 rounded-full transition-colors duration-200"
-                style={{
-                  backgroundColor: soundEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
-                }}
-              >
-                <motion.div
-                  className="absolute top-1 w-4 h-4 rounded-full"
-                  animate={{
-                    left: soundEnabled ? "calc(100% - 20px)" : "4px",
-                    backgroundColor: soundEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              </button>
-            </div>
-          </motion.section>
 
-          {/* Haptic Feedback */}
-          <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Haptic Feedback
-            </h2>
-            <div
-              className="rounded-2xl p-5 flex items-center justify-between"
-              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
-            >
+              {/* Divider */}
+              <div className="border-t" style={{ borderColor: "var(--color-card-border)" }} />
+
+              {/* Response Length */}
               <div>
-                <p className="text-sm text-text">Haptic Feedback</p>
-                <p className="text-xs text-text-secondary mt-0.5 opacity-60">
-                  Enable vibration on tap and interactions
-                </p>
-              </div>
-              <button
-                onClick={handleHapticsToggle}
-                className="relative w-11 h-6 rounded-full transition-colors duration-200"
-                style={{
-                  backgroundColor: hapticsEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
-                }}
-              >
-                <motion.div
-                  className="absolute top-1 w-4 h-4 rounded-full"
-                  animate={{
-                    left: hapticsEnabled ? "calc(100% - 20px)" : "4px",
-                    backgroundColor: hapticsEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              </button>
-            </div>
-          </motion.section>
-
-          {/* Clear Chat History */}
-          <motion.section variants={itemVariants} className="mb-8">
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Chat History
-            </h2>
-            <div
-              className="rounded-2xl p-5 space-y-3"
-              style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
-            >
-              {CHARACTER_IDS.map((charId) => {
-                const { name, color } = CHARACTER_LABELS[charId];
-                const isCleared = cleared === charId;
-                return (
-                  <div key={charId} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="text-sm text-text">{name}</span>
-                    </div>
+                <label className="text-xs text-text-secondary block mb-3">Response Length</label>
+                <div className="flex gap-2">
+                  {(["short", "medium", "long"] as const).map((option) => (
                     <button
-                      onClick={() => clearCharacterHistory(charId)}
-                      className="text-xs px-3 py-1.5 rounded-full transition-colors"
+                      key={option}
+                      onClick={() => handleLengthChange(option)}
+                      className="flex-1 py-2 rounded-full text-sm font-medium capitalize transition-colors"
                       style={{
-                        background: isCleared ? "rgba(74,222,128,0.15)" : "var(--color-card-border)",
-                        color: isCleared ? "#4ade80" : "var(--color-text-secondary)",
+                        background: responseLength === option ? "rgba(167, 139, 250, 0.25)" : "var(--color-card-border)",
+                        color: responseLength === option ? "#a78bfa" : "var(--color-text-secondary)",
+                        border: `1.5px solid ${responseLength === option ? "rgba(167, 139, 250, 0.4)" : "transparent"}`,
                       }}
                     >
-                      {isCleared ? "Cleared" : "Clear"}
+                      {option}
                     </button>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+                <p className="text-xs text-text-secondary mt-2 opacity-60">
+                  Controls how long character responses will be.
+                </p>
+              </div>
             </div>
           </motion.section>
 
-          {/* Export Data */}
+          {/* Audio & Feedback */}
           <motion.section variants={itemVariants} className="mb-8">
             <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Export Data
+              Audio &amp; Feedback
             </h2>
             <div
-              className="rounded-2xl p-5 space-y-3"
+              className="rounded-2xl p-5 space-y-4"
               style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
-              <p className="text-xs text-text-secondary opacity-60 mb-3">
-                Download your chat history as a text or JSON file.
-              </p>
-              <button
-                onClick={() => {
-                  for (const charId of CHARACTER_IDS) {
-                    const raw = localStorage.getItem(`${LS_PREFIX}history-${charId}`);
-                    if (raw) {
-                      const messages: ChatMessage[] = JSON.parse(raw);
-                      exportAsText(messages, CHARACTER_LABELS[charId].name);
-                    }
-                  }
-                }}
-                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                style={{
-                  background: "rgba(167, 139, 250, 0.1)",
-                  color: "#a78bfa",
-                  border: "1px solid rgba(167, 139, 250, 0.2)",
-                }}
-              >
-                Export All Chats (Text)
-              </button>
-              <button
-                onClick={() => {
-                  for (const charId of CHARACTER_IDS) {
-                    const raw = localStorage.getItem(`${LS_PREFIX}history-${charId}`);
-                    if (raw) {
-                      const messages: ChatMessage[] = JSON.parse(raw);
-                      exportAsJSON(messages, CHARACTER_LABELS[charId].name);
-                    }
-                  }
-                }}
-                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                style={{
-                  background: "var(--color-card-border)",
-                  color: "var(--color-text-secondary)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                Export All Chats (JSON)
-              </button>
+              {/* Sound Effects */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text">Sound Effects</p>
+                  <p className="text-xs text-text-secondary mt-0.5 opacity-60">
+                    Enable typing and UI sounds
+                  </p>
+                </div>
+                <button
+                  onClick={handleSoundToggle}
+                  className="relative w-11 h-6 rounded-full transition-colors duration-200"
+                  style={{
+                    backgroundColor: soundEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
+                  }}
+                >
+                  <motion.div
+                    className="absolute top-1 w-4 h-4 rounded-full"
+                    animate={{
+                      left: soundEnabled ? "calc(100% - 20px)" : "4px",
+                      backgroundColor: soundEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t" style={{ borderColor: "var(--color-card-border)" }} />
+
+              {/* Haptic Feedback */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text">Haptic Feedback</p>
+                  <p className="text-xs text-text-secondary mt-0.5 opacity-60">
+                    Enable vibration on tap and interactions
+                  </p>
+                </div>
+                <button
+                  onClick={handleHapticsToggle}
+                  className="relative w-11 h-6 rounded-full transition-colors duration-200"
+                  style={{
+                    backgroundColor: hapticsEnabled ? "rgba(167, 139, 250, 0.4)" : "var(--color-toggle-bg)",
+                  }}
+                >
+                  <motion.div
+                    className="absolute top-1 w-4 h-4 rounded-full"
+                    animate={{
+                      left: hapticsEnabled ? "calc(100% - 20px)" : "4px",
+                      backgroundColor: hapticsEnabled ? "#a78bfa" : "var(--color-toggle-knob)",
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </button>
+              </div>
             </div>
           </motion.section>
 
-          {/* Backup & Restore Progress */}
+          {/* Data */}
           <motion.section variants={itemVariants} className="mb-8">
             <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Backup &amp; Restore Progress
+              Data
             </h2>
             <div
-              className="rounded-2xl p-5 space-y-3"
+              className="rounded-2xl p-5 space-y-6"
               style={{ background: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}
             >
-              <p className="text-xs text-text-secondary opacity-60 mb-3">
-                Save all your affinity, memories, diary, quests, and settings to a file. Restore anytime to recover lost progress.
-              </p>
-              <button
-                onClick={() => {
-                  const backup: Record<string, string> = {};
-                  for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.startsWith("anime-chatbot-")) {
-                      backup[key] = localStorage.getItem(key) || "";
-                    }
-                  }
-                  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `hexxii-backup-${new Date().toISOString().slice(0, 10)}.json`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                style={{
-                  background: "rgba(74,222,128,0.1)",
-                  color: "#4ade80",
-                  border: "1px solid rgba(74,222,128,0.2)",
-                }}
-              >
-                Backup All Progress
-              </button>
-              <button
-                onClick={() => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = ".json";
-                  input.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      try {
-                        const backup = JSON.parse(reader.result as string);
-                        let count = 0;
-                        for (const [key, value] of Object.entries(backup)) {
-                          if (typeof key === "string" && key.startsWith("anime-chatbot-") && typeof value === "string") {
-                            localStorage.setItem(key, value);
-                            count++;
-                          }
+              {/* Chat History */}
+              <div>
+                <label className="text-xs text-text-secondary block mb-3">Chat History</label>
+                <div className="space-y-3">
+                  {CHARACTER_IDS.map((charId) => {
+                    const { name, color } = CHARACTER_LABELS[charId];
+                    const isCleared = cleared === charId;
+                    return (
+                      <div key={charId} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-sm text-text">{name}</span>
+                        </div>
+                        <button
+                          onClick={() => clearCharacterHistory(charId)}
+                          className="text-xs px-3 py-1.5 rounded-full transition-colors"
+                          style={{
+                            background: isCleared ? "rgba(74,222,128,0.15)" : "var(--color-card-border)",
+                            color: isCleared ? "#4ade80" : "var(--color-text-secondary)",
+                          }}
+                        >
+                          {isCleared ? "Cleared" : "Clear"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t" style={{ borderColor: "var(--color-card-border)" }} />
+
+              {/* Export */}
+              <div>
+                <label className="text-xs text-text-secondary block mb-3">Export</label>
+                <p className="text-xs text-text-secondary opacity-60 mb-3">
+                  Download your chat history as a text or JSON file.
+                </p>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      for (const charId of CHARACTER_IDS) {
+                        const raw = localStorage.getItem(`${LS_PREFIX}history-${charId}`);
+                        if (raw) {
+                          const messages: ChatMessage[] = JSON.parse(raw);
+                          exportAsText(messages, CHARACTER_LABELS[charId].name);
                         }
-                        alert(`Restored ${count} entries. Reloading...`);
-                        window.location.reload();
-                      } catch {
-                        alert("Invalid backup file.");
                       }
-                    };
-                    reader.readAsText(file);
-                  };
-                  input.click();
-                }}
-                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                style={{
-                  background: "var(--color-card-border)",
-                  color: "var(--color-text-secondary)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                Restore from Backup
-              </button>
-            </div>
-          </motion.section>
+                    }}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{
+                      background: "rgba(167, 139, 250, 0.1)",
+                      color: "#a78bfa",
+                      border: "1px solid rgba(167, 139, 250, 0.2)",
+                    }}
+                  >
+                    Export All Chats (Text)
+                  </button>
+                  <button
+                    onClick={() => {
+                      for (const charId of CHARACTER_IDS) {
+                        const raw = localStorage.getItem(`${LS_PREFIX}history-${charId}`);
+                        if (raw) {
+                          const messages: ChatMessage[] = JSON.parse(raw);
+                          exportAsJSON(messages, CHARACTER_LABELS[charId].name);
+                        }
+                      }
+                    }}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{
+                      background: "var(--color-card-border)",
+                      color: "var(--color-text-secondary)",
+                      border: "1px solid var(--color-border)",
+                    }}
+                  >
+                    Export All Chats (JSON)
+                  </button>
+                </div>
+              </div>
 
-          {/* Danger Zone */}
-          <motion.section variants={itemVariants}>
-            <h2 className="text-sm font-medium tracking-wide uppercase text-text-secondary mb-3">
-              Danger Zone
-            </h2>
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: "var(--color-card-bg)", border: "1px solid rgba(239,68,68,0.15)" }}
-            >
-              <p className="text-xs text-text-secondary mb-3 opacity-60">
-                This will clear all settings and chat history for every character.
-              </p>
-              <button
-                onClick={clearAllData}
-                className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                style={{
-                  background: cleared === "all" ? "rgba(74,222,128,0.15)" : "rgba(239,68,68,0.1)",
-                  color: cleared === "all" ? "#4ade80" : "#ef4444",
-                  border: `1px solid ${cleared === "all" ? "rgba(74,222,128,0.2)" : "rgba(239,68,68,0.2)"}`,
-                }}
-              >
-                {cleared === "all" ? "All Data Cleared" : "Clear All Data"}
-              </button>
+              {/* Divider */}
+              <div className="border-t" style={{ borderColor: "var(--color-card-border)" }} />
+
+              {/* Backup & Restore */}
+              <div>
+                <label className="text-xs text-text-secondary block mb-3">Backup &amp; Restore</label>
+                <p className="text-xs text-text-secondary opacity-60 mb-3">
+                  Save all your affinity, memories, diary, quests, and settings to a file. Restore anytime to recover lost progress.
+                </p>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      const backup: Record<string, string> = {};
+                      for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith("anime-chatbot-")) {
+                          backup[key] = localStorage.getItem(key) || "";
+                        }
+                      }
+                      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `hexxii-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{
+                      background: "rgba(74,222,128,0.1)",
+                      color: "#4ade80",
+                      border: "1px solid rgba(74,222,128,0.2)",
+                    }}
+                  >
+                    Backup All Progress
+                  </button>
+                  <button
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = ".json";
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          try {
+                            const backup = JSON.parse(reader.result as string);
+                            let count = 0;
+                            for (const [key, value] of Object.entries(backup)) {
+                              if (typeof key === "string" && key.startsWith("anime-chatbot-") && typeof value === "string") {
+                                localStorage.setItem(key, value);
+                                count++;
+                              }
+                            }
+                            alert(`Restored ${count} entries. Reloading...`);
+                            window.location.reload();
+                          } catch {
+                            alert("Invalid backup file.");
+                          }
+                        };
+                        reader.readAsText(file);
+                      };
+                      input.click();
+                    }}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{
+                      background: "var(--color-card-border)",
+                      color: "var(--color-text-secondary)",
+                      border: "1px solid var(--color-border)",
+                    }}
+                  >
+                    Restore from Backup
+                  </button>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t" style={{ borderColor: "var(--color-card-border)" }} />
+
+              {/* Danger Zone */}
+              <div>
+                <label className="text-xs block mb-3" style={{ color: "#ef4444" }}>Danger Zone</label>
+                <p className="text-xs text-text-secondary mb-3 opacity-60">
+                  This will clear all settings and chat history for every character.
+                </p>
+                <button
+                  onClick={clearAllData}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  style={{
+                    background: cleared === "all" ? "rgba(74,222,128,0.15)" : "rgba(239,68,68,0.1)",
+                    color: cleared === "all" ? "#4ade80" : "#ef4444",
+                    border: `1px solid ${cleared === "all" ? "rgba(74,222,128,0.2)" : "rgba(239,68,68,0.2)"}`,
+                  }}
+                >
+                  {cleared === "all" ? "All Data Cleared" : "Clear All Data"}
+                </button>
+              </div>
             </div>
           </motion.section>
         </motion.div>
