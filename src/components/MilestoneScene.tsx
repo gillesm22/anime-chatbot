@@ -349,12 +349,13 @@ export function MilestoneScene({
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center gap-6 px-4 py-8"
+      className="fixed inset-0 flex flex-col items-center justify-end px-4"
       style={{
         zIndex: 100,
         background: "rgba(0,0,0,0.93)",
         opacity: closing ? 0 : visible ? 1 : 0,
         transition: closing ? "opacity 0.5s ease" : "opacity 0.4s ease",
+        paddingBottom: 60,
       }}
       onClick={handleClick}
     >
@@ -369,14 +370,15 @@ export function MilestoneScene({
       {/* CG Card */}
       <div
         style={{
-          width: "min(90vw, 500px)",
-          aspectRatio: "3 / 4",
+          width: "min(85vw, 420px)",
+          maxHeight: "55vh",
           borderRadius: "20px",
           border: `2px solid ${accentColor}`,
           boxShadow: `0 0 40px ${accentColor}55, 0 0 80px ${accentColor}22`,
           position: "relative",
           overflow: "hidden",
-          flexShrink: 0,
+          flexShrink: 1,
+          marginBottom: 16,
         }}
       >
         {/* Sprite */}
