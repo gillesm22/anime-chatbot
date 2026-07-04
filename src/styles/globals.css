@@ -336,7 +336,7 @@ input, textarea, button { -webkit-appearance: none; }
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 30;
 }
 
 .vn-dialogue {

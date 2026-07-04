@@ -37,16 +37,14 @@ export function useVNControls({
   const isWaiting = state.phase === "waiting";
   const showAdvanceIndicator =
     state.phase === "speaking" &&
-    !state.isTyping &&
-    state.currentLineIndex < state.currentLines.length - 1;
+    !state.isTyping;
 
   // Auto-advance: start timer when typing completes during speaking phase
   useEffect(() => {
     if (
       state.phase === "speaking" &&
       !state.isTyping &&
-      state.autoAdvance &&
-      state.currentLineIndex < state.currentLines.length - 1
+      state.autoAdvance
     ) {
       autoAdvanceTimer.current = setTimeout(() => {
         dispatch(advanceLine());
