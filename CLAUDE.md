@@ -69,8 +69,10 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 - `ConfessionScene.tsx` · Branching VN confession at Soulmate level
 - `QuestPanel.tsx` · Daily quests with rewards
 - `BottomNav.tsx` · Fixed bottom nav (Chat, Outfits, Gifts, Diary, More)
-- `ChatInput.tsx` · Message input bar
 - `ChatHistory.tsx` · Scrollable chat history
+- `VNLayout.tsx` · Full-screen VN layout wrapper with header controls
+- `VNMenu.tsx` · Radial fan menu replacing bottom nav (new VN architecture)
+- `VNTransition.tsx` · Scene transition effects
 - `GiftShop.tsx` · Gift giving UI
 - `DiaryView.tsx` · Character diary entries viewer
 - `SplashScreen.tsx` · Initial app loading screen
