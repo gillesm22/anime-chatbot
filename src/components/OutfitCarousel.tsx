@@ -29,7 +29,7 @@ export interface OutfitCarouselProps {
   onClose: () => void;
 }
 
-const FULL_OUTFIT_CHARS = new Set(["arisu", "marin", "nao", "kurisu", "merrick"]);
+const FULL_OUTFIT_CHARS = new Set(["arisu", "marin", "nao", "kurisu", "merrick", "ticia"]);
 
 export function OutfitCarousel({
   characterId,
@@ -74,8 +74,8 @@ export function OutfitCarousel({
       <div
         className="outfit-carousel-panel"
         style={{
-          position: "fixed",
-          bottom: "65px",
+          position: "absolute",
+          bottom: 0,
           left: 0,
           right: 0,
           zIndex: 35,
