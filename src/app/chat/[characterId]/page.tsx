@@ -431,16 +431,32 @@ function ChatContent({ characterId }: { characterId: string }) {
                 input.value = "";
               }
             }}
+            className="flex gap-2 items-center"
           >
             <input
               type="text"
               placeholder={`Talk to ${character.name}...`}
               autoFocus
-              className="vn-input"
+              className="vn-input flex-1"
               style={{ borderColor: `${accent}30` }}
               onFocus={(e) => { e.currentTarget.style.borderColor = `${accent}80`; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = `${accent}30`; }}
             />
+            <button
+              type="submit"
+              className="flex-shrink-0 rounded-full flex items-center justify-center"
+              style={{
+                width: 40, height: 40,
+                background: `${accent}`,
+                color: "#fff",
+              }}
+              aria-label="Send"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
           </form>
         </div>
       )}

@@ -113,9 +113,9 @@ const MENU_ITEMS: MenuItem[] = [
 ];
 
 // Arc: from -180deg (left) to -90deg (up), 7 items evenly spaced
-const ARC_START_DEG = -180;
-const ARC_END_DEG = -90;
-const RADIUS = 90; // px
+const ARC_START_DEG = -170;
+const ARC_END_DEG = -80;
+const RADIUS = 130; // px
 
 function getArcPosition(index: number, total: number) {
   const t = total === 1 ? 0.5 : index / (total - 1);
