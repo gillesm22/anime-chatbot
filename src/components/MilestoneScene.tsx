@@ -370,8 +370,9 @@ export function MilestoneScene({
       {/* CG Card */}
       <div
         style={{
-          width: "min(85vw, 420px)",
-          maxHeight: "55vh",
+          width: "min(80vw, 380px)",
+          maxHeight: "60vh",
+          aspectRatio: "2 / 3",
           borderRadius: "20px",
           border: `2px solid ${accentColor}`,
           boxShadow: `0 0 40px ${accentColor}55, 0 0 80px ${accentColor}22`,
@@ -387,14 +388,12 @@ export function MilestoneScene({
           src={spriteSrc}
           alt={characterName}
           style={{
-            width: "110%",
-            height: "110%",
+            width: "100%",
+            height: "100%",
             objectFit: "cover",
-            objectPosition: "15% 10%",
+            objectPosition: "center 20%",
             filter: "brightness(0.88)",
             display: "block",
-            marginLeft: "-5%",
-            marginTop: "-3%",
           }}
         />
 
