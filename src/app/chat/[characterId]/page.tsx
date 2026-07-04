@@ -3,266 +3,107 @@
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getCharacter } from "@/lib/characters";
-import { ChatProvider, useChat, getSavedUserName, saveUserName } from "@/lib/chat/context";
-import {
-  sendMessage,
-  receiveResponse,
-  lineTyped,
-  advanceLine,
-  toggleAutoAdvance,
-  setExpression,
-} from "@/lib/chat/actions";
-import { streamChat } from "@/lib/api";
-import { formatMemoriesForPrompt, saveMemory } from "@/lib/memory";
-import { getMood, updateMood, moodToExpression } from "@/lib/mood";
-import type { Expression } from "@/lib/characters/types";
-import { useTimeTheme } from "@/lib/useTimeTheme";
-import { CharacterSprite } from "@/components/CharacterSprite";
+import { ChatProvider, useChat } from "@/lib/chat/context";
+import { receiveResponse, setExpression } from "@/lib/chat/actions";
+import { useCharacterSession } from "@/hooks/useCharacterSession";
+import { useMessageHandler } from "@/hooks/useMessageHandler";
+import { usePanels } from "@/hooks/usePanels";
+import { useVNControls } from "@/hooks/useVNControls";
+import { useExpressionEffects } from "@/hooks/useExpressionEffects";
+import { VNLayout } from "@/components/VNLayout";
+import { VNMenu } from "@/components/VNMenu";
+import { VNTransition } from "@/components/VNTransition";
+import { SceneObjects } from "@/components/SceneObjects";
 import { DialogueBox } from "@/components/DialogueBox";
-import { ControlBar } from "@/components/ControlBar";
-import { PageTransition } from "@/components/PageTransition";
 import { ChatHistory } from "@/components/ChatHistory";
 import { CharacterInfo } from "@/components/CharacterInfo";
-import { OutfitSelector, type Outfit } from "@/components/OutfitSelector";
-import { playSendSwoosh, playExpressionChange, playMessageReceived } from "@/lib/sounds";
-import { startAmbientMusic, stopAmbientMusic } from "@/lib/ambient";
-import { exportAsText } from "@/lib/exportChat";
-import { ScreenshotMode } from "@/components/ScreenshotMode";
-import { getAffinity, addAffinityPoints, recordVisit, formatAffinityForPrompt, getNextLevelProgress } from "@/lib/affinity";
-import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
-import { getCrossCharacterContext } from "@/lib/crosschar";
-import { detectMiniGame, getMiniGamePrompt } from "@/lib/minigames";
-import { MilestoneToast } from "@/components/MilestoneToast";
-import { SceneBackground } from "@/components/SceneBackground";
-import { getCharacterDefaultScene, SCENES, type SceneId } from "@/lib/backgrounds";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { startSceneAudio, stopSceneAudio } from "@/lib/sceneSounds";
-import { triggerScreenShake } from "@/lib/screenShake";
-import { TypingTracker } from "@/lib/typingReactions";
-import { startIdleTimer, resetIdleTimer, stopHumming } from "@/lib/humming";
-import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession";
+import { OutfitCarousel } from "@/components/OutfitCarousel";
 import { ConfessionScene } from "@/components/ConfessionScene";
 import { MilestoneScene } from "@/components/MilestoneScene";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { VoiceToggle } from "@/components/VoiceToggle";
-import { addDiaryEntry } from "@/lib/diary";
+import { MilestoneToast } from "@/components/MilestoneToast";
+import { SaveToast } from "@/components/SaveToast";
 import { DiaryView } from "@/components/DiaryView";
 import { GiftShop } from "@/components/GiftShop";
-import type { Gift, CharacterReaction } from "@/lib/gifts";
-import { formatGiftContextForPrompt } from "@/lib/gifts";
-import { BottomNav } from "@/components/BottomNav";
-import { InteractiveElements } from "@/components/InteractiveElements";
 import { QuestPanel } from "@/components/QuestPanel";
-import { getStarters } from "@/lib/conversationStarters";
-import { OutfitCarousel } from "@/components/OutfitCarousel";
-import { AffinityProgressBar } from "@/components/AffinityProgressBar";
-import { MoodIndicator } from "@/components/MoodIndicator";
-import { getHeroAppearanceForPrompt, getHeroClassReactionForPrompt } from "@/lib/heroAvatar";
 import { BloodBat } from "@/components/BloodBat";
-import { buildGreetingContext } from "@/lib/greetingContext";
-import { getPersonalityContext, updateUserStyle } from "@/lib/personality";
-import { saveSessionEndMood, getSessionStartMood } from "@/lib/mood";
-import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
-import { haptic } from "@/lib/haptics";
-import { useSwipeGesture } from "@/lib/useSwipeGesture";
-import { prefetchSpeech } from "@/lib/speech";
-import { initSaveSystem, saveSnapshot, exportFullBackup } from "@/lib/saveSystem";
-import { SaveToast } from "@/components/SaveToast";
+import { ScreenshotMode } from "@/components/ScreenshotMode";
+import { VoiceToggle } from "@/components/VoiceToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { BottomNav } from "@/components/BottomNav";
+import { getStarters } from "@/lib/conversationStarters";
+import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
+import { getSessionStartMood } from "@/lib/mood";
+import { getAffinity, recordVisit } from "@/lib/affinity";
+import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession";
+import { addDiaryEntry } from "@/lib/diary";
+import { SCENES, type SceneId } from "@/lib/backgrounds";
+import type { Gift, CharacterReaction } from "@/lib/gifts";
 
-const MEMORY_PATTERNS: Array<{ pattern: RegExp; topic: string; group: number }> = [
-  { pattern: /i (?:really )?like (\w[\w\s]{0,30}?\w)/i, topic: "likes", group: 1 },
-  { pattern: /i love (\w[\w\s]{0,30}?\w)/i, topic: "loves", group: 1 },
-  { pattern: /i hate (\w[\w\s]{0,30}?\w)/i, topic: "dislikes", group: 1 },
-  { pattern: /i(?:'m| am) (?:a |an )?(\w[\w\s]{0,30}?\w)/i, topic: "identity", group: 1 },
-  { pattern: /i work (?:at|for|in) (\w[\w\s]{0,30}?\w)/i, topic: "work", group: 1 },
-  { pattern: /my favorite (\w+) is (\w[\w\s]{0,30}?\w)/i, topic: "favorite", group: 0 },
-  { pattern: /i have (?:a |an )?(\w[\w\s]{0,30}?\w)/i, topic: "has", group: 1 },
-  { pattern: /i(?:'m| am) from (\w[\w\s]{0,30}?\w)/i, topic: "origin", group: 1 },
-  { pattern: /i live in (\w[\w\s]{0,30}?\w)/i, topic: "location", group: 1 },
-  { pattern: /i(?:'m| am) (\d+) years old/i, topic: "age", group: 1 },
-  { pattern: /i study (\w[\w\s]{0,30}?\w)/i, topic: "studies", group: 1 },
-  { pattern: /i play (\w[\w\s]{0,30}?\w)/i, topic: "plays", group: 1 },
-];
-
-function extractMemoriesFromMessage(message: string): Array<{ topic: string; detail: string }> {
-  const results: Array<{ topic: string; detail: string }> = [];
-  for (const { pattern, topic, group } of MEMORY_PATTERNS) {
-    const match = message.match(pattern);
-    if (match) {
-      const detail = group === 0 ? match[0] : match[group];
-      if (detail && detail.length > 1) {
-        results.push({ topic: `${topic}:${detail.toLowerCase().trim()}`, detail: match[0].trim() });
-      }
-    }
-  }
-  return results;
-}
-
-const NAME_PATTERNS = [
-  /my name(?:'s| is) (\w+)/i,
-  /i'm (\w+)/i,
-  /i am (\w+)/i,
-  /call me (\w+)/i,
-  /they call me (\w+)/i,
-  /the name(?:'s| is) (\w+)/i,
-  /^(\w+)[.,!]? (?:here|nice to meet you|pleased to meet you)/i,
-];
-
-function extractNameFromIntroduction(message: string): string | null {
-  for (const pattern of NAME_PATTERNS) {
-    const match = message.match(pattern);
-    if (match) {
-      const name = match[match.length - 1];
-      const ignore = new Set(["a", "the", "an", "not", "just", "very", "so", "really", "here", "there", "fine", "good", "okay", "ok", "well", "sure", "sorry", "glad", "happy", "sad", "tired", "busy", "new", "back", "done", "ready"]);
-      if (name && !ignore.has(name.toLowerCase())) {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-      }
-    }
-  }
-  return null;
-}
+// ─── ChatContent ────────────────────────────────────────────────────────────
 
 function ChatContent({ characterId }: { characterId: string }) {
-  const character = getCharacter(characterId);
   const router = useRouter();
   const { state, dispatch } = useChat();
-  const timeTheme = useTimeTheme();
-  const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const recentExpressionsRef = useRef<string[]>([]);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const currentMoodRef = useRef<ReturnType<typeof getMood>>("neutral");
-  const [outfit, setOutfit] = useState<Outfit>(() => {
-    if (typeof window === "undefined") return "default";
-    return (localStorage.getItem(`anime-chatbot-outfit-${characterId}`) as Outfit) || "default";
-  });
-
-  // Persist outfit selection
-  useEffect(() => {
-    if (outfit !== "default") {
-      try { localStorage.setItem(`anime-chatbot-outfit-${characterId}`, outfit); } catch {}
-    } else {
-      localStorage.removeItem(`anime-chatbot-outfit-${characterId}`);
-    }
-  }, [outfit, characterId]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showCharInfo, setShowCharInfo] = useState(false);
-  const [showScreenshot, setShowScreenshot] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [textSpeed, setTextSpeed] = useState(12);
-  const [responseLength, setResponseLength] = useState<"short" | "medium" | "long">("medium");
-  const [aiProvider, setAiProvider] = useState("gpt-4o");
+  const containerRef = useRef<HTMLDivElement>(null);
   const greetingShownRef = useRef(false);
-  const [milestoneQueue, setMilestoneQueue] = useState<string[]>([]);
-  const [currentMilestone, setCurrentMilestone] = useState<string | null>(null);
-  const [currentScene, setCurrentScene] = useState(() => getCharacterDefaultScene(characterId));
-  const [showScenePicker, setShowScenePicker] = useState(false);
-  const typingTrackerRef = useRef(new TypingTracker());
+
+  // ── Hooks ────────────────────────────────────────────────────────────────
+  const session = useCharacterSession(characterId);
+  const panels = usePanels();
+
+  // Local UI state
   const [showConfession, setShowConfession] = useState(false);
-  const [showDiary, setShowDiary] = useState(false);
-  const [showGiftShop, setShowGiftShop] = useState(false);
-  const [showOutfitCarousel, setShowOutfitCarousel] = useState(false);
-  const [showQuestPanel, setShowQuestPanel] = useState(false);
-  const [showMoreControls, setShowMoreControls] = useState(false);
   const [giftReaction, setGiftReaction] = useState<{ gift: Gift; reaction: CharacterReaction } | null>(null);
   const [starters, setStarters] = useState<string[]>([]);
-  const [activeEffect, setActiveEffect] = useState<ExpressionEffect | null>(null);
-  const [levelUpMilestone, setLevelUpMilestone] = useState<{ level: number; levelName: string } | null>(null);
   const [hexxPhrase, setHexxPhrase] = useState<string | null>(null);
   const [pendingDiscoveryContext, setPendingDiscoveryContext] = useState<string | null>(null);
   const [discoveryToast, setDiscoveryToast] = useState<{ line: string; expression: string } | null>(null);
-  const [saveToast, setSaveToast] = useState<{ message: string; type: "save" | "restore" } | null>(null);
-  const saveInitialized = useRef(false);
+  const [currentMilestone, setCurrentMilestone] = useState<string | null>(null);
+  const [sceneTransition, setSceneTransition] = useState(false);
 
-  // Save critical state when app closes (beforeunload) or goes to background (visibilitychange)
-  // useEffect cleanup is NOT reliable on tab/app close — these events are.
-  useEffect(() => {
-    const saveState = () => {
-      saveSessionEndMood(characterId, currentMoodRef.current);
-    };
-    const handleVisibility = () => {
-      if (document.visibilityState === "hidden") saveState();
-    };
-    window.addEventListener("beforeunload", saveState);
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => {
-      saveState(); // also save on normal unmount (navigation)
-      window.removeEventListener("beforeunload", saveState);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [characterId]);
-
-  useEffect(() => {
-    currentMoodRef.current = getMood(characterId);
-    setUserName(getSavedUserName(characterId));
-    const savedSpeed = localStorage.getItem("anime-chatbot-text-speed");
-    if (savedSpeed) setTextSpeed(Number(savedSpeed));
-    const savedLength = localStorage.getItem("anime-chatbot-response-length");
-    if (savedLength) setResponseLength(savedLength as "short" | "medium" | "long");
-    const savedProvider = localStorage.getItem("anime-chatbot-ai-provider");
-    if (savedProvider) setAiProvider(savedProvider);
-
-    const startMusic = () => {
-      startAmbientMusic();
-      document.removeEventListener("click", startMusic);
-      document.removeEventListener("keydown", startMusic);
-    };
-    document.addEventListener("click", startMusic);
-    document.addEventListener("keydown", startMusic);
-
-    return () => {
-      stopAmbientMusic();
-      document.removeEventListener("click", startMusic);
-      document.removeEventListener("keydown", startMusic);
-    };
-  }, [characterId]);
-
-  // Scene audio lifecycle (separate so scene changes don't kill ambient music)
-  useEffect(() => {
-    startSceneAudio(currentScene, characterId);
-    return () => { stopSceneAudio(); };
-  }, [characterId, currentScene]);
-
-  // Humming: separate effect so cleanup doesn't interfere
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      startIdleTimer(characterId);
-    }, 2000); // small delay to let page settle
-    return () => {
-      clearTimeout(timer);
-      stopHumming();
-    };
-  }, [characterId]);
-
-  // Save system initialization
-  useEffect(() => {
-    if (saveInitialized.current) return;
-    saveInitialized.current = true;
-    initSaveSystem().then(({ restored }) => {
-      if (restored) {
-        setSaveToast({ message: "Progress restored from backup", type: "restore" });
+  const { handleSend, handleGift, typingTracker } = useMessageHandler({
+    characterId,
+    userName: session.userName,
+    setUserName: session.setUserName,
+    responseLength: session.responseLength,
+    aiProvider: session.aiProvider,
+    addAffinity: session.addAffinity,
+    updateMoodFromExpressions: session.updateMoodFromExpressions,
+    resetIdle: session.resetIdle,
+    currentMood: session.currentMood,
+    pendingDiscoveryContext,
+    clearDiscoveryContext: () => setPendingDiscoveryContext(null),
+    onSceneChange: (sceneId) => {
+      setSceneTransition(true);
+      setTimeout(() => session.setCurrentScene(sceneId), 300);
+    },
+    onHexxPhrase: setHexxPhrase,
+    onConfessionCheck: () => {
+      if (canConfess(characterId) && Math.random() < 0.2) {
+        setShowConfession(true);
       }
-    }).catch(() => {});
-  }, []);
+    },
+  });
 
-  // Dynamic theme-color for status bar
-  useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute("content", character?.theme.tint || "#0d0d12");
-    }
-    return () => {
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", "#0d0d12");
-    };
-  }, [character]);
+  const vnControls = useVNControls({
+    characterId,
+    containerRef,
+    activePanel: panels.activePanel,
+    openPanel: panels.openPanel,
+    closePanel: panels.closePanel,
+  });
 
+  const effects = useExpressionEffects({ currentMood: session.currentMood });
+
+  // ── Effects ──────────────────────────────────────────────────────────────
+
+  // Greeting on first visit
   useEffect(() => {
-    if (!greetingShownRef.current && state.historyLoaded && state.messages.length === 0 && character) {
+    if (!greetingShownRef.current && state.historyLoaded && state.messages.length === 0 && session.character) {
       greetingShownRef.current = true;
       const { daysAbsent, newMilestones } = recordVisit(characterId);
       if (newMilestones.length > 0) {
-        setMilestoneQueue((prev) => [...prev, ...newMilestones]);
+        session.setMilestoneQueue((prev) => [...prev, ...newMilestones]);
       }
       const affinityData = getAffinity(characterId);
       const { mood: startMood } = getSessionStartMood(characterId, daysAbsent, affinityData.streak);
@@ -273,8 +114,9 @@ function ChatContent({ characterId }: { characterId: string }) {
       const fullGreeting = streakMsg ? `${greeting} ${streakMsg}` : greeting;
       dispatch(receiveResponse(fullGreeting, daysAbsent >= 4 ? "sad" : "happy"));
     }
-  }, [character, state.historyLoaded, state.messages.length, dispatch, characterId]);
+  }, [session.character, state.historyLoaded, state.messages.length, dispatch, characterId, session.setMilestoneQueue]);
 
+  // Conversation starters
   useEffect(() => {
     if (state.historyLoaded && state.messages.length === 0) {
       setStarters(getStarters(characterId));
@@ -283,865 +125,361 @@ function ChatContent({ characterId }: { characterId: string }) {
     }
   }, [state.historyLoaded, state.messages.length, characterId]);
 
+  // Milestone queue consumer
   useEffect(() => {
-    if (milestoneQueue.length > 0 && !currentMilestone) {
-      setCurrentMilestone(milestoneQueue[0]);
-      setMilestoneQueue((prev) => prev.slice(1));
+    if (session.milestoneQueue.length > 0 && !currentMilestone) {
+      setCurrentMilestone(session.milestoneQueue[0]);
+      session.setMilestoneQueue((prev) => prev.slice(1));
     }
-  }, [milestoneQueue, currentMilestone]);
+  }, [session.milestoneQueue, currentMilestone, session.setMilestoneQueue]);
 
+  // Diary auto-entry every 5 user messages
   useEffect(() => {
-    if (state.phase === "idle" && state.messages.length > 0 && canConfess(characterId)) {
-      // 20% chance to trigger after each conversation exchange
-      if (Math.random() < 0.2) {
-        setShowConfession(true);
-      }
-    }
-  }, [state.phase, state.messages.length, characterId]);
-
-  useEffect(() => {
-    const msgCount = state.messages.filter(m => m.role === "user").length;
-    if (msgCount > 0 && msgCount % 5 === 0 && state.phase === "idle" && character) {
-      const lastUserMsgs = state.messages.slice(-10).filter(m => m.role === "user").map(m => m.content);
-      const lastAssistantMsgs = state.messages.slice(-10).filter(m => m.role === "assistant").map(m => m.content);
-      const topics = lastUserMsgs.map(m => m.split(" ").slice(0, 3).join(" ")).slice(-3);
-      const mood = currentMoodRef.current;
-      const entry = lastAssistantMsgs.length > 0
-        ? `We talked about many things today. ${lastAssistantMsgs[lastAssistantMsgs.length - 1]?.slice(0, 100)}... It was a good conversation.`
+    const msgCount = state.messages.filter((m) => m.role === "user").length;
+    if (msgCount > 0 && msgCount % 5 === 0 && state.phase === "idle" && session.character) {
+      const lastAssistant = state.messages.slice(-10).filter((m) => m.role === "assistant").map((m) => m.content);
+      const lastUser = state.messages.slice(-10).filter((m) => m.role === "user").map((m) => m.content);
+      const topics = lastUser.map((m) => m.split(" ").slice(0, 3).join(" ")).slice(-3);
+      const entry = lastAssistant.length > 0
+        ? `We talked about many things today. ${lastAssistant[lastAssistant.length - 1]?.slice(0, 100)}... It was a good conversation.`
         : "Had a nice chat today.";
-      addDiaryEntry(characterId, entry, mood, topics);
+      addDiaryEntry(characterId, entry, session.currentMood, topics);
     }
-  }, [state.messages.length, state.phase]);
+  }, [state.messages.length, state.phase, characterId, session.character, session.currentMood, state.messages]);
 
-  if (!character) {
-    router.replace("/");
-    return null;
-  }
-
-  const handleSave = useCallback(async () => {
-    haptic.tick();
-    await saveSnapshot();
-    exportFullBackup();
-    setSaveToast({ message: "Progress saved!", type: "save" });
-  }, []);
-
-  const handleSend = useCallback(
-    async (message: string) => {
-      // Guard against sending while a response is still streaming
-      if (state.phase === "waiting" || state.phase === "speaking") return;
-
-      resetIdleTimer();
-      playSendSwoosh();
-      haptic.pulse();
-      dispatch(sendMessage(message));
-
-      const msgEvent = message.length > 50
-        ? { type: "long_message" as const }
-        : { type: "message_sent" as const };
-      const affinityResult = addAffinityPoints(characterId, msgEvent);
-      if (affinityResult.newMilestones.length > 0) {
-        setMilestoneQueue((prev) => [...prev, ...affinityResult.newMilestones]);
-      }
-      if (affinityResult.leveledUp && affinityResult.data.level >= 2 && affinityResult.data.level <= 4) {
-        setLevelUpMilestone({ level: affinityResult.data.level, levelName: affinityResult.data.levelName });
-        haptic.success();
-      }
-
-      const history = state.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const memories = formatMemoriesForPrompt(characterId);
-
-      let fullText = "";
-      // eslint-disable-next-line prefer-const -- mutated inside streamChat callback
-      let expression = "neutral" as Expression;
-
-      const affinityPrompt = formatAffinityForPrompt(characterId);
-      const giftContext = formatGiftContextForPrompt(characterId);
-      const heroAppearance = getHeroAppearanceForPrompt();
-      const heroClassReaction = getHeroClassReactionForPrompt(characterId);
-      const crossChar = getCrossCharacterContext(characterId);
-      const miniGame = detectMiniGame(message);
-      const miniGamePrompt = miniGame ? getMiniGamePrompt(miniGame, getAffinity(characterId).level) : undefined;
-
-      const typingHint = typingTrackerRef.current.getReactionHint();
-
-      const greetingCtx = state.messages.length === 0
-        ? buildGreetingContext(characterId, 0, getAffinity(characterId).streak)
-        : undefined;
-      const personalityCtx = getPersonalityContext(characterId) || undefined;
-      const hexxMentioned = message.toLowerCase().includes("hexx");
-      const discoveryCtx = pendingDiscoveryContext;
-      if (discoveryCtx) setPendingDiscoveryContext(null);
-
-      try {
-        await streamChat(
-          { message, characterId, history, userName, memories, responseLength, provider: aiProvider, affinityPrompt, giftContext, heroAppearance, heroClassReaction, crossCharPrompt: crossChar.prompt, miniGamePrompt, typingHint, language: (typeof window !== "undefined" ? localStorage.getItem("anime-chatbot-language") : null) ?? "en", greetingContext: greetingCtx, personalityContext: personalityCtx, hexxMentioned, discoveryContext: discoveryCtx || undefined },
-          (event) => {
-            switch (event.type) {
-              case "expression":
-                expression = event.expression;
-                dispatch(setExpression(expression));
-                playExpressionChange();
-                haptic.expression(expression);
-                playMessageReceived();
-                if (expression === "angry" || expression === "surprised") {
-                  triggerScreenShake(expression === "angry" ? "heavy" : "medium");
-                }
-                break;
-              case "text":
-                fullText += event.content;
-                break;
-              case "scene":
-                if (event.sceneId) {
-                  setCurrentScene(event.sceneId as SceneId);
-                }
-                break;
-              case "hexx":
-                setHexxPhrase(event.content);
-                break;
-              case "error":
-                console.error("[chat] SSE error:", event.message);
-                fullText = "I'm sorry, something went wrong. Please try again.";
-                break;
-            }
-          }
-        );
-      } catch {
-        fullText = fullText || "Connection lost. Please try again.";
-      }
-
-      if (!userName) {
-        const nameFromUser = extractNameFromIntroduction(message);
-        if (nameFromUser) {
-          const nameLower = nameFromUser.toLowerCase();
-          const responseLower = fullText.toLowerCase();
-          if (responseLower.includes(nameLower)) {
-            saveUserName(characterId, nameFromUser);
-            setUserName(nameFromUser);
-          }
-        }
-      }
-
-      const newMemories = extractMemoriesFromMessage(message);
-      for (const mem of newMemories) {
-        const category = ["likes", "loves", "dislikes", "favorite"].includes(mem.topic.split(":")[0])
-          ? "preference" as const
-          : "fact" as const;
-        saveMemory(characterId, category, mem.detail, message);
-      }
-
-      recentExpressionsRef.current.push(expression);
-      if (recentExpressionsRef.current.length > 10) {
-        recentExpressionsRef.current = recentExpressionsRef.current.slice(-10);
-      }
-      currentMoodRef.current = updateMood(characterId, recentExpressionsRef.current);
-
-      updateUserStyle(characterId, {
-        expressionTriggered: expression,
-        messageLength: message.length,
-      });
-
-      if (expression === "laugh") {
-        const r = addAffinityPoints(characterId, { type: "made_her_laugh" });
-        if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
-      }
-      if (expression === "flustered") {
-        const r = addAffinityPoints(characterId, { type: "made_her_flustered" });
-        if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
-      }
-      dispatch(receiveResponse(fullText || "...", expression));
-    },
-    [dispatch, state.messages, state.phase, characterId, userName]
-  );
-
-  const handleGift = useCallback((gift: Gift, reaction: CharacterReaction) => {
-    setGiftReaction({ gift, reaction });
-    haptic.success();
-    setShowGiftShop(false);
-    // Map compound expressions like "crying/devoted" to the first valid one
-    const exprParts = reaction.expression.split("/");
-    const validExpr = (exprParts[0] || "happy") as Expression;
-    dispatch(receiveResponse(reaction.dialogue, validExpr));
-    // Apply the actual gift affinity bonus
-    const result = addAffinityPoints(characterId, { type: "message_sent" }, gift.affinityBonus);
-    if (result.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...result.newMilestones]);
-    setTimeout(() => setGiftReaction(null), 5000);
-  }, [characterId, dispatch]);
-
+  // Discovery reaction handler
   const handleDiscoveryReaction = useCallback((line: string, expression: string) => {
-    // Show as ephemeral toast — doesn't enter chat history or block the dialogue
-    dispatch(setExpression(expression as Expression));
+    dispatch(setExpression(expression as any));
     setDiscoveryToast({ line, expression });
     setTimeout(() => setDiscoveryToast(null), 3500);
   }, [dispatch]);
 
-  const handleTypeComplete = useCallback(() => {
-    // Prefetch the NEXT line's audio so it's ready when the user advances
-    const nextIndex = state.currentLineIndex + 1;
-    if (nextIndex < state.currentLines.length) {
-      prefetchSpeech(state.currentLines[nextIndex], characterId);
-    }
-    dispatch(lineTyped());
-  }, [dispatch, state.currentLineIndex, state.currentLines, characterId]);
+  // Gift handler wrapper
+  const onGift = useCallback((gift: Gift, reaction: CharacterReaction) => {
+    const result = handleGift(gift, reaction);
+    setGiftReaction(result);
+    panels.closePanel();
+    setTimeout(() => setGiftReaction(null), 5000);
+  }, [handleGift, panels]);
 
-  const handleAdvance = useCallback(() => {
-    haptic.tick();
-    dispatch(advanceLine());
-  }, [dispatch]);
+  // ── Guard ────────────────────────────────────────────────────────────────
 
-  const prevPhaseRef = useRef(state.phase);
-  useEffect(() => {
-    if (prevPhaseRef.current !== "idle" && state.phase === "idle") {
-      dispatch(setExpression(moodToExpression(currentMoodRef.current)));
-    }
-    prevPhaseRef.current = state.phase;
-  }, [state.phase, dispatch]);
+  if (!session.character) {
+    return null;
+  }
 
-  useSwipeGesture(chatContainerRef, (result) => {
-    if (result.direction === "right" && result.fromEdge && !showHistory) {
-      haptic.tick();
-      setShowHistory(true);
-    } else if (result.direction === "left") {
-      if (showHistory) { haptic.tick(); setShowHistory(false); }
-      else if (showDiary) { haptic.tick(); setShowDiary(false); }
-      else if (showGiftShop) { haptic.tick(); setShowGiftShop(false); }
-      else if (showOutfitCarousel) { haptic.tick(); setShowOutfitCarousel(false); }
-      else if (showQuestPanel) { haptic.tick(); setShowQuestPanel(false); }
-      else if (showScenePicker) { haptic.tick(); setShowScenePicker(false); }
-    }
-  });
+  const character = session.character;
+  const accent = character.theme.accent;
 
-  useEffect(() => {
-    if (state.autoAdvance && state.phase === "speaking" && !state.isTyping) {
-      autoAdvanceTimerRef.current = setTimeout(() => {
-        dispatch(advanceLine());
-      }, 1500);
-      return () => {
-        if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
-      };
-    }
-  }, [state.autoAdvance, state.phase, state.isTyping, state.currentLineIndex, dispatch]);
-
-  const currentLine = state.currentLines[state.currentLineIndex] || "";
-  const showInput = state.phase === "idle";
-  const showDialogue = state.phase === "speaking" || state.phase === "waiting";
-  const isTalking = state.phase === "speaking" && state.isTyping;
-  const showAdvanceIndicator =
-    state.phase === "speaking" &&
-    !state.isTyping;
+  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <PageTransition>
-      <style>{`
-        .send-btn-micro {
-          transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          overflow: hidden;
-        }
-        .send-ripple {
-          position: absolute;
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.4);
-          transform: translate(-50%, -50%) scale(0);
-          animation: send-ripple-anim 0.5s ease-out forwards;
-          pointer-events: none;
-        }
-        @keyframes send-ripple-anim {
-          to { transform: translate(-50%, -50%) scale(12); opacity: 0; }
-        }
-      `}</style>
-      <div
-        ref={chatContainerRef}
-        id="chat-container"
-        className="h-screen flex flex-col overflow-hidden"
-        style={{ position: "relative" }}
-        suppressHydrationWarning
-      >
-        <SceneBackground sceneId={currentScene} characterAccent={character.theme.accent} />
-        {activeEffect?.type === "sparkle" && (
-          <div className="expression-sparkle absolute inset-0 pointer-events-none z-30" style={{
-            background: `radial-gradient(circle at 50% 40%, ${character.theme.accent}40 0%, transparent 60%)`,
-          }} />
-        )}
-        {activeEffect?.type === "shake" && (
-          <div className="expression-shake-vignette absolute inset-0 pointer-events-none z-30" style={{
-            background: "radial-gradient(ellipse at center, transparent 50%, rgba(239,68,68,0.2) 100%)",
-          }} />
-        )}
-        {activeEffect?.type === "blush" && (
-          <div className="expression-blush absolute inset-0 pointer-events-none z-30" style={{
-            background: "radial-gradient(circle at 50% 35%, rgba(244,114,182,0.3) 0%, transparent 50%)",
-          }} />
-        )}
-        {activeEffect?.type === "dim" && (
-          <div className="expression-dim absolute inset-0 pointer-events-none z-30" />
-        )}
-        {activeEffect?.type === "flash" && (
-          <div className="expression-flash absolute inset-0 pointer-events-none z-30" style={{
-            background: "rgba(255,255,255,0.15)",
-          }} />
-        )}
-        <InteractiveElements
-          sceneId={currentScene}
-          accentColor={character.theme.accent}
-          characterId={characterId}
-          onReaction={handleDiscoveryReaction}
-          onDiscoveryContext={(ctx) => setPendingDiscoveryContext(ctx)}
-        />
-        {/* Discovery reaction toast — ephemeral, doesn't block chat */}
-        {discoveryToast && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 140,
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 25,
-              maxWidth: "85%",
-              padding: "10px 20px",
-              borderRadius: 16,
-              background: "var(--color-surface-alpha, rgba(10,10,16,0.88))",
-              backdropFilter: "blur(10px)",
-              border: `1px solid ${character.theme.accent}30`,
-              color: "var(--color-dialogue-text, #e8e0e8)",
-              fontSize: "14px",
-              fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)",
-              textAlign: "center",
-              animation: "fadeIn 0.3s ease-out, fadeIn 0.3s ease-in 3s reverse forwards",
-              pointerEvents: "none",
-            }}
-          >
-            <span style={{ color: character.theme.accent, fontWeight: 600, fontSize: "11px", letterSpacing: "0.05em", marginRight: 6 }}>
-              {character.name}:
-            </span>
-            {discoveryToast.line}
-          </div>
-        )}
-        {currentMilestone && character && (
-          <MilestoneToast
-            milestone={currentMilestone}
-            accentColor={character.theme.accent}
-            onDone={() => setCurrentMilestone(null)}
-          />
-        )}
-        {saveToast && (
-          <SaveToast
-            message={saveToast.message}
-            type={saveToast.type}
-            onDone={() => setSaveToast(null)}
-          />
-        )}
-        {/* Control bar */}
-        <div className="flex items-center justify-between px-3 py-2 md:px-6 md:py-3 relative z-20" style={{ background: "var(--color-overlay)", backdropFilter: "blur(8px)" }}>
-          {/* Left - essential controls always visible */}
-          <div className="flex items-center gap-2 md:gap-4">
-            <button
-              onClick={() => router.push("/")}
-              className="touch-target flex items-center gap-1 md:gap-2 text-text-secondary hover:text-text transition-colors text-xs md:text-sm"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="hidden sm:inline">Back</span>
-            </button>
-            <VoiceToggle />
-            <ThemeToggle />
-            <button
-              onClick={() => setShowHistory((prev) => !prev)}
-              className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm transition-colors"
-              style={{ color: showHistory ? character.theme.accent : "var(--color-text-secondary)" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-              <span className="hidden sm:inline">Log</span>
-            </button>
-
-            {/* Mobile: "..." toggle for secondary actions */}
-            <button
-              onClick={() => setShowMoreControls((prev) => !prev)}
-              className="md:hidden flex items-center justify-center w-6 h-6 rounded-full transition-colors text-xs"
-              style={{
-                color: showMoreControls ? character.theme.accent : "var(--color-text-secondary)",
-                background: showMoreControls ? `${character.theme.accent}20` : "transparent",
-              }}
-              title="More actions"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="3" cy="7" r="1.2" fill="currentColor" />
-                <circle cx="7" cy="7" r="1.2" fill="currentColor" />
-                <circle cx="11" cy="7" r="1.2" fill="currentColor" />
-              </svg>
-            </button>
-
-            {/* Secondary actions: always visible on md+, toggled on mobile */}
-            <div className={`${showMoreControls ? "flex" : "hidden"} md:flex items-center gap-2 md:gap-4`}>
-              <LanguageToggle />
-              <Link
-                href="/settings"
-                className="flex items-center text-text-secondary hover:text-text transition-colors"
-                title="Settings"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M6.86 1.45a1.2 1.2 0 0 1 2.28 0l.27.82a1.2 1.2 0 0 0 1.52.74l.82-.27a1.2 1.2 0 0 1 1.61 1.61l-.27.82a1.2 1.2 0 0 0 .74 1.52l.82.27a1.2 1.2 0 0 1 0 2.28l-.82.27a1.2 1.2 0 0 0-.74 1.52l.27.82a1.2 1.2 0 0 1-1.61 1.61l-.82-.27a1.2 1.2 0 0 0-1.52.74l-.27.82a1.2 1.2 0 0 1-2.28 0l-.27-.82a1.2 1.2 0 0 0-1.52-.74l-.82.27a1.2 1.2 0 0 1-1.61-1.61l.27-.82a1.2 1.2 0 0 0-.74-1.52l-.82-.27a1.2 1.2 0 0 1 0-2.28l.82-.27a1.2 1.2 0 0 0 .74-1.52l-.27-.82A1.2 1.2 0 0 1 4.25 1.9l.82.27a1.2 1.2 0 0 0 1.52-.74l.27-.82Z" stroke="currentColor" strokeWidth="1.2" />
-                  <circle cx="8" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.2" />
-                </svg>
-              </Link>
-              {state.messages.length > 0 && (
-                <>
-                  <button
-                    onClick={() => exportAsText(state.messages, character.name)}
-                    className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
-                    title="Export chat"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setShowScreenshot(true)}
-                    className="flex items-center gap-1 md:gap-1.5 text-xs md:text-sm text-text-secondary hover:text-text transition-colors"
-                    title="Screenshot mode"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <rect x="1.5" y="3.5" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-                      <circle cx="8" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.3" />
-                      <path d="M5.5 3.5L6.5 1.5h3l1 2" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                </>
-              )}
-              <button
-                onClick={() => setShowDiary(true)}
-                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-                style={{ color: character.theme.accent, opacity: 0.7 }}
-                title="Diary"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="2" y="1" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
-                  <path d="M4 1v14" stroke="currentColor" strokeWidth="1.3"/>
-                </svg>
-                <span className="hidden sm:inline">Diary</span>
-              </button>
-              <button
-                onClick={() => setShowGiftShop(true)}
-                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-                style={{ color: character.theme.accent, opacity: 0.7 }}
-                title="Gifts"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="1" y="7" width="14" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M8 7v8" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M1 10h14" stroke="currentColor" strokeWidth="1" opacity="0.4"/>
-                  <path d="M8 7C8 7 6 5.5 4.5 4.5C3 3.5 3 1.5 5 1.5C7 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                  <path d="M8 7C8 7 10 5.5 11.5 4.5C13 3.5 13 1.5 11 1.5C9 1.5 8 4 8 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                </svg>
-                <span className="hidden sm:inline">Gifts</span>
-              </button>
-              <button
-                onClick={() => setShowScenePicker((prev) => !prev)}
-                className="flex items-center gap-1.5 text-xs md:text-sm transition-all duration-200 hover:scale-110"
-                style={{ color: showScenePicker ? character.theme.accent : "var(--color-text-secondary)" }}
-                title="Change scene"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M1 10l4-3 3 2 4-4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" strokeLinecap="round"/>
-                  <circle cx="11" cy="5.5" r="1.5" stroke="currentColor" strokeWidth="1"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Center - name + info */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs md:text-sm font-medium" style={{ color: character.theme.accent }}>
-              {character.name}
-            </span>
-            <MoodIndicator mood={currentMoodRef.current} accentColor={character.theme.accent} />
-            <button
-              onClick={() => setShowCharInfo(true)}
-              className="w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold transition-colors"
-              style={{
-                color: character.theme.accent,
-                border: `1.5px solid ${character.theme.accent}60`,
-              }}
-            >
-              i
-            </button>
-          </div>
-
-          {/* Right - auto toggle */}
+    <VNLayout
+      character={character}
+      characterId={characterId}
+      expression={state.currentExpression}
+      isTalking={vnControls.isTalking}
+      outfit={session.outfit}
+      currentScene={session.currentScene}
+      activeEffect={effects.activeEffect}
+      onHeadpat={() => session.addAffinity("headpat")}
+      onExpressionChange={effects.handleExpressionChange}
+      onSpriteTap={effects.handleSpriteTap}
+      onDiscoveryReaction={handleDiscoveryReaction}
+      onDiscoveryContext={(ctx) => setPendingDiscoveryContext(ctx)}
+      containerRef={containerRef}
+      headerLeft={
+        <>
           <button
-            onClick={() => dispatch(toggleAutoAdvance())}
-            className="flex items-center gap-1 md:gap-2 text-xs md:text-sm transition-colors"
-            style={{ color: state.autoAdvance ? character.theme.accent : "var(--color-text-secondary)" }}
+            onClick={() => router.push("/")}
+            className="touch-target flex items-center gap-1 text-text-secondary hover:text-text transition-colors text-xs"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <span className="text-xs font-medium" style={{ color: accent }}>{character.name}</span>
+          <VoiceToggle />
+          <ThemeToggle />
+        </>
+      }
+      headerRight={
+        <button
+          onClick={vnControls.handleToggleAutoAdvance}
+          className="flex items-center gap-1 text-xs transition-colors"
+          style={{ color: state.autoAdvance ? accent : "var(--color-text-secondary)" }}
+        >
+          <div
+            className="w-8 h-4 rounded-full relative transition-colors"
+            style={{ backgroundColor: state.autoAdvance ? `${accent}40` : "var(--color-toggle-bg)" }}
           >
             <div
-              className="w-8 h-4 rounded-full relative transition-colors"
-              style={{ backgroundColor: state.autoAdvance ? `${character.theme.accent}40` : "var(--color-toggle-bg)" }}
+              className="absolute top-0.5 w-3 h-3 rounded-full transition-all"
+              style={{
+                backgroundColor: state.autoAdvance ? accent : "var(--color-toggle-knob)",
+                left: state.autoAdvance ? "calc(100% - 14px)" : "2px",
+              }}
+            />
+          </div>
+          Auto
+        </button>
+      }
+      overlays={
+        <>
+          <SceneObjects
+            sceneId={session.currentScene}
+            accentColor={accent}
+            onObjectTap={(action) => {/* scene object actions handled by InteractiveElements */}}
+          />
+          <VNMenu
+            accentColor={accent}
+            onSelect={panels.openPanel}
+            onSave={session.handleSave}
+          />
+
+          {currentMilestone && (
+            <MilestoneToast milestone={currentMilestone} accentColor={accent} onDone={() => setCurrentMilestone(null)} />
+          )}
+          {session.saveToast && (
+            <SaveToast message={session.saveToast.message} type={session.saveToast.type} onDone={() => session.setSaveToast(null)} />
+          )}
+
+          {/* Discovery reaction toast */}
+          {discoveryToast && (
+            <div
+              style={{
+                position: "absolute", bottom: 140, left: "50%", transform: "translateX(-50%)",
+                zIndex: 25, maxWidth: "85%", padding: "10px 20px", borderRadius: 16,
+                background: "var(--color-surface-alpha, rgba(10,10,16,0.88))", backdropFilter: "blur(10px)",
+                border: `1px solid ${accent}30`, color: "var(--color-dialogue-text, #e8e0e8)",
+                fontSize: "14px", fontFamily: "var(--font-dialogue, 'Zen Maru Gothic', sans-serif)",
+                textAlign: "center", animation: "fadeIn 0.3s ease-out, fadeIn 0.3s ease-in 3s reverse forwards",
+                pointerEvents: "none",
+              }}
             >
-              <div
-                className="absolute top-0.5 w-3 h-3 rounded-full transition-all"
-                style={{
-                  backgroundColor: state.autoAdvance ? character.theme.accent : "var(--color-toggle-knob)",
-                  left: state.autoAdvance ? "calc(100% - 14px)" : "2px",
-                }}
-              />
+              <span style={{ color: accent, fontWeight: 600, fontSize: "11px", letterSpacing: "0.05em", marginRight: 6 }}>
+                {character.name}:
+              </span>
+              {discoveryToast.line}
             </div>
-            Auto
-          </button>
-        </div>
+          )}
 
-        <div className="px-4 relative z-10">
-          <AffinityProgressBar
-            level={getAffinity(characterId).level}
-            levelName={getAffinity(characterId).levelName}
-            progress={getNextLevelProgress(getAffinity(characterId)).percent}
-            accentColor={character.theme.accent}
+          {/* Panels */}
+          <ChatHistory
+            messages={state.messages}
+            characterName={character.name}
+            accentColor={accent}
+            visible={panels.isOpen("history")}
+            onClose={panels.closePanel}
           />
-        </div>
-
-        {/* Chat history panel */}
-        <ChatHistory
-          messages={state.messages}
-          characterName={character.name}
-          accentColor={character.theme.accent}
-          visible={showHistory}
-          onClose={() => setShowHistory(false)}
-        />
-
-        {/* Character info panel */}
-        <CharacterInfo
-          character={character}
-          visible={showCharInfo}
-          onClose={() => setShowCharInfo(false)}
-        />
-
-        {/* Sprite area - single click for flustered reaction */}
-        <div
-          className="flex-1 min-h-0 relative overflow-hidden cursor-pointer z-10"
-          onClick={(e) => {
-            if (e.detail === 1 && state.phase === "idle") {
-              dispatch(setExpression("flustered"));
-              setTimeout(() => dispatch(setExpression(moodToExpression(currentMoodRef.current))), 2000);
-            }
-          }}
-        >
-          <CharacterSprite
+          <CharacterInfo
             character={character}
-            expression={state.currentExpression}
-            isTalking={isTalking}
-            outfit={outfit}
-            onHeadpat={() => {
-              const r = addAffinityPoints(characterId, { type: "headpat" });
-              if (r.newMilestones.length > 0) setMilestoneQueue((prev) => [...prev, ...r.newMilestones]);
-              haptic.pet();
-            }}
-            onExpressionChange={(effect) => {
-              setActiveEffect(effect);
-              setTimeout(() => setActiveEffect(null), effect.durationMs);
-            }}
+            visible={panels.isOpen("charInfo")}
+            onClose={panels.closePanel}
           />
-          <OutfitSelector
-            accentColor={character.theme.accent}
+          <OutfitCarousel
             characterId={characterId}
-            currentOutfit={outfit}
-            onSelectOutfit={setOutfit}
+            basePath={character.sprite.basePath}
+            accentColor={accent}
+            currentOutfit={session.outfit}
+            onSelectOutfit={session.setOutfit}
+            isOpen={panels.isOpen("outfits")}
+            onClose={panels.closePanel}
           />
-        </div>
-
-        {/* Dialogue / input area - always visible at bottom */}
-        <div className="flex-shrink-0 relative z-10" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))", minHeight: showDialogue ? "120px" : undefined }}>
-          {showDialogue && (
-            <DialogueBox
-              characterName={character.name}
+          {panels.isOpen("diary") && (
+            <DiaryView characterId={characterId} characterName={character.name} accentColor={accent} onClose={panels.closePanel} />
+          )}
+          {panels.isOpen("gifts") && (
+            <GiftShop characterId={characterId} characterName={character.name} accentColor={accent} onGift={onGift} onClose={panels.closePanel} />
+          )}
+          {panels.isOpen("quests") && (
+            <QuestPanel
               characterId={characterId}
-              accentColor={character.theme.accent}
-              line={state.phase === "waiting" ? "..." : currentLine}
-              isTyping={state.isTyping}
-              onAdvance={handleAdvance}
-              onTypeComplete={handleTypeComplete}
-              showAdvance={showAdvanceIndicator}
-              typeSpeed={textSpeed}
-              expression={state.currentExpression}
+              accentColor={accent}
+              onClose={panels.closePanel}
+              onClaimReward={() => session.addAffinity("message_sent")}
             />
           )}
-          {starters.length > 0 && showInput && (
-            <div className="flex flex-wrap gap-2 px-4 mb-2 relative z-20 animate-[fadeIn_0.4s_ease-out]">
-              {starters.map((text) => (
-                <button
-                  key={text}
-                  onClick={() => { handleSend(text); setStarters([]); }}
-                  className="px-3 py-1.5 rounded-full text-xs transition-all hover:scale-105"
-                  style={{
-                    background: `${character.theme.accent}15`,
-                    border: `1px solid ${character.theme.accent}30`,
-                    color: character.theme.accent,
-                  }}
-                >
-                  {text}
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="px-3 py-3 md:px-6 md:py-4" style={{ display: showDialogue ? "none" : undefined }}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const input = e.currentTarget.querySelector("input") as HTMLInputElement;
-                if (input.value.trim()) {
-                  handleSend(input.value.trim());
-                  input.value = "";
-                }
-              }}
-              className="flex gap-3"
-            >
-              <input
-                type="text"
-                placeholder="Type your message..."
-                autoFocus
-                className="flex-1 min-w-0 px-3 py-2.5 md:px-5 md:py-3 rounded-full bg-surface text-text text-sm md:text-base outline-none"
-                style={{ border: `1.5px solid ${character.theme.accent}40` }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = character.theme.accent; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = `${character.theme.accent}40`; }}
-              />
+
+          {/* Scene picker */}
+          <div
+            style={{
+              position: "fixed", bottom: "65px", left: 0, right: 0, zIndex: 35,
+              background: "var(--color-panel)", backdropFilter: "blur(14px)",
+              borderTop: "1px solid var(--color-border)", padding: "12px 12px 16px",
+              transform: panels.isOpen("scenes") ? "translateY(0)" : "translateY(110%)",
+              transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              pointerEvents: panels.isOpen("scenes") ? "auto" : "none",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-secondary)" }}>
+                Scenes
+              </span>
               <button
-                type="submit"
-                className="px-4 py-2.5 md:px-6 md:py-3 rounded-full text-sm font-medium flex-shrink-0 send-btn-micro"
-                style={{ backgroundColor: character.theme.accent, color: "var(--color-nameplate-text)" }}
-                onClick={(e) => {
-                  const btn = e.currentTarget;
-                  btn.style.transform = "scale(0.9)";
-                  setTimeout(() => { btn.style.transform = "scale(1.05)"; }, 100);
-                  setTimeout(() => { btn.style.transform = "scale(1)"; }, 250);
-                  // Ripple
-                  const ripple = document.createElement("span");
-                  ripple.className = "send-ripple";
-                  const rect = btn.getBoundingClientRect();
-                  ripple.style.left = `${e.clientX - rect.left}px`;
-                  ripple.style.top = `${e.clientY - rect.top}px`;
-                  btn.appendChild(ripple);
-                  setTimeout(() => ripple.remove(), 500);
-                }}
+                onClick={panels.closePanel}
+                style={{ background: "var(--color-border)", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-secondary)", fontSize: "14px", lineHeight: 1, padding: 0 }}
+                aria-label="Close scene picker"
               >
-                Send
+                ✕
               </button>
-            </form>
-          </div>
-        </div>
-
-        <OutfitCarousel
-          characterId={characterId}
-          basePath={character.sprite.basePath}
-          accentColor={character.theme.accent}
-          currentOutfit={outfit}
-          onSelectOutfit={setOutfit}
-          isOpen={showOutfitCarousel}
-          onClose={() => setShowOutfitCarousel(false)}
-        />
-
-        {/* Scene picker panel */}
-        <div
-          style={{
-            position: "fixed",
-            bottom: "65px",
-            left: 0,
-            right: 0,
-            zIndex: 35,
-            background: "var(--color-panel)",
-            backdropFilter: "blur(14px)",
-            borderTop: "1px solid var(--color-border)",
-            padding: "12px 12px 16px",
-            transform: showScenePicker ? "translateY(0)" : "translateY(110%)",
-            transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            pointerEvents: showScenePicker ? "auto" : "none",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-secondary)" }}>
-              Scenes
-            </span>
-            <button
-              onClick={() => setShowScenePicker(false)}
-              style={{ background: "var(--color-border)", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-secondary)", fontSize: "14px", lineHeight: 1, padding: 0 }}
-              aria-label="Close scene picker"
-            >
-              ✕
-            </button>
-          </div>
-          <div style={{ display: "flex", gap: "8px", overflowX: "auto", overflowY: "hidden", paddingBottom: "2px" }}>
-            {(Object.values(SCENES) as { id: SceneId; name: string; gradient: string }[]).map((scene) => {
-              const isActive = scene.id === currentScene;
-              return (
-                <button
-                  key={scene.id}
-                  onClick={() => { setCurrentScene(scene.id); setShowScenePicker(false); }}
-                  style={{
-                    flex: "0 0 auto",
-                    width: "60px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "5px",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                  title={scene.name}
-                >
-                  <div
+            </div>
+            <div style={{ display: "flex", gap: "8px", overflowX: "auto", overflowY: "hidden", paddingBottom: "2px" }}>
+              {(Object.values(SCENES) as { id: SceneId; name: string; gradient: string }[]).map((scene) => {
+                const isActive = scene.id === session.currentScene;
+                return (
+                  <button
+                    key={scene.id}
+                    onClick={() => { session.setCurrentScene(scene.id); panels.closePanel(); }}
                     style={{
-                      width: "60px",
-                      height: "40px",
-                      borderRadius: "8px",
-                      overflow: "hidden",
-                      border: isActive ? `2px solid ${character.theme.accent}` : "2px solid var(--color-toggle-bg)",
-                      boxShadow: isActive ? `0 0 10px ${character.theme.accent}66` : "none",
-                      background: scene.gradient,
+                      flex: "0 0 auto", width: "60px", display: "flex", flexDirection: "column",
+                      alignItems: "center", gap: "5px", background: "transparent", border: "none", cursor: "pointer", padding: 0,
                     }}
-                  />
-                  <span style={{ fontSize: "8px", color: isActive ? character.theme.accent : "var(--color-inactive-nav)", fontWeight: isActive ? 600 : 400, textAlign: "center", maxWidth: "60px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {scene.name}
-                  </span>
-                </button>
-              );
-            })}
+                    title={scene.name}
+                  >
+                    <div style={{
+                      width: "60px", height: "40px", borderRadius: "8px", overflow: "hidden",
+                      border: isActive ? `2px solid ${accent}` : "2px solid var(--color-toggle-bg)",
+                      boxShadow: isActive ? `0 0 10px ${accent}66` : "none",
+                      background: scene.gradient,
+                    }} />
+                    <span style={{ fontSize: "8px", color: isActive ? accent : "var(--color-inactive-nav)", fontWeight: isActive ? 600 : 400, textAlign: "center", maxWidth: "60px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {scene.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <BottomNav
+          {showConfession && (
+            <ConfessionScene
+              characterId={characterId}
+              script={getConfessionScript(characterId)}
+              onComplete={() => { markConfessed(characterId); setShowConfession(false); }}
+            />
+          )}
+          {session.levelUpMilestone && (
+            <MilestoneScene
+              characterId={characterId}
+              characterName={character.name}
+              accentColor={accent}
+              level={session.levelUpMilestone.level}
+              levelName={session.levelUpMilestone.levelName}
+              onComplete={() => session.setLevelUpMilestone(null)}
+            />
+          )}
+          <ScreenshotMode
+            character={character}
+            expression={state.currentExpression}
+            lastLine={[...state.messages].reverse().find((m) => m.role === "assistant")?.content || ""}
+            visible={panels.isOpen("screenshot")}
+            onClose={panels.closePanel}
+          />
+
+          <BottomNav
+            characterId={characterId}
+            accentColor={accent}
+            activeTab={panels.isOpen("outfits") ? "outfits" : panels.isOpen("gifts") ? "gifts" : panels.isOpen("diary") ? "diary" : panels.isOpen("quests") ? "more" : "chat"}
+            onShowDiary={() => panels.openPanel("diary")}
+            onShowGifts={() => panels.openPanel("gifts")}
+            onShowHistory={() => panels.togglePanel("history")}
+            onShowScreenshot={() => panels.openPanel("screenshot")}
+            onShowOutfits={() => panels.togglePanel("outfits")}
+            onShowQuests={() => panels.openPanel("quests")}
+            onSave={session.handleSave}
+          />
+
+          <BloodBat
+            expression={state.currentExpression}
+            accentColor={accent}
+            isIdle={state.phase === "idle" && state.messages.length > 0}
+            chatPhrase={hexxPhrase}
+            onChatPhraseDone={() => setHexxPhrase(null)}
+          />
+
+          <VNTransition active={sceneTransition} onComplete={() => setSceneTransition(false)} />
+        </>
+      }
+    >
+      {/* Bottom zone: dialogue + starters + input */}
+      {vnControls.showDialogue && (
+        <DialogueBox
+          characterName={character.name}
           characterId={characterId}
-          accentColor={character.theme.accent}
-          activeTab={showOutfitCarousel ? "outfits" : showGiftShop ? "gifts" : showDiary ? "diary" : showQuestPanel ? "more" : "chat"}
-          onShowDiary={() => { setShowDiary(true); setShowGiftShop(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
-          onShowGifts={() => { setShowGiftShop(true); setShowDiary(false); setShowOutfitCarousel(false); setShowQuestPanel(false); setShowScenePicker(false); }}
-          onShowHistory={() => setShowHistory(prev => !prev)}
-          onShowScreenshot={() => setShowScreenshot(true)}
-          onShowOutfits={() => { setShowOutfitCarousel(prev => !prev); setShowDiary(false); setShowGiftShop(false); setShowQuestPanel(false); setShowScenePicker(false); }}
-          onShowQuests={() => { setShowQuestPanel(true); setShowDiary(false); setShowGiftShop(false); setShowOutfitCarousel(false); setShowScenePicker(false); }}
-          onSave={handleSave}
-        />
-        <BloodBat
+          accentColor={accent}
+          line={vnControls.isWaiting ? "..." : (vnControls.currentLine || "")}
+          isTyping={state.isTyping}
+          onAdvance={vnControls.handleAdvance}
+          onTypeComplete={vnControls.handleTypeComplete}
+          showAdvance={vnControls.showAdvanceIndicator}
+          typeSpeed={session.textSpeed}
           expression={state.currentExpression}
-          accentColor={character.theme.accent}
-          isIdle={state.phase === "idle" && state.messages.length > 0}
-          chatPhrase={hexxPhrase}
-          onChatPhraseDone={() => setHexxPhrase(null)}
-        />
-      </div>
-
-      {showConfession && character && (
-        <ConfessionScene
-          characterId={characterId}
-          script={getConfessionScript(characterId)}
-          onComplete={(ending) => {
-            markConfessed(characterId);
-            setShowConfession(false);
-          }}
         />
       )}
 
-      {levelUpMilestone && character && (
-        <MilestoneScene
-          characterId={characterId}
-          characterName={character.name}
-          accentColor={character.theme.accent}
-          level={levelUpMilestone.level}
-          levelName={levelUpMilestone.levelName}
-          onComplete={() => setLevelUpMilestone(null)}
-        />
+      {starters.length > 0 && vnControls.showInput && (
+        <div className="flex flex-wrap gap-2 px-4 mb-2 relative z-20 animate-[fadeIn_0.4s_ease-out]">
+          {starters.map((text) => (
+            <button
+              key={text}
+              onClick={() => { handleSend(text); setStarters([]); }}
+              className="px-3 py-1.5 rounded-full text-xs transition-all hover:scale-105"
+              style={{ background: `${accent}15`, border: `1px solid ${accent}30`, color: accent }}
+            >
+              {text}
+            </button>
+          ))}
+        </div>
       )}
 
-      {showDiary && character && (
-        <DiaryView
-          characterId={characterId}
-          characterName={character.name}
-          accentColor={character.theme.accent}
-          onClose={() => setShowDiary(false)}
-        />
+      {vnControls.showInput && (
+        <div className="vn-input-zone">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const input = e.currentTarget.querySelector("input") as HTMLInputElement;
+              if (input.value.trim()) {
+                handleSend(input.value.trim());
+                input.value = "";
+              }
+            }}
+            className="flex gap-3"
+          >
+            <input
+              type="text"
+              placeholder="Type your message..."
+              autoFocus
+              className="vn-input flex-1 min-w-0"
+              style={{ borderColor: `${accent}40` }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = accent; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = `${accent}40`; }}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2.5 rounded-full text-sm font-medium flex-shrink-0"
+              style={{ backgroundColor: accent, color: "var(--color-nameplate-text)" }}
+            >
+              Send
+            </button>
+          </form>
+        </div>
       )}
-      {showGiftShop && character && (
-        <GiftShop
-          characterId={characterId}
-          characterName={character.name}
-          accentColor={character.theme.accent}
-          onGift={handleGift}
-          onClose={() => setShowGiftShop(false)}
-        />
-      )}
-      {showQuestPanel && character && (
-        <QuestPanel
-          characterId={characterId}
-          accentColor={character.theme.accent}
-          onClose={() => setShowQuestPanel(false)}
-          onClaimReward={(points) => {
-            const result = addAffinityPoints(characterId, { type: "message_sent" });
-            if (result.newMilestones.length > 0) {
-              setMilestoneQueue(prev => [...prev, ...result.newMilestones]);
-            }
-          }}
-        />
-      )}
-
-      {/* Screenshot mode overlay */}
-      <ScreenshotMode
-        character={character}
-        expression={state.currentExpression}
-        lastLine={
-          [...state.messages].reverse().find((m) => m.role === "assistant")?.content || ""
-        }
-        visible={showScreenshot}
-        onClose={() => setShowScreenshot(false)}
-      />
-    </PageTransition>
+    </VNLayout>
   );
 }
+
+// ─── Loading skeleton ───────────────────────────────────────────────────────
 
 function LoadingSkeleton() {
   return (
     <div className="h-screen bg-bg flex flex-col items-center justify-center overflow-hidden relative">
       <style>{`
-        @keyframes skeleton-shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        @keyframes skeleton-pulse-outline {
-          0%, 100% { opacity: 0.15; }
-          50% { opacity: 0.4; }
-        }
-        .skeleton-silhouette {
-          width: 180px;
-          height: 320px;
-          border-radius: 24px;
-          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-          background-size: 200% 100%;
-          animation: skeleton-shimmer 1.8s ease-in-out infinite;
-          position: relative;
-        }
-        .skeleton-silhouette::after {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          border-radius: 26px;
-          border: 2px solid rgba(255,255,255,0.2);
-          animation: skeleton-pulse-outline 2s ease-in-out infinite;
-          pointer-events: none;
-        }
-        .skeleton-bar {
-          height: 12px;
-          border-radius: 6px;
-          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-          background-size: 200% 100%;
-          animation: skeleton-shimmer 1.8s ease-in-out infinite;
-        }
+        @keyframes skeleton-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes skeleton-pulse-outline { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.4; } }
+        .skeleton-silhouette { width: 180px; height: 320px; border-radius: 24px; background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.8s ease-in-out infinite; position: relative; }
+        .skeleton-silhouette::after { content: ''; position: absolute; inset: -2px; border-radius: 26px; border: 2px solid rgba(255,255,255,0.2); animation: skeleton-pulse-outline 2s ease-in-out infinite; pointer-events: none; }
+        .skeleton-bar { height: 12px; border-radius: 6px; background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.8s ease-in-out infinite; }
       `}</style>
       <div className="skeleton-silhouette" />
       <div style={{ marginTop: 32, width: 220, display: "flex", flexDirection: "column", gap: 8 }}>
