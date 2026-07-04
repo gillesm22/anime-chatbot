@@ -198,27 +198,30 @@ function ChatContent({ characterId }: { characterId: string }) {
               <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs font-medium leading-none" style={{ color: accent }}>{character.name}</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-semibold leading-none" style={{ color: accent }}>{character.name}</span>
             {(() => {
               const aff = getAffinity(characterId);
               const progress = getNextLevelProgress(aff);
               return (
-                <div className="flex items-center gap-1.5">
-                  <span style={{ fontSize: "8px", color: "rgba(255,255,255,0.5)", lineHeight: 1 }}>
+                <div className="flex items-center gap-2">
+                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", lineHeight: 1, fontWeight: 500 }}>
                     Lv.{aff.level} {aff.levelName}
                   </span>
                   <div style={{
-                    width: 48, height: 3, borderRadius: 2,
-                    background: "rgba(255,255,255,0.12)",
+                    width: 80, height: 5, borderRadius: 3,
+                    background: "rgba(255,255,255,0.15)",
                     overflow: "hidden",
                   }}>
                     <div style={{
                       width: `${progress.percent}%`, height: "100%",
-                      background: accent, borderRadius: 2,
+                      background: accent, borderRadius: 3,
                       transition: "width 0.5s ease",
                     }} />
                   </div>
+                  <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", lineHeight: 1 }}>
+                    {Math.round(progress.percent)}%
+                  </span>
                 </div>
               );
             })()}
