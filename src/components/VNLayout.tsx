@@ -145,15 +145,17 @@ export function VNLayout({
       {activeEffect && <EffectOverlay effect={activeEffect} />}
 
       {/* Layer 4: Character sprite */}
-      <div className="vn-sprite-zone" onClick={onSpriteTap}>
-        <CharacterSprite
-          character={character}
-          expression={expression}
-          isTalking={isTalking}
-          outfit={outfit as any}
-          onHeadpat={onHeadpat}
-          onExpressionChange={onExpressionChange}
-        />
+      <div className="vn-sprite-zone">
+        <div onClick={onSpriteTap} style={{ cursor: "pointer" }}>
+          <CharacterSprite
+            character={character}
+            expression={expression}
+            isTalking={isTalking}
+            outfit={outfit as any}
+            onHeadpat={onHeadpat}
+            onExpressionChange={onExpressionChange}
+          />
+        </div>
       </div>
 
       {/* Layer 5: Minimal header */}

@@ -293,7 +293,7 @@ input, textarea, button { -webkit-appearance: none; }
   justify-content: center;
   z-index: 5;
   pointer-events: none;
-  padding-bottom: 20%;
+  padding-bottom: 0;
 }
 .vn-sprite-zone > * {
   pointer-events: auto;
