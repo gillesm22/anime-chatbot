@@ -33,7 +33,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { getStarters } from "@/lib/conversationStarters";
 import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
 import { getSessionStartMood } from "@/lib/mood";
-import { getAffinity, recordVisit } from "@/lib/affinity";
+import { getAffinity, getNextLevelProgress, recordVisit } from "@/lib/affinity";
 import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession";
 import { addDiaryEntry } from "@/lib/diary";
 import { SCENES, type SceneId } from "@/lib/backgrounds";
@@ -198,7 +198,31 @@ function ChatContent({ characterId }: { characterId: string }) {
               <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <span className="text-xs font-medium" style={{ color: accent }}>{character.name}</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs font-medium leading-none" style={{ color: accent }}>{character.name}</span>
+            {(() => {
+              const aff = getAffinity(characterId);
+              const progress = getNextLevelProgress(aff);
+              return (
+                <div className="flex items-center gap-1.5">
+                  <span style={{ fontSize: "8px", color: "rgba(255,255,255,0.5)", lineHeight: 1 }}>
+                    Lv.{aff.level} {aff.levelName}
+                  </span>
+                  <div style={{
+                    width: 48, height: 3, borderRadius: 2,
+                    background: "rgba(255,255,255,0.12)",
+                    overflow: "hidden",
+                  }}>
+                    <div style={{
+                      width: `${progress.percent}%`, height: "100%",
+                      background: accent, borderRadius: 2,
+                      transition: "width 0.5s ease",
+                    }} />
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
           <VoiceToggle />
           <ThemeToggle />
         </>
