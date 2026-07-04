@@ -90,7 +90,11 @@ export function DialogueBox({
       // Strip emojis so TTS doesn't try to read them
       if (line !== "..." && characterId) {
         stopSpeaking();
-        const ttsText = line.replace(/[\u{1F600}-\u{1F9FF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1FFFF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "").trim();
+        const ttsText = line
+          .replace(/[\u{1F600}-\u{1F9FF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1FFFF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "")
+          .replace(/[*~_#`|><^\\]/g, "")
+          .replace(/\s{2,}/g, " ")
+          .trim();
         if (ttsText) speakLine(ttsText, characterId);
       }
 
