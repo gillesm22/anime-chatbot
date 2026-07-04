@@ -431,24 +431,16 @@ function ChatContent({ characterId }: { characterId: string }) {
                 input.value = "";
               }
             }}
-            className="flex gap-3"
           >
             <input
               type="text"
-              placeholder="Type your message..."
+              placeholder={`Talk to ${character.name}...`}
               autoFocus
-              className="vn-input flex-1 min-w-0"
-              style={{ borderColor: `${accent}40` }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = accent; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = `${accent}40`; }}
+              className="vn-input"
+              style={{ borderColor: `${accent}30` }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = `${accent}80`; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = `${accent}30`; }}
             />
-            <button
-              type="submit"
-              className="px-4 py-2.5 rounded-full text-sm font-medium flex-shrink-0"
-              style={{ backgroundColor: accent, color: "var(--color-nameplate-text)" }}
-            >
-              Send
-            </button>
           </form>
         </div>
       )}
