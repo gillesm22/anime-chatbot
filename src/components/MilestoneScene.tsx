@@ -387,12 +387,14 @@ export function MilestoneScene({
           src={spriteSrc}
           alt={characterName}
           style={{
-            width: "100%",
-            height: "100%",
+            width: "110%",
+            height: "110%",
             objectFit: "cover",
-            objectPosition: "top center",
+            objectPosition: "15% 10%",
             filter: "brightness(0.88)",
             display: "block",
+            marginLeft: "-5%",
+            marginTop: "-3%",
           }}
         />
 
