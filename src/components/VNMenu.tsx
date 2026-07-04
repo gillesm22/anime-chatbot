@@ -112,10 +112,10 @@ const MENU_ITEMS: MenuItem[] = [
   { label: "Save",    icon: <SaveIcon />,   panelId: "save" },
 ];
 
-// Arc: from -195deg (past left) to -55deg (past up), 7 items spread wide
-const ARC_START_DEG = -195;
-const ARC_END_DEG = -55;
-const RADIUS = 160; // px
+// Arc: from left (-185) to straight up (-90), stays within viewport
+const ARC_START_DEG = -185;
+const ARC_END_DEG = -90;
+const RADIUS = 150; // px
 
 function getArcPosition(index: number, total: number) {
   const t = total === 1 ? 0.5 : index / (total - 1);
