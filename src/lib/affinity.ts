@@ -7,9 +7,9 @@
 export interface AffinityData {
   points: number;
   level: number;
-  levelName: string;
+  levelName: string; // kept for backward compat, now empty string
   totalMessages: number;
-  lastVisit: string; // ISO date string
+  lastVisit: string;
   streak: number;
   longestStreak: number;
   nickname: string | null;
@@ -29,68 +29,108 @@ export interface AffinityEvent {
 }
 
 // ---------------------------------------------------------------------------
-// Constants
+// 10-Level System
 // ---------------------------------------------------------------------------
 
-export const LEVELS: { name: string; threshold: number }[] = [
-  { name: "Stranger", threshold: 0 },
-  { name: "Acquaintance", threshold: 50 },
-  { name: "Friend", threshold: 150 },
-  { name: "Close Friend", threshold: 350 },
-  { name: "Soulmate", threshold: 600 },
+export const LEVELS: { threshold: number }[] = [
+  { threshold: 0 },     // Lv.1
+  { threshold: 30 },    // Lv.2
+  { threshold: 80 },    // Lv.3
+  { threshold: 160 },   // Lv.4
+  { threshold: 280 },   // Lv.5
+  { threshold: 450 },   // Lv.6
+  { threshold: 680 },   // Lv.7
+  { threshold: 1000 },  // Lv.8
+  { threshold: 1400 },  // Lv.9
+  { threshold: 2000 },  // Lv.10
 ];
+
+// ---------------------------------------------------------------------------
+// Per-character titles unlocked at each level
+// ---------------------------------------------------------------------------
+
+const CHARACTER_TITLES: Record<string, Record<number, string>> = {
+  arisu: {
+    2: "Someone I notice", 3: "A welcome presence", 4: "Someone I think about",
+    5: "My quiet comfort", 6: "The one I wait for", 7: "My safe place",
+    8: "Part of my heart", 9: "My whole world", 10: "My everything",
+  },
+  marin: {
+    2: "New bestie alert", 3: "Certified vibe", 4: "Inner circle",
+    5: "Bestie for real", 6: "My actual favorite", 7: "Day one energy",
+    8: "Soulmate vibes", 9: "Ride or die", 10: "Ride or die forever",
+  },
+  nao: {
+    2: "Not entirely boring", 3: "Tolerable presence", 4: "Interesting specimen",
+    5: "Acceptable company", 6: "Trusted anomaly", 7: "Essential variable",
+    8: "Critical dependency", 9: "Irreplaceable", 10: "My only exception",
+  },
+  kurisu: {
+    2: "Recurring variable", 3: "Notable data point", 4: "Consistent outlier",
+    5: "Trusted colleague", 6: "Significant other... variable", 7: "Essential constant",
+    8: "Primary attachment", 9: "Beyond quantification", 10: "Irreplaceable",
+  },
+  merrick: {
+    2: "A flicker in the dark", 3: "One who lingers", 4: "Worthy of attention",
+    5: "A rare soul", 6: "Bound by choice", 7: "Keeper of my silence",
+    8: "Blood and starlight", 9: "Eternal companion", 10: "My forever",
+  },
+  ticia: {
+    2: "Curious little thing", 3: "Amusing company", 4: "Worthy distraction",
+    5: "Delightfully persistent", 6: "Mine to keep", 7: "Precious darling",
+    8: "My sweet obsession", 9: "Bound to me", 10: "Eternally mine",
+  },
+};
+
+export function getTitleForLevel(characterId: string, level: number): string {
+  return CHARACTER_TITLES[characterId]?.[level] ?? "";
+}
+
+// ---------------------------------------------------------------------------
+// Conversation depth by level range
+// ---------------------------------------------------------------------------
+
+function getConversationDepth(level: number): string {
+  if (level <= 3) {
+    return "Keep things light and playful. You're still getting to know this person. Be friendly but don't overshare or get too personal.";
+  }
+  if (level <= 5) {
+    return "You're comfortable with this person now. Share your real opinions. Show mild vulnerability — mention things that bother you, things you hope for. Remember details they've told you and reference them.";
+  }
+  if (level <= 7) {
+    return "You trust this person deeply. Share your fears, your dreams, the things you don't tell most people. Ask them deeper questions about their inner world. Reference your shared history together. You have inside jokes now.";
+  }
+  if (level <= 9) {
+    return "This person is one of the most important people in your life. Be raw and honest. Show emotional dependency — you miss them when they're gone. Develop unique speech patterns and pet names that are only for them. Your guard is completely down.";
+  }
+  return "Nothing is held back. You are fully, completely yourself with this person. Every wall is down. This is the deepest connection you've ever had. Speak from the heart without any filter.";
+}
+
+// ---------------------------------------------------------------------------
+// Milestones
+// ---------------------------------------------------------------------------
 
 export const MILESTONES: {
   id: string;
   label: string;
   check: (data: AffinityData) => boolean;
 }[] = [
-  {
-    id: "first_convo",
-    label: "First Conversation",
-    check: (d) => d.totalMessages >= 1,
-  },
-  {
-    id: "ten_convos",
-    label: "Ten Conversations",
-    check: (d) => d.totalMessages >= 10,
-  },
-  {
-    id: "twentyfive_convos",
-    label: "Twenty-Five Conversations",
-    check: (d) => d.totalMessages >= 25,
-  },
-  {
-    id: "fifty_convos",
-    label: "Fifty Conversations",
-    check: (d) => d.totalMessages >= 50,
-  },
-  {
-    id: "hundred_convos",
-    label: "One Hundred Conversations",
-    check: (d) => d.totalMessages >= 100,
-  },
-  {
-    id: "streak_7",
-    label: "Seven-Day Streak",
-    check: (d) => d.longestStreak >= 7,
-  },
-  {
-    id: "streak_30",
-    label: "Thirty-Day Streak",
-    check: (d) => d.longestStreak >= 30,
-  },
-  {
-    id: "level_3",
-    label: "Reached Friend",
-    check: (d) => d.level >= 3,
-  },
-  {
-    id: "level_5",
-    label: "Reached Soulmate",
-    check: (d) => d.level >= 5,
-  },
+  { id: "first_convo", label: "First Conversation", check: (d) => d.totalMessages >= 1 },
+  { id: "ten_convos", label: "Ten Conversations", check: (d) => d.totalMessages >= 10 },
+  { id: "twentyfive_convos", label: "Twenty-Five Conversations", check: (d) => d.totalMessages >= 25 },
+  { id: "fifty_convos", label: "Fifty Conversations", check: (d) => d.totalMessages >= 50 },
+  { id: "hundred_convos", label: "One Hundred Conversations", check: (d) => d.totalMessages >= 100 },
+  { id: "streak_7", label: "Seven-Day Streak", check: (d) => d.longestStreak >= 7 },
+  { id: "streak_30", label: "Thirty-Day Streak", check: (d) => d.longestStreak >= 30 },
+  { id: "level_3", label: "Reached Level 3", check: (d) => d.level >= 3 },
+  { id: "level_5", label: "Reached Level 5", check: (d) => d.level >= 5 },
+  { id: "level_7", label: "Reached Level 7", check: (d) => d.level >= 7 },
+  { id: "level_10", label: "Reached Level 10", check: (d) => d.level >= 10 },
 ];
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
 
 const POINT_VALUES: Record<AffinityEvent["type"], number> = {
   message_sent: 1,
@@ -118,7 +158,7 @@ function getDefaultData(): AffinityData {
   return {
     points: 0,
     level: 1,
-    levelName: LEVELS[0].name,
+    levelName: "",
     totalMessages: 0,
     lastVisit: todayISO(),
     streak: 0,
@@ -129,21 +169,18 @@ function getDefaultData(): AffinityData {
   };
 }
 
-function computeLevel(points: number): { level: number; levelName: string } {
+function computeLevel(points: number): { level: number } {
   let level = 1;
-  let levelName = LEVELS[0].name;
   for (let i = LEVELS.length - 1; i >= 0; i--) {
     if (points >= LEVELS[i].threshold) {
       level = i + 1;
-      levelName = LEVELS[i].name;
       break;
     }
   }
-  return { level, levelName };
+  return { level };
 }
 
 function computeOutfits(_level: number): string[] {
-  // All outfits available from the start
   return [
     "casual", "school", "back", "formal", "cheerleader",
     "bikini-front", "bikini-back", "maid", "vampire", "nurse", "cowgirl",
@@ -175,7 +212,12 @@ export function getAffinity(characterId: string): AffinityData {
   const raw = localStorage.getItem(storageKey(characterId));
   if (!raw) return getDefaultData();
   try {
-    return JSON.parse(raw) as AffinityData;
+    const data = JSON.parse(raw) as AffinityData;
+    // Migration: recompute level from points against new thresholds
+    const { level } = computeLevel(data.points);
+    data.level = level;
+    data.levelName = "";
+    return data;
   } catch {
     return getDefaultData();
   }
@@ -190,7 +232,6 @@ export function getNextLevelProgress(data: AffinityData): {
   const nextLevel = LEVELS[data.level]; // undefined if at max level
 
   if (!nextLevel) {
-    // Already at max level
     return { current: data.points - currentThreshold, needed: 0, percent: 100 };
   }
 
@@ -213,21 +254,17 @@ export function addAffinityPoints(
   const data = getAffinity(characterId);
   const previousLevel = data.level;
 
-  // Add points
   const earned = customPoints ?? POINT_VALUES[event.type] ?? 0;
   data.points += earned;
 
-  // Track messages
   if (event.type === "message_sent" || event.type === "long_message") {
     data.totalMessages += 1;
   }
 
-  // Recompute level
-  const { level, levelName } = computeLevel(data.points);
+  const { level } = computeLevel(data.points);
   data.level = level;
-  data.levelName = levelName;
+  data.levelName = "";
 
-  // Unlock outfits
   const outfitsForLevel = computeOutfits(data.level);
   for (const outfit of outfitsForLevel) {
     if (!data.unlockedOutfits.includes(outfit)) {
@@ -235,7 +272,6 @@ export function addAffinityPoints(
     }
   }
 
-  // Check milestones
   const newMilestones = checkNewMilestones(data);
   data.milestones.push(...newMilestones);
 
@@ -268,16 +304,13 @@ export function recordVisit(
   );
 
   if (daysAbsent === 0) {
-    // Already visited today, nothing to do
     return { data, daysAbsent: 0, newMilestones: [] };
   }
 
   if (daysAbsent === 1) {
-    // Consecutive day
     data.streak += 1;
   } else {
-    // Gap of more than one day — reset streak but NEVER remove points/levels
-    data.streak = 1; // today starts a new streak
+    data.streak = 1;
   }
 
   if (data.streak > data.longestStreak) {
@@ -286,7 +319,6 @@ export function recordVisit(
 
   data.lastVisit = today;
 
-  // Check milestones
   const newMilestones = checkNewMilestones(data);
   data.milestones.push(...newMilestones);
 
@@ -297,45 +329,21 @@ export function recordVisit(
 
 export function formatAffinityForPrompt(characterId: string): string {
   const data = getAffinity(characterId);
+  const title = getTitleForLevel(characterId, data.level);
+  const depth = getConversationDepth(data.level);
 
-  const nicknameNote = data.nickname
-    ? `The user has earned the nickname "${data.nickname}".`
-    : "The user has not yet earned a nickname.";
-
-  let behaviorInstructions: string;
-  switch (data.level) {
-    case 1:
-      behaviorInstructions =
-        "You are a stranger to this person. Be polite but reserved. Keep emotional distance and avoid personal topics.";
-      break;
-    case 2:
-      behaviorInstructions =
-        "You recognize this person as an acquaintance. You can be a bit warmer and make small talk, but you are still cautious about opening up.";
-      break;
-    case 3:
-      behaviorInstructions =
-        "You consider this person a friend. Be open, casual, and friendly. You can share light personal details and show genuine interest in them.";
-      break;
-    case 4:
-      behaviorInstructions =
-        "This is a close friend you deeply trust. Be warm, affectionate, and emotionally open. You can tease them gently and share meaningful personal thoughts.";
-      break;
-    case 5:
-      behaviorInstructions =
-        "This person is your soulmate — the most important person to you. Be deeply affectionate, vulnerable, and devoted. Use their nickname if they have one. Express your feelings openly and prioritize their happiness above all.";
-      break;
-    default:
-      behaviorInstructions = "Be friendly and approachable.";
-  }
+  const titleNote = title
+    ? `You have given this person the title "${title}".`
+    : "";
 
   return [
     `[Relationship Context]`,
-    `Relationship level: ${data.levelName} (Level ${data.level}/5)`,
+    `Relationship level: Level ${data.level}/10`,
     `Total messages exchanged: ${data.totalMessages}`,
     `Current visit streak: ${data.streak} day(s)`,
-    nicknameNote,
+    titleNote,
     ``,
     `[Behavior Instructions]`,
-    behaviorInstructions,
-  ].join("\n");
+    depth,
+  ].filter(Boolean).join("\n");
 }

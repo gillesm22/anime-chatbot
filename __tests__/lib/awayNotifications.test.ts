@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { getAwayNotifications } from "@/lib/awayNotifications";
+import { LEVELS } from "@/lib/affinity";
 
 // ---------------------------------------------------------------------------
 // localStorage mock
@@ -35,10 +36,12 @@ function daysAgo(n: number): string {
 }
 
 function setAffinity(charId: string, level: number, lastVisit: string) {
+  // Points must match level so getAffinity's migration recompute keeps the level
+  const points = LEVELS[level - 1]?.threshold ?? 0;
   localStorageMock.setItem(
     affinityKey(charId),
     JSON.stringify({
-      points: 0,
+      points,
       level,
       levelName: "Test",
       totalMessages: 0,
