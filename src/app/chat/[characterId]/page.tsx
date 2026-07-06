@@ -34,7 +34,7 @@ import { TodoPanel } from "@/components/TodoPanel";
 import { getStarters } from "@/lib/conversationStarters";
 import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
 import { getSessionStartMood } from "@/lib/mood";
-import { getAffinity, getNextLevelProgress, recordVisit } from "@/lib/affinity";
+import { getAffinity, getNextLevelProgress, getTitleForLevel, recordVisit } from "@/lib/affinity";
 import { canConfess, getConfessionScript, markConfessed } from "@/lib/confession";
 import { addDiaryEntry } from "@/lib/diary";
 import { SCENES, type SceneId } from "@/lib/backgrounds";
@@ -206,6 +206,7 @@ function ChatContent({ characterId }: { characterId: string }) {
       expression={state.currentExpression}
       isTalking={vnControls.isTalking}
       outfit={session.outfit}
+      level={getAffinity(characterId).level}
       currentScene={session.currentScene}
       activeEffect={effects.activeEffect}
       onHeadpat={() => session.addAffinity("headpat")}
@@ -230,25 +231,35 @@ function ChatContent({ characterId }: { characterId: string }) {
               const aff = getAffinity(characterId);
               const progress = getNextLevelProgress(aff);
               return (
-                <div className="flex items-center gap-2">
-                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", lineHeight: 1, fontWeight: 500 }}>
-                    Lv.{aff.level} {aff.levelName}
-                  </span>
-                  <div style={{
-                    width: 80, height: 5, borderRadius: 3,
-                    background: "rgba(255,255,255,0.15)",
-                    overflow: "hidden",
-                  }}>
+                <>
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", lineHeight: 1, fontWeight: 500 }}>
+                      Lv.{aff.level}
+                    </span>
                     <div style={{
-                      width: `${progress.percent}%`, height: "100%",
-                      background: accent, borderRadius: 3,
-                      transition: "width 0.5s ease",
-                    }} />
+                      width: 80, height: 5, borderRadius: 3,
+                      background: "rgba(255,255,255,0.15)",
+                      overflow: "hidden",
+                    }}>
+                      <div style={{
+                        width: `${progress.percent}%`, height: "100%",
+                        background: accent, borderRadius: 3,
+                        transition: "width 0.5s ease",
+                      }} />
+                    </div>
+                    <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", lineHeight: 1 }}>
+                      {Math.round(progress.percent)}%
+                    </span>
                   </div>
-                  <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", lineHeight: 1 }}>
-                    {Math.round(progress.percent)}%
-                  </span>
-                </div>
+                  {(() => {
+                    const title = getTitleForLevel(characterId, aff.level);
+                    return title ? (
+                      <span style={{ fontSize: "8px", color: `${accent}99`, lineHeight: 1, fontStyle: "italic" }}>
+                        &ldquo;{title}&rdquo;
+                      </span>
+                    ) : null;
+                  })()}
+                </>
               );
             })()}
           </div>

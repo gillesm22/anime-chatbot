@@ -2,12 +2,12 @@
 
 interface CharacterGlowProps {
   accentColor: string;
-  intensity?: "low" | "medium" | "high";
+  intensity?: "low" | "medium" | "high" | "radiant";
 }
 
 export function CharacterGlow({ accentColor, intensity = "medium" }: CharacterGlowProps) {
-  const sizes = { low: 200, medium: 300, high: 400 };
-  const opacities = { low: 0.08, medium: 0.15, high: 0.25 };
+  const sizes = { low: 200, medium: 300, high: 400, radiant: 500 };
+  const opacities = { low: 0.08, medium: 0.15, high: 0.25, radiant: 0.35 };
   const size = sizes[intensity];
 
   return (

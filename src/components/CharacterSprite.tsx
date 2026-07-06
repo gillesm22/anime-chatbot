@@ -7,12 +7,20 @@ import { CharacterGlow } from "./CharacterGlow";
 import { useParallax } from "@/lib/parallax";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
 
+function getGlowIntensity(level: number, isTalking: boolean): "low" | "medium" | "high" | "radiant" {
+  if (level >= 10) return "radiant";
+  if (level >= 8 || isTalking) return "high";
+  if (level >= 4) return "medium";
+  return "low";
+}
+
 interface CharacterSpriteProps {
   character: Character;
   expression: Expression;
   isTalking: boolean;
   pose?: BodyPose;
   outfit?: Outfit;
+  level?: number;
   onHeadpat?: () => void;
   onExpressionChange?: (effect: ExpressionEffect) => void;
 }
@@ -23,6 +31,7 @@ export function CharacterSprite({
   isTalking,
   pose,
   outfit = "default",
+  level = 1,
   onHeadpat,
   onExpressionChange,
 }: CharacterSpriteProps) {
@@ -31,8 +40,8 @@ export function CharacterSprite({
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
   const basePath = character.sprite.basePath;
-  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick";
-  const hasOutfitAssets = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick";
+  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
+  const hasOutfitAssets = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
   const isGenericOutfit = outfit !== "default" && outfit !== "back" && outfit !== "bikini-back" && outfit !== "bikini-front";
   const [outfitError, setOutfitError] = useState(false);
   const [visibleExpr, setVisibleExpr] = useState<Expression>(expression);
@@ -120,7 +129,27 @@ export function CharacterSprite({
           transform: `translate(${parallax.x * 3}px, ${parallax.y * 2}px)`,
         }}
       >
-        <CharacterGlow accentColor={character.theme.accent} intensity={isTalking ? "high" : "medium"} />
+        <CharacterGlow accentColor={character.theme.accent} intensity={getGlowIntensity(level, isTalking)} />
+        {level >= 4 && (
+          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+            {Array.from({ length: Math.min(level - 1, 15) }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  left: `${20 + Math.sin(i * 2.3) * 30}%`,
+                  top: `${15 + Math.cos(i * 1.7) * 35}%`,
+                  width: 3,
+                  height: 3,
+                  borderRadius: "50%",
+                  background: character.theme.accent,
+                  opacity: 0.3,
+                  animation: `floatParticle ${5 + (i % 4)}s ease-in-out ${i * 0.6}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+        )}
         {/* Base layer */}
         <img
           src={getSrc(visibleExpr)}
