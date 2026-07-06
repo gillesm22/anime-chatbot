@@ -1,24 +1,35 @@
 import { describe, it, expect } from "vitest";
-import { getObjectsForScene, SCENE_OBJECTS } from "@/lib/sceneObjects";
+import { getHotspotsForScene, SCENE_HOTSPOTS } from "@/lib/sceneObjects";
 
-describe("getObjectsForScene", () => {
-  it("returns objects for cozy_room (should have several)", () => {
-    const result = getObjectsForScene("cozy_room");
-    expect(result.length).toBeGreaterThan(1);
-    result.forEach(obj => expect(obj.scenes).toContain("cozy_room"));
+describe("getHotspotsForScene", () => {
+  it("returns hotspots for lab", () => {
+    const hotspots = getHotspotsForScene("lab");
+    expect(hotspots.length).toBeGreaterThan(0);
+    expect(hotspots.every(h => h.scenes.includes("lab"))).toBe(true);
   });
 
-  it("returns empty array for unknown scene", () => {
-    const result = getObjectsForScene("unknown_scene_xyz");
-    expect(result).toEqual([]);
+  it("returns hotspots for cafe", () => {
+    const hotspots = getHotspotsForScene("cafe");
+    expect(hotspots.length).toBeGreaterThan(0);
   });
 
-  it("all objects have valid positions (0-100)", () => {
-    SCENE_OBJECTS.forEach(obj => {
-      expect(obj.x).toBeGreaterThanOrEqual(0);
-      expect(obj.x).toBeLessThanOrEqual(100);
-      expect(obj.y).toBeGreaterThanOrEqual(0);
-      expect(obj.y).toBeLessThanOrEqual(100);
-    });
+  it("returns hotspots for cyberpunk", () => {
+    const hotspots = getHotspotsForScene("cyberpunk");
+    expect(hotspots.length).toBeGreaterThan(0);
+  });
+
+  it("returns empty for outdoor scenes", () => {
+    expect(getHotspotsForScene("sakura")).toHaveLength(0);
+    expect(getHotspotsForScene("beach")).toHaveLength(0);
+    expect(getHotspotsForScene("rain")).toHaveLength(0);
+  });
+
+  it("all hotspots have valid positions", () => {
+    for (const h of SCENE_HOTSPOTS) {
+      expect(h.x).toBeGreaterThanOrEqual(0);
+      expect(h.x + h.width).toBeLessThanOrEqual(100);
+      expect(h.y).toBeGreaterThanOrEqual(0);
+      expect(h.y + h.height).toBeLessThanOrEqual(100);
+    }
   });
 });

@@ -29,6 +29,7 @@ import { BloodBat } from "@/components/BloodBat";
 import { ScreenshotMode } from "@/components/ScreenshotMode";
 import { VoiceToggle } from "@/components/VoiceToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { TodoPanel } from "@/components/TodoPanel";
 
 import { getStarters } from "@/lib/conversationStarters";
 import { getEngagementGreeting, getStreakMessage } from "@/lib/engagement";
@@ -94,6 +95,31 @@ function ChatContent({ characterId }: { characterId: string }) {
   });
 
   const effects = useExpressionEffects({ currentMood: session.currentMood });
+
+  // ── Todo reactions ───────────────────────────────────────────────────────
+
+  const TODO_ADD_REACTIONS: Record<string, string[]> = {
+    arisu: ["I'll remember that for you.", "Adding it to the list~ Let's get it done together.", "That's important to you, isn't it? I'll keep track."],
+    marin: ["Ooh writing stuff down, look at you being productive!", "Got it got it!! We're SO on top of this.", "Added! Now don't forget ok??"],
+    nao: ["Noted. I'll hold you accountable.", "...fine, I'll help you stay organized.", "Task logged. Don't slack off."],
+    kurisu: ["Documented. I expect you to follow through.", "Adding it to the queue. Efficiency matters.", "Hmph. At least you're being systematic about it."],
+    merrick: ["I shall remember this... across the ages if necessary.", "Written in ink that does not fade.", "Consider it etched into the record."],
+    ticia: ["Mm, I'll keep that safe for you~", "Another thing to do... how deliciously mortal.", "Noted, darling."],
+  };
+
+  const TODO_COMPLETE_REACTIONS: Record<string, string[]> = {
+    arisu: ["You did it! I'm proud of you.", "One less thing to worry about~", "See? You're more capable than you think."],
+    marin: ["YESSS checked off!! Let's GOOO!", "Productivity queen!! Slay!!", "Another one DONE! You're unstoppable!"],
+    nao: ["...impressive. Don't let it go to your head.", "Task eliminated. Acceptable performance.", "Hm. Maybe you're not hopeless after all."],
+    kurisu: ["Completed. Your efficiency is... noted.", "Good. One variable resolved.", "Don't expect praise for doing what you should. ...Well done though."],
+    merrick: ["Another burden lifted from your mortal shoulders.", "It is done. Time moves ever forward.", "Satisfying, isn't it? The completion of a task."],
+    ticia: ["Mmm, well done~", "How productive of you... I approve.", "Crossed off. You're full of surprises."],
+  };
+
+  function pickReaction(pool: string[]): string | null {
+    if (Math.random() > 0.6) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
 
   // ── Effects ──────────────────────────────────────────────────────────────
 
@@ -256,7 +282,9 @@ function ChatContent({ characterId }: { characterId: string }) {
           <SceneObjects
             sceneId={session.currentScene}
             accentColor={accent}
-            onObjectTap={(action) => {/* scene object actions handled by InteractiveElements */}}
+            onObjectTap={(action) => {
+              if (action === "todos") panels.openPanel("todos");
+            }}
           />
           <VNMenu
             accentColor={accent}
@@ -327,6 +355,30 @@ function ChatContent({ characterId }: { characterId: string }) {
               onClaimReward={() => session.addAffinity("message_sent")}
             />
           )}
+
+          <TodoPanel
+            accentColor={accent}
+            isOpen={panels.isOpen("todos")}
+            onClose={panels.closePanel}
+            onAdd={() => {
+              const reactions = TODO_ADD_REACTIONS[characterId] || TODO_ADD_REACTIONS.arisu;
+              const line = pickReaction(reactions);
+              if (line) {
+                dispatch(setExpression("thinking"));
+                setDiscoveryToast({ line, expression: "thinking" });
+                setTimeout(() => setDiscoveryToast(null), 3500);
+              }
+            }}
+            onComplete={() => {
+              const reactions = TODO_COMPLETE_REACTIONS[characterId] || TODO_COMPLETE_REACTIONS.arisu;
+              const line = pickReaction(reactions);
+              if (line) {
+                dispatch(setExpression("happy"));
+                setDiscoveryToast({ line, expression: "happy" });
+                setTimeout(() => setDiscoveryToast(null), 3500);
+              }
+            }}
+          />
 
           {/* Scene picker */}
           <div

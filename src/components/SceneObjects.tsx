@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { getObjectsForScene } from "@/lib/sceneObjects";
+import { useState, useEffect } from "react";
+import { getHotspotsForScene } from "@/lib/sceneObjects";
 import { haptic } from "@/lib/haptics";
+
+const DISCOVERED_KEY = "anime-chatbot-todo-discovered";
 
 interface SceneObjectsProps {
   sceneId: string;
@@ -11,59 +13,61 @@ interface SceneObjectsProps {
 }
 
 export function SceneObjects({ sceneId, accentColor, onObjectTap }: SceneObjectsProps) {
-  const objects = getObjectsForScene(sceneId);
+  const hotspots = getHotspotsForScene(sceneId);
+  const [discovered, setDiscovered] = useState(true);
+
+  useEffect(() => {
+    const d = localStorage.getItem(DISCOVERED_KEY);
+    setDiscovered(d === "true");
+  }, []);
+
+  const handleTap = (action: string) => {
+    haptic.tick();
+    if (!discovered) {
+      localStorage.setItem(DISCOVERED_KEY, "true");
+      setDiscovered(true);
+    }
+    onObjectTap(action);
+  };
+
+  if (hotspots.length === 0) return null;
 
   return (
     <>
-      {objects.map((obj) => (
-        <motion.button
-          key={obj.id}
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 0.7, scale: 1 }}
-          whileHover={{ opacity: 1, scale: 1.15 }}
-          whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          onClick={() => {
-            haptic.tick();
-            onObjectTap(obj.action);
-          }}
+      {hotspots.map((hotspot) => (
+        <button
+          key={hotspot.id}
+          onClick={() => handleTap(hotspot.action)}
           style={{
             position: "absolute",
-            left: `${obj.x}%`,
-            top: `${obj.y}%`,
-            transform: "translate(-50%, -50%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 3,
-            background: "rgba(255, 255, 255, 0.12)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            border: `1px solid rgba(255, 255, 255, 0.2)`,
-            borderRadius: "50%",
-            width: obj.size + 16,
-            height: obj.size + 16,
+            left: `${hotspot.x}%`,
+            top: `${hotspot.y}%`,
+            width: `${hotspot.width}%`,
+            height: `${hotspot.height}%`,
+            zIndex: 8,
+            background: "transparent",
+            border: "none",
             cursor: "pointer",
             padding: 0,
-            boxShadow: `0 2px 12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}20`,
+            outline: "none",
+            // Subtle glow pulse on undiscovered hotspots
+            ...(!discovered ? {
+              boxShadow: `inset 0 0 20px ${accentColor}15, 0 0 30px ${accentColor}10`,
+              animation: "hotspot-pulse 3s ease-in-out infinite",
+              borderRadius: 12,
+            } : {}),
           }}
-          title={obj.label}
-        >
-          <span style={{ fontSize: obj.size * 0.6, lineHeight: 1 }}>{obj.icon}</span>
-          <span
-            style={{
-              fontSize: 8,
-              color: "rgba(255,255,255,0.85)",
-              fontWeight: 600,
-              letterSpacing: 0.3,
-              lineHeight: 1,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {obj.label}
-          </span>
-        </motion.button>
+          aria-label="Open task board"
+        />
       ))}
+      {!discovered && (
+        <style>{`
+          @keyframes hotspot-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+          }
+        `}</style>
+      )}
     </>
   );
 }

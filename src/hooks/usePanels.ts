@@ -12,6 +12,7 @@ export type PanelId =
   | "quests"
   | "scenes"
   | "screenshot"
+  | "todos"
   | "more"
   | null;
 

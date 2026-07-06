@@ -1,22 +1,25 @@
-export interface SceneObject {
+export interface SceneHotspot {
   id: string;
-  label: string;
-  x: number;     // percentage 0-100
-  y: number;     // percentage 0-100
-  size: number;  // px
-  icon: string;  // emoji
+  /** Which scenes this hotspot appears in */
   scenes: string[];
+  /** What action it triggers */
   action: string;
+  /** Position and size as percentage of viewport */
+  x: number;      // left edge %
+  y: number;      // top edge %
+  width: number;  // % of viewport width
+  height: number; // % of viewport height
 }
 
-export const SCENE_OBJECTS: SceneObject[] = [
-  { id: "notebook", label: "Notebook", x: 12, y: 65, size: 36, icon: "📓", scenes: ["cozy_room", "cafe", "lab"], action: "notebook" },
-  { id: "clock",    label: "Clock",    x: 88, y: 15, size: 32, icon: "🕐", scenes: ["cozy_room", "lab", "cyberpunk"], action: "timer" },
-  { id: "phone",    label: "Phone",    x: 85, y: 70, size: 30, icon: "📱", scenes: ["cozy_room", "cafe", "morning"], action: "reminders" },
-  { id: "pinboard", label: "Board",    x: 15, y: 25, size: 34, icon: "📌", scenes: ["cozy_room", "lab", "cyberpunk"], action: "todos" },
-  { id: "bookshelf",label: "Books",    x: 10, y: 40, size: 34, icon: "📚", scenes: ["cozy_room", "lab"], action: "notes" },
+export const SCENE_HOTSPOTS: SceneHotspot[] = [
+  // Lab: desk/papers area (bottom-left)
+  { id: "todos-lab", scenes: ["lab"], action: "todos", x: 15, y: 55, width: 15, height: 20 },
+  // Cafe: foreground table (bottom-center)
+  { id: "todos-cafe", scenes: ["cafe"], action: "todos", x: 35, y: 65, width: 20, height: 15 },
+  // Cyberpunk: neon screen (right side)
+  { id: "todos-cyberpunk", scenes: ["cyberpunk"], action: "todos", x: 70, y: 25, width: 18, height: 25 },
 ];
 
-export function getObjectsForScene(sceneId: string): SceneObject[] {
-  return SCENE_OBJECTS.filter(obj => obj.scenes.includes(sceneId));
+export function getHotspotsForScene(sceneId: string): SceneHotspot[] {
+  return SCENE_HOTSPOTS.filter(h => h.scenes.includes(sceneId));
 }
