@@ -101,3 +101,33 @@ export function playDiscoveryChime(): void {
     osc.stop(t + 0.4);
   });
 }
+
+export function playHexxChomp() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  // Low thud
+  const osc1 = ctx.createOscillator();
+  const gain1 = ctx.createGain();
+  osc1.type = "sine";
+  osc1.frequency.value = 150;
+  gain1.gain.setValueAtTime(0.15, now);
+  gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+  osc1.connect(gain1);
+  gain1.connect(ctx.destination);
+  osc1.start(now);
+  osc1.stop(now + 0.06);
+
+  // High chirp
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  osc2.type = "sine";
+  osc2.frequency.value = 1200;
+  gain2.gain.setValueAtTime(0.06, now + 0.02);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+  osc2.start(now + 0.02);
+  osc2.stop(now + 0.05);
+}
