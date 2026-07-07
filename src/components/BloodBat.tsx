@@ -3,6 +3,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Expression } from "@/lib/characters/types";
 
+// Global ref for blood drip system to read Hexx's position
+let hexxContainerRef: HTMLDivElement | null = null;
+
+export function getHexxBounds(): DOMRect | null {
+  return hexxContainerRef?.getBoundingClientRect() ?? null;
+}
+
+// Global callback for blood drip feeding reaction
+let hexxFeedCallback: (() => void) | null = null;
+
+export function triggerHexxFeed() {
+  hexxFeedCallback?.();
+}
+
 interface BloodBatProps {
   expression?: Expression;
   accentColor?: string;
@@ -136,8 +150,11 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   const [headTilt, setHeadTilt] = useState(0);
   const [size, setSize] = useState(DEFAULT_SIZE);
   const [sparkle, setSparkle] = useState(false);
+  const [feedReaction, setFeedReaction] = useState(false);
   const phraseTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const tiltTimer = useRef<ReturnType<typeof setInterval>>(undefined);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const longPressFired = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Drag state
@@ -152,6 +169,22 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
       const saved = localStorage.getItem(SIZE_KEY);
       if (saved) setSize(Math.min(MAX_SIZE, Math.max(MIN_SIZE, Number(saved))));
     } catch {}
+  }, []);
+
+  // Expose container ref globally for blood drip overlap detection
+  useEffect(() => {
+    hexxContainerRef = containerRef.current;
+    return () => { hexxContainerRef = null; };
+  }, []);
+
+  // Register feed reaction callback for blood drip system
+  useEffect(() => {
+    hexxFeedCallback = () => {
+      setFeedReaction(true);
+      setMood("excited");
+      setTimeout(() => setFeedReaction(false), 400);
+    };
+    return () => { hexxFeedCallback = null; };
   }, []);
 
   // Scroll wheel to resize
@@ -173,21 +206,41 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     setIsDragging(true);
     hasMoved.current = false;
+    longPressFired.current = false;
     dragStart.current = { x: e.clientX, y: e.clientY, px: pos.x, py: pos.y };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+    // Long-press timer for blood drip toggle
+    longPressTimer.current = setTimeout(() => {
+      if (!hasMoved.current) {
+        longPressFired.current = true;
+        try {
+          const current = localStorage.getItem("anime-chatbot-blood-drip") === "true";
+          localStorage.setItem("anime-chatbot-blood-drip", String(!current));
+          window.dispatchEvent(new CustomEvent("blood-drip-toggle", { detail: !current }));
+          setPhrase(!current ? "Blood mode ON" : "Blood mode OFF");
+          if (phraseTimer.current) clearTimeout(phraseTimer.current);
+          phraseTimer.current = setTimeout(() => setPhrase(null), 2000);
+        } catch {}
+      }
+    }, 800);
   }, [pos]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved.current = true;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      hasMoved.current = true;
+      if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
+    }
     setPos({ x: dragStart.current.px + dx, y: dragStart.current.py + dy });
   }, [isDragging]);
 
   const handlePointerUp = useCallback(() => {
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setIsDragging(false);
-    if (!hasMoved.current) {
+    if (!hasMoved.current && !longPressFired.current) {
       setIsClicked(true);
       setTimeout(() => setIsClicked(false), 500);
       setClickCount((c) => c + 1);
@@ -299,7 +352,9 @@ export function BloodBat({ expression, accentColor = "#b71c1c", isIdle, isAudioP
   }, [chatPhrase, onChatPhraseDone]);
 
   const spriteUrl = HEXX_SPRITES[mood] || HEXX_SPRITES.neutral;
-  const bodySquish = isClicked ? "scaleY(0.88) scaleX(1.08)" : isHovered ? "scaleY(1.03)" : "scaleY(1)";
+  const bodySquish = feedReaction
+    ? "scaleY(0.85) scaleX(1.1)"
+    : isClicked ? "scaleY(0.88) scaleX(1.08)" : isHovered ? "scaleY(1.03)" : "scaleY(1)";
   const bubbleSize = Math.max(12, Math.round(size * 0.14));
 
   return (
