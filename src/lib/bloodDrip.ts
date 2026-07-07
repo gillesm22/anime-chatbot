@@ -72,3 +72,73 @@ export function updateDrop(drop: Drop, dt: number): Drop {
 
   return { ...drop, vy, y, trail };
 }
+
+const MAX_SPLATS = 20;
+
+interface HexxBounds {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+export class DripScene {
+  drops: Drop[] = [];
+  splats: Splat[] = [];
+  floorY: number;
+  hexxBounds: HexxBounds | null = null;
+  lastHexxFed = false;
+
+  constructor(floorY: number) {
+    this.floorY = floorY;
+  }
+
+  addDrop(x: number, y: number) {
+    this.drops.push(createDrop(x, y));
+  }
+
+  isIdle(): boolean {
+    return this.drops.length === 0 && this.splats.length === 0;
+  }
+
+  tick(dt: number) {
+    this.lastHexxFed = false;
+
+    const survivingDrops: Drop[] = [];
+    for (const drop of this.drops) {
+      const prevY = drop.y;
+      const updated = updateDrop(drop, dt);
+
+      if (this.hexxBounds && this._overlapsHexx(updated, prevY)) {
+        this.lastHexxFed = true;
+        continue;
+      }
+
+      if (updated.y >= this.floorY) {
+        this.splats.push(createSplat(updated.x, this.floorY));
+        continue;
+      }
+
+      survivingDrops.push(updated);
+    }
+    this.drops = survivingDrops;
+
+    this.splats = this.splats
+      .map((s) => updateSplat(s, dt))
+      .filter((s) => s.opacity > 0);
+
+    if (this.splats.length > MAX_SPLATS) {
+      this.splats = this.splats.slice(this.splats.length - MAX_SPLATS);
+    }
+  }
+
+  private _overlapsHexx(drop: Drop, prevY?: number): boolean {
+    if (!this.hexxBounds) return false;
+    const b = this.hexxBounds;
+    if (drop.x < b.left || drop.x > b.right) return false;
+    // Check if the drop's current position or its path from prevY crosses the bounds
+    const yMin = prevY !== undefined ? Math.min(prevY, drop.y) : drop.y;
+    const yMax = prevY !== undefined ? Math.max(prevY, drop.y) : drop.y;
+    return yMax >= b.top && yMin <= b.bottom;
+  }
+}

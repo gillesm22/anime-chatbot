@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createDrop, updateDrop, createSplat, updateSplat } from "@/lib/bloodDrip";
+import { createDrop, updateDrop, createSplat, updateSplat, DripScene } from "@/lib/bloodDrip";
 
 describe("createDrop", () => {
   it("creates a drop at the given coordinates", () => {
@@ -68,5 +68,59 @@ describe("updateSplat", () => {
     let splat = createSplat(150, 700);
     splat = updateSplat(splat, 3.1);
     expect(splat.opacity).toBe(0);
+  });
+});
+
+describe("DripScene", () => {
+  it("starts with no drops or splats", () => {
+    const scene = new DripScene(800);
+    expect(scene.drops).toHaveLength(0);
+    expect(scene.splats).toHaveLength(0);
+    expect(scene.isIdle()).toBe(true);
+  });
+
+  it("adds a drop on addDrop()", () => {
+    const scene = new DripScene(800);
+    scene.addDrop(100, 200);
+    expect(scene.drops).toHaveLength(1);
+    expect(scene.isIdle()).toBe(false);
+  });
+
+  it("converts drops to splats when they reach the floor", () => {
+    const scene = new DripScene(400);
+    scene.addDrop(100, 390);
+    scene.tick(1);
+    expect(scene.drops).toHaveLength(0);
+    expect(scene.splats).toHaveLength(1);
+    expect(scene.splats[0].y).toBe(400);
+  });
+
+  it("removes splats after they fully fade", () => {
+    const scene = new DripScene(800);
+    scene.addDrop(100, 790);
+    scene.tick(0.5);
+    expect(scene.splats).toHaveLength(1);
+    scene.tick(3.5);
+    expect(scene.splats).toHaveLength(0);
+    expect(scene.isIdle()).toBe(true);
+  });
+
+  it("caps splats at 20", () => {
+    const scene = new DripScene(10);
+    for (let i = 0; i < 25; i++) {
+      scene.addDrop(i * 10, 5);
+    }
+    scene.tick(1);
+    expect(scene.splats.length).toBeLessThanOrEqual(20);
+  });
+
+  it("consumes drop when it overlaps hexx bounds", () => {
+    const scene = new DripScene(800);
+    scene.hexxBounds = { left: 90, right: 110, top: 290, bottom: 310 };
+    scene.addDrop(100, 280);
+    scene.tick(0.5);
+    expect(scene.drops).toHaveLength(0);
+    expect(scene.splats).toHaveLength(0);
+    expect(scene.lastHexxFed).toBe(true);
   });
 });
