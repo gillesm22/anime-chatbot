@@ -142,3 +142,58 @@ export class DripScene {
     return yMax >= b.top && yMin <= b.bottom;
   }
 }
+
+const DROP_COLOR = "#8b0000";
+const DROP_HIGHLIGHT = "#cc2222";
+
+export function drawDrop(ctx: CanvasRenderingContext2D, drop: Drop) {
+  // Draw trail
+  for (const t of drop.trail) {
+    if (t.opacity < 0.05) continue;
+    ctx.globalAlpha = t.opacity;
+    ctx.fillStyle = DROP_COLOR;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, drop.radius * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Draw teardrop
+  ctx.globalAlpha = 1;
+  const r = drop.radius;
+  ctx.beginPath();
+  ctx.moveTo(drop.x, drop.y - r * 1.6);
+  ctx.bezierCurveTo(drop.x - r, drop.y - r * 0.5, drop.x - r, drop.y + r * 0.5, drop.x, drop.y + r);
+  ctx.bezierCurveTo(drop.x + r, drop.y + r * 0.5, drop.x + r, drop.y - r * 0.5, drop.x, drop.y - r * 1.6);
+  ctx.closePath();
+
+  const grad = ctx.createRadialGradient(drop.x - r * 0.3, drop.y - r * 0.3, 0, drop.x, drop.y, r * 1.4);
+  grad.addColorStop(0, DROP_HIGHLIGHT);
+  grad.addColorStop(1, DROP_COLOR);
+  ctx.fillStyle = grad;
+  ctx.fill();
+}
+
+export function drawSplat(ctx: CanvasRenderingContext2D, splat: Splat) {
+  ctx.globalAlpha = splat.opacity;
+  ctx.fillStyle = DROP_COLOR;
+  for (const blob of splat.blobs) {
+    ctx.save();
+    ctx.translate(splat.x + blob.offsetX, splat.y + blob.offsetY);
+    ctx.rotate(blob.angle);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, blob.rx, blob.ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+export function renderScene(ctx: CanvasRenderingContext2D, scene: DripScene, width: number, height: number) {
+  ctx.clearRect(0, 0, width, height);
+  for (const drop of scene.drops) {
+    drawDrop(ctx, drop);
+  }
+  for (const splat of scene.splats) {
+    drawSplat(ctx, splat);
+  }
+  ctx.globalAlpha = 1;
+}
