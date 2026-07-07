@@ -4,6 +4,7 @@ import Script from "next/script";
 import "@/styles/globals.css";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { SplashScreen } from "@/components/SplashScreen";
+import { BloodDripCanvas } from "@/components/BloodDripCanvas";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function RootLayout({
             }
           }
         `}</Script>
+        <BloodDripCanvas />
         {children}
       </body>
     </html>
