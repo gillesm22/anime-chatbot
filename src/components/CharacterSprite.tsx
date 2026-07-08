@@ -6,6 +6,12 @@ import type { Outfit } from "./OutfitSelector";
 import { CharacterGlow } from "./CharacterGlow";
 import { useParallax } from "@/lib/parallax";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
+import { SpriteZone } from "./SpriteZone";
+import { HairSwayCanvas } from "./HairSwayCanvas";
+import { getZoneConfig } from "@/lib/sprites/zones";
+import { useIdleBehavior } from "@/lib/sprites/idle";
+import { useReactiveAnimation } from "@/lib/sprites/reactive";
+import { useBlink } from "@/lib/sprites/engine";
 
 function getGlowIntensity(level: number, isTalking: boolean): "low" | "medium" | "high" | "radiant" {
   if (level >= 10) return "radiant";
@@ -21,6 +27,7 @@ interface CharacterSpriteProps {
   pose?: BodyPose;
   outfit?: Outfit;
   level?: number;
+  chatPhase?: "idle" | "waiting" | "speaking" | "user_typing";
   onHeadpat?: () => void;
   onExpressionChange?: (effect: ExpressionEffect) => void;
 }
@@ -32,10 +39,15 @@ export function CharacterSprite({
   pose,
   outfit = "default",
   level = 1,
+  chatPhase = "idle",
   onHeadpat,
   onExpressionChange,
 }: CharacterSpriteProps) {
   const parallax = useParallax();
+  const config = getZoneConfig(character.id);
+  const idle = useIdleBehavior(config.personality, false);
+  const reactive = useReactiveAnimation(expression, chatPhase, isTalking, config.personality, idle.headRef, idle.torsoRef, idle.baseRef);
+  const isBlinking = useBlink(config.personality.blinkInterval[0] * 1000, config.personality.blinkInterval[1] * 1000);
   const showBack = outfit === "back" || outfit === "bikini-back";
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
@@ -117,15 +129,11 @@ export function CharacterSprite({
   return (
     <div
       className="w-full h-full flex items-end justify-center animate-[slideIn_0.6s_ease-out]"
-      style={{ animation: "idleSway 6s ease-in-out infinite" }}
     >
       <div
         className="relative h-full w-full max-w-[700px]"
         style={{
           maxHeight: "100%",
-          animation: isTalking
-            ? "talkBounce 0.4s ease-in-out infinite"
-            : "breathe 4s ease-in-out infinite",
           transform: `translate(${parallax.x * 3}px, ${parallax.y * 2}px)`,
         }}
       >
@@ -150,26 +158,61 @@ export function CharacterSprite({
             ))}
           </div>
         )}
-        {/* Base layer */}
-        <img
-          src={getSrc(visibleExpr)}
-          alt={character.name}
-          className="h-full object-contain object-bottom absolute inset-0"
-          style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
+        {/* Zone-based sprite layers */}
+        {(["head", "torso", "base"] as const).map((zone) => {
+          const zoneRef = zone === "head" ? idle.headRef : zone === "torso" ? idle.torsoRef : idle.baseRef;
+          const hideBase = ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError);
+          return (
+            <SpriteZone
+              key={zone}
+              ref={zoneRef}
+              src={getSrc(visibleExpr)}
+              alt={character.name}
+              zone={config[zone]}
+              style={{ zIndex: 1, opacity: hideBase ? 0 : 1, transition: "opacity 300ms ease" }}
+            />
+          );
+        })}
+        {/* Expression transition zones */}
+        {expression !== visibleExpr && (["head", "torso", "base"] as const).map((zone) => {
+          const hideBase = ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError);
+          return (
+            <SpriteZone
+              key={`transition-${zone}`}
+              src={getSrc(expression)}
+              alt={`${character.name} ${expression}`}
+              zone={config[zone]}
+              style={{
+                zIndex: 2,
+                opacity: fadeIn && !hideBase ? 1 : 0,
+                transition: "opacity 300ms ease",
+              }}
+            />
+          );
+        })}
+        {/* Hair sway canvas overlay */}
+        <HairSwayCanvas
+          spriteSrc={getSrc(visibleExpr)}
+          heightPercent={config.hairCanvasHeight}
+          speed={config.personality.hairSwaySpeed}
+          amount={config.personality.hairSwayAmount}
+          windIntensity={reactive.windIntensity}
         />
-        {/* Transition layer */}
-        {expression !== visibleExpr && (
-          <img
-            src={getSrc(expression)}
-            alt={`${character.name} ${expression}`}
-            className="h-full object-contain object-bottom absolute inset-0"
-            style={{
-              zIndex: 2,
-              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
-              transition: "opacity 300ms ease",
-            }}
-          />
-        )}
+        {/* Blink overlay */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            top: `${config.head.clipTop + 8}%`,
+            left: "25%",
+            right: "25%",
+            height: "6%",
+            background: "rgba(0,0,0,0.15)",
+            opacity: isBlinking ? 1 : 0,
+            transition: isBlinking ? "opacity 50ms ease-in" : "opacity 100ms ease-out",
+            zIndex: 12,
+            borderRadius: "40%",
+          }}
+        />
         {/* Back view - only for characters with outfit assets */}
         {hasOutfitAssets && (
           <img

@@ -7,13 +7,13 @@ import type { MouthVariant } from "@/lib/characters/types";
  * Hook that triggers a blink at random intervals.
  * Returns true when the character should be blinking (eyes closed).
  */
-export function useBlink(): boolean {
+export function useBlink(minInterval = 3000, maxInterval = 6000): boolean {
   const [isBlinking, setIsBlinking] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     function scheduleBlink() {
-      const delay = 3000 + Math.random() * 3000; // 3-6 seconds
+      const delay = minInterval + Math.random() * (maxInterval - minInterval);
       timeoutRef.current = setTimeout(() => {
         setIsBlinking(true);
         setTimeout(() => {

@@ -19,6 +19,7 @@ export interface VNLayoutProps {
   currentScene: SceneId;
   activeEffect: ExpressionEffect | null;
   level?: number;
+  chatPhase?: "idle" | "waiting" | "speaking" | "user_typing";
   onHeadpat: () => void;
   onExpressionChange: (effect: ExpressionEffect) => void;
   onSpriteTap: () => void;
@@ -115,6 +116,7 @@ export function VNLayout({
   currentScene,
   activeEffect,
   level,
+  chatPhase,
   onHeadpat,
   onExpressionChange,
   onSpriteTap,
@@ -164,6 +166,7 @@ export function VNLayout({
           isTalking={isTalking}
           outfit={outfit as any}
           level={level}
+          chatPhase={chatPhase}
           onHeadpat={onHeadpat}
           onExpressionChange={onExpressionChange}
         />
