@@ -20,6 +20,48 @@ export interface CharacterReaction {
   dialogue: string;
 }
 
+export interface GiftPreference {
+  giftId: string;
+  multiplier: number; // >1 = favorite, <1 = dislike
+  reaction: CharacterReaction;
+}
+
+export const GIFT_PREFERENCES: Record<string, GiftPreference[]> = {
+  arisu: [
+    { giftId: "letter", multiplier: 2, reaction: { expression: "crying", dialogue: "You wrote this... for me? I'm going to read it again and again. Thank you." } },
+    { giftId: "music_box", multiplier: 1.5, reaction: { expression: "devoted", dialogue: "A music box... the melody is so gentle. It sounds like how I feel when you're here." } },
+    { giftId: "flower", multiplier: 1.5, reaction: { expression: "happy", dialogue: "Flowers! They're beautiful. I'll press one and keep it. Is that too much? I don't care." } },
+  ],
+  marin: [
+    { giftId: "teddy", multiplier: 2, reaction: { expression: "excited", dialogue: "A TEDDY BEAR?? oh my GOD it's so soft I'm literally never letting go of this okay it's MINE now!!" } },
+    { giftId: "candy", multiplier: 1.5, reaction: { expression: "laugh", dialogue: "CANDY!! you know me SO well bestie, this is literally my love language okay thank youuu!!" } },
+    { giftId: "coffee", multiplier: 0.5, reaction: { expression: "thinking", dialogue: "coffee?? I mean... I'll drink it but like... you know I'm more of a boba person right lol" } },
+  ],
+  nao: [
+    { giftId: "coffee", multiplier: 1.5, reaction: { expression: "smirk", dialogue: "Coffee. You actually remembered I run on this. ...That's annoyingly thoughtful of you." } },
+    { giftId: "letter", multiplier: 0.5, reaction: { expression: "flustered", dialogue: "A love letter. You're really doing this. I — okay. I'll read it later. Alone. Stop looking at me." } },
+    { giftId: "flower", multiplier: 0.5, reaction: { expression: "neutral", dialogue: "Flowers. Romantic. They'll be dead in a week, you know. ...Fine, I'll put them in water." } },
+  ],
+  kurisu: [
+    { giftId: "coffee", multiplier: 2, reaction: { expression: "happy", dialogue: "Coffee. You — yes. This is exactly what I needed. How did you know? Don't answer that. Thank you." } },
+    { giftId: "beaker", multiplier: 2, reaction: { expression: "excited", dialogue: "A proper Erlenmeyer flask! The glass quality on this is excellent. This is going on my desk immediately." } },
+    { giftId: "lab_notebook", multiplier: 1.5, reaction: { expression: "shy", dialogue: "A research journal... the binding is beautiful. I'll use it for my most important work. Which is — never mind." } },
+    { giftId: "candy", multiplier: 0.5, reaction: { expression: "neutral", dialogue: "Candy. How... juvenile. I'll eat it, obviously, but I want it noted that I have more sophisticated tastes." } },
+  ],
+  merrick: [
+    { giftId: "voodoo_doll", multiplier: 2, reaction: { expression: "excited", dialogue: "A spirit doll — and hand-stitched, no less. You understand my traditions. That is rarer than you know, cher." } },
+    { giftId: "hex_candle", multiplier: 1.5, reaction: { expression: "happy", dialogue: "A hex candle. The markings are old — older than most people would recognize. You chose well. I am touched." } },
+    { giftId: "necklace", multiplier: 1.5, reaction: { expression: "devoted", dialogue: "A necklace. I shall wear it against my skin, close to the heart. You have excellent taste." } },
+    { giftId: "candy", multiplier: 0.5, reaction: { expression: "smirk", dialogue: "Candy. How charmingly mortal. I suppose I will try it — my palate has changed over the centuries, but not entirely." } },
+  ],
+  ticia: [
+    { giftId: "dead_rose", multiplier: 2, reaction: { expression: "devoted", dialogue: "A dead rose. You understand that death is not an ending but a perfection. This is the most romantic thing anyone has ever given me." } },
+    { giftId: "poison_vial", multiplier: 2, reaction: { expression: "excited", dialogue: "Poison. How thoughtful. The color is exquisite — is it hemlock? Nightshade? No, do not tell me. The mystery is half the pleasure." } },
+    { giftId: "flower", multiplier: 0.5, reaction: { expression: "neutral", dialogue: "A living flower. How optimistic of you. I shall watch it wither — that will be the truly beautiful part." } },
+    { giftId: "star", multiplier: 0.5, reaction: { expression: "thinking", dialogue: "A shooting star. Bright and fleeting. I prefer things that endure in darkness. But the gesture is... noted. With warmth." } },
+  ],
+};
+
 export const GIFT_CATALOG: Gift[] = [
   // Common
   { id: "flower", name: "Flower Bouquet", emoji: "💐", description: "A beautiful bouquet", affinityBonus: 5, rarity: "common" },
@@ -30,6 +72,12 @@ export const GIFT_CATALOG: Gift[] = [
   { id: "teddy", name: "Teddy Bear", emoji: "🧸", description: "A cuddly companion", affinityBonus: 15, rarity: "rare" },
   { id: "necklace", name: "Necklace", emoji: "📿", description: "A beautiful necklace", affinityBonus: 20, rarity: "rare" },
   { id: "music_box", name: "Music Box", emoji: "🎵", description: "Plays a gentle melody", affinityBonus: 18, rarity: "rare" },
+  { id: "beaker", name: "Lab Beaker", emoji: "🧪", description: "A pristine Erlenmeyer flask", affinityBonus: 18, rarity: "rare" },
+  { id: "voodoo_doll", name: "Voodoo Doll", emoji: "🪆", description: "A hand-stitched spirit doll", affinityBonus: 18, rarity: "rare" },
+  { id: "dead_rose", name: "Dead Rose", emoji: "🥀", description: "A perfectly withered black rose", affinityBonus: 18, rarity: "rare" },
+  { id: "lab_notebook", name: "Research Journal", emoji: "📓", description: "A leather-bound lab notebook", affinityBonus: 15, rarity: "rare" },
+  { id: "hex_candle", name: "Hex Candle", emoji: "🕯️", description: "A black candle with strange markings", affinityBonus: 15, rarity: "rare" },
+  { id: "poison_vial", name: "Poison Vial", emoji: "🧴", description: "An elegant glass vial of something suspicious", affinityBonus: 15, rarity: "rare" },
   // Legendary
   { id: "star", name: "Shooting Star", emoji: "🌠", description: "A wish upon a star", affinityBonus: 50, rarity: "legendary" },
   { id: "ring", name: "Promise Ring", emoji: "💍", description: "A symbol of forever", affinityBonus: 100, rarity: "legendary" },
@@ -45,6 +93,13 @@ export function getGiftById(id: string): Gift | undefined {
 
 export function getCharacterReaction(characterId: string, gift: Gift): CharacterReaction {
   const id = characterId.toLowerCase();
+
+  // Check gift-specific preferences first
+  const prefs = GIFT_PREFERENCES[id];
+  if (prefs) {
+    const match = prefs.find((p) => p.giftId === gift.id);
+    if (match) return match.reaction;
+  }
 
   if (id === "arisu") {
     if (gift.rarity === "common") {
@@ -146,13 +201,21 @@ export function giveGift(
   const gift = getGiftById(giftId);
   if (!gift) return null;
 
+  // Apply preference multiplier to affinity bonus
+  const prefs = GIFT_PREFERENCES[characterId];
+  const prefMatch = prefs?.find((p) => p.giftId === giftId);
+  const multiplier = prefMatch?.multiplier ?? 1;
+  const adjustedGift: Gift = multiplier !== 1
+    ? { ...gift, affinityBonus: Math.round(gift.affinityBonus * multiplier) }
+    : gift;
+
   const record: GiftRecord = { giftId, characterId, timestamp: Date.now() };
   const history = getGiftHistory(characterId);
   history.push(record);
   saveGiftHistory(characterId, history);
 
-  const reaction = getCharacterReaction(characterId, gift);
-  return { gift, reaction };
+  const reaction = getCharacterReaction(characterId, adjustedGift);
+  return { gift: adjustedGift, reaction };
 }
 
 export function getGiftCount(characterId: string): number {
