@@ -65,6 +65,60 @@ export const TIME_GREETINGS: Record<string, Record<TimeOfDay, string[]>> = {
       "Late night. Either something's bothering you or you have terrible sleep habits. Either way, I'm here.",
     ],
   },
+  kurisu: {
+    morning: [
+      "Morning. I've been up for hours already — there was a dataset I couldn't leave alone. What brings you here this early?",
+      "Oh. You're awake. Good morning, I suppose. I was just about to make coffee. Don't read anything into that.",
+    ],
+    afternoon: [
+      "Afternoon. I lost track of time again — that happens when the work is actually interesting. What do you need?",
+      "You caught me between experiments. Afternoon. I have a few minutes before the next batch runs.",
+    ],
+    evening: [
+      "Evening. The lab gets quieter around this time. I won't pretend I mind the company. What's on your mind?",
+      "Good evening. I was just reviewing some results. They can wait. Probably. What is it?",
+    ],
+    latenight: [
+      "You're up this late? I was going to say that's irresponsible, but I'm still here too, so. What's going on?",
+      "Late night. The best ideas come at this hour — or the worst ones. Hard to tell the difference sometimes. Hi.",
+    ],
+  },
+  merrick: {
+    morning: [
+      "Good morning, cher. The dawn is not my preferred hour, but I find I do not mind it when you are here.",
+      "Morning. I watched the sun rise — a habit I have not quite broken, even after all this time. Come, sit with me.",
+    ],
+    afternoon: [
+      "Afternoon. The light is golden right now — almost bearable. I was just thinking about something you said last time.",
+      "Ah, you came in the afternoon. The world is loud at this hour, but you bring a certain quiet with you. I appreciate that.",
+    ],
+    evening: [
+      "The evening suits us both, I think. Come in. I have been waiting — not impatiently, but with genuine anticipation.",
+      "Good evening. This is the hour when the world becomes honest. I am glad you chose to spend it here.",
+    ],
+    latenight: [
+      "Late night. My favorite hours. The living world sleeps and everything becomes more interesting. Including you, apparently.",
+      "You are awake at this hour. Good. The night belongs to those who refuse to waste it on sleep. What shall we discuss?",
+    ],
+  },
+  ticia: {
+    morning: [
+      "Morning. The light is rather aggressive today. I drew the curtains, naturally. But you are welcome to come in.",
+      "Good morning. I was up all night, which is not unusual. The morning is simply the part where everyone else finally catches up.",
+    ],
+    afternoon: [
+      "Afternoon. The most tedious part of the day — too bright, too busy. But your arrival has improved it considerably.",
+      "You came in the afternoon. How conventional of you. I say that with affection, of course. Mostly.",
+    ],
+    evening: [
+      "The evening. When the world begins to look like itself again. I have been expecting you — in the most non-threatening way possible.",
+      "Good evening. The shadows are getting longer. I find that deeply comforting. As I find your presence. Come, sit.",
+    ],
+    latenight: [
+      "You are up at this hour. How wonderful. The night is when all the most interesting conversations happen, I find.",
+      "Late night. My preferred state of being. Everything is quieter, darker, and more honest. You chose well.",
+    ],
+  },
 };
 
 export const ABSENCE_GREETINGS: Record<
