@@ -154,37 +154,36 @@ export function CharacterSprite({
             ))}
           </div>
         )}
-        {/* Base layer — whole sprite with idle animation */}
-        <div
-          ref={idle.torsoRef}
-          className="absolute inset-0"
-          style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
-        >
-          <img
-            src={getSrc(visibleExpr)}
-            alt={character.name}
-            className="h-full object-contain object-bottom absolute inset-0"
-            style={{ pointerEvents: "none" }}
-          />
-        </div>
-        {/* Transition layer */}
-        {expression !== visibleExpr && (
-          <div
-            className="absolute inset-0"
-            style={{
-              zIndex: 2,
-              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
-              transition: "opacity 300ms ease",
-            }}
-          >
+        {/* Idle animation wrapper (breathing, sway) */}
+        <div ref={idle.torsoRef} className="absolute inset-0" style={{ zIndex: 1, willChange: "transform" }}>
+          {/* Reactive animation wrapper (expression reactions) */}
+          <div ref={idle.headRef} className="absolute inset-0" style={{ willChange: "transform", transition: "transform 300ms ease-out" }}>
+            {/* Base layer */}
             <img
-              src={getSrc(expression)}
-              alt={`${character.name} ${expression}`}
+              src={getSrc(visibleExpr)}
+              alt={character.name}
               className="h-full object-contain object-bottom absolute inset-0"
-              style={{ pointerEvents: "none" }}
+              style={{
+                pointerEvents: "none",
+                opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1,
+                transition: "opacity 300ms ease",
+              }}
             />
+            {/* Transition layer */}
+            {expression !== visibleExpr && (
+              <img
+                src={getSrc(expression)}
+                alt={`${character.name} ${expression}`}
+                className="h-full object-contain object-bottom absolute inset-0"
+                style={{
+                  pointerEvents: "none",
+                  opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
+                  transition: "opacity 300ms ease",
+                }}
+              />
+            )}
           </div>
-        )}
+        </div>
         {/* Back view - only for characters with outfit assets */}
         {hasOutfitAssets && (
           <img

@@ -77,11 +77,15 @@ export function useReactiveAnimation(
     function frame(now: number) {
       const t = Math.min((now - start) / anim.duration, 1);
       const tr = anim.apply(t, scale);
-      if (headRef.current && tr.head) headRef.current.style.transform = tr.head;
-      if (torsoRef.current && tr.torso) torsoRef.current.style.transform = tr.torso;
-      if (baseRef.current && tr.base) baseRef.current.style.transform = tr.base;
+      // Combine all zone transforms into one — applied to single reactive wrapper
+      const combined = [tr.head, tr.torso, tr.base].filter(Boolean).join(" ");
+      if (headRef.current && combined) headRef.current.style.transform = combined;
       if (t < 1 || anim.hold) { requestAnimationFrame(frame); }
-      else { activeRef.current = false; cooldownRef.current = performance.now() + 2000; }
+      else {
+        activeRef.current = false;
+        if (headRef.current) headRef.current.style.transform = "";
+        cooldownRef.current = performance.now() + 2000;
+      }
     }
     requestAnimationFrame(frame);
   }, [headRef, torsoRef, baseRef]);
