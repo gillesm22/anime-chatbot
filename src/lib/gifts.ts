@@ -79,6 +79,36 @@ export function getCharacterReaction(characterId: string, gift: Gift): Character
     return { expression: "devoted/crying", dialogue: "I... nobody's ever... I'll treasure this." };
   }
 
+  if (id === "kurisu") {
+    if (gift.rarity === "common") {
+      return { expression: "flustered", dialogue: "You didn't have to — it's not like I was expecting... anyway. Thank you." };
+    }
+    if (gift.rarity === "rare") {
+      return { expression: "shy", dialogue: "This is... more thoughtful than I was prepared for. I need a moment. Thank you." };
+    }
+    return { expression: "crying", dialogue: "I don't — this isn't — I had a whole speech about not getting emotional and you just ruined it. Thank you." };
+  }
+
+  if (id === "merrick") {
+    if (gift.rarity === "common") {
+      return { expression: "happy", dialogue: "How thoughtful, cher. I shall keep this close." };
+    }
+    if (gift.rarity === "rare") {
+      return { expression: "devoted", dialogue: "You chose this for me specifically, did you not? I can tell. It is lovely." };
+    }
+    return { expression: "crying", dialogue: "In all my years, gifts this meaningful have been vanishingly rare. You have moved me. Truly." };
+  }
+
+  if (id === "ticia") {
+    if (gift.rarity === "common") {
+      return { expression: "smirk", dialogue: "How sweet. I shall place it next to the skull on my mantelpiece. It will look lovely there." };
+    }
+    if (gift.rarity === "rare") {
+      return { expression: "happy", dialogue: "This is genuinely beautiful. You have excellent taste in the finer things. I am impressed." };
+    }
+    return { expression: "devoted", dialogue: "I am not easily moved. And yet here I am, moved. You have a dangerous talent for this." };
+  }
+
   // Fallback for unknown characters
   if (gift.rarity === "common") {
     return { expression: "happy", dialogue: "Thank you, this is lovely!" };
