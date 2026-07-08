@@ -45,6 +45,29 @@ export async function speakLine(text: string, characterId: string): Promise<void
   }
 }
 
+const prefetchCache = new Map<string, Promise<Blob>>();
+
+export function prefetchSpeech(text: string, characterId: string): void {
+  if (typeof window === "undefined") return;
+  if (!isVoiceEnabled()) return;
+
+  const key = `${characterId}:${text}`;
+  if (prefetchCache.has(key)) return;
+
+  const promise = fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, characterId }),
+  })
+    .then((r) => (r.ok ? r.blob() : Promise.reject()))
+    .catch(() => {
+      prefetchCache.delete(key);
+      return new Blob();
+    });
+
+  prefetchCache.set(key, promise);
+}
+
 export function toggleVoice(): boolean {
   if (typeof window === "undefined") return false;
   const current = isVoiceEnabled();

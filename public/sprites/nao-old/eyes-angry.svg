@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect x="10" y="10" width="780" height="380" rx="20" fill="#a78bfa" opacity="0.3" stroke="#a78bfa" stroke-width="2"/>
+  <text x="400" y="200" text-anchor="middle" dominant-baseline="middle" fill="#a78bfa" font-size="24" font-family="sans-serif">N: eyes-angry</text>
+</svg>

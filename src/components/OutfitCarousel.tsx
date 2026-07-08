@@ -23,8 +23,8 @@ export interface OutfitCarouselProps {
   characterId: string;
   basePath: string;
   accentColor: string;
-  currentOutfit: Outfit;
-  onSelectOutfit: (outfit: Outfit) => void;
+  currentOutfit: string;
+  onSelectOutfit: (outfit: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }

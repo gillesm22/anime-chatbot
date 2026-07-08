@@ -3,11 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useChat } from "@/lib/chat/context";
 import { setExpression } from "@/lib/chat/actions";
-import { moodToExpression } from "@/lib/mood";
+import { moodToExpression, type Mood } from "@/lib/mood";
 import type { ExpressionEffect } from "@/lib/expressionEffects";
 
 interface UseExpressionEffectsArgs {
-  currentMood: string;
+  currentMood: Mood;
 }
 
 export function useExpressionEffects({ currentMood }: UseExpressionEffectsArgs) {

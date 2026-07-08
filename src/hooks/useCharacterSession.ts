@@ -14,7 +14,7 @@ import {
   getNextLevelProgress,
 } from "@/lib/affinity";
 import type { AffinityEvent } from "@/lib/affinity";
-import { getMood, updateMood, moodToExpression, saveSessionEndMood, getSessionStartMood } from "@/lib/mood";
+import { getMood, updateMood, moodToExpression, saveSessionEndMood, getSessionStartMood, type Mood } from "@/lib/mood";
 import { startAmbientMusic, stopAmbientMusic } from "@/lib/ambient";
 import { startSceneAudio, stopSceneAudio } from "@/lib/sceneSounds";
 import { startIdleTimer, resetIdleTimer, stopHumming } from "@/lib/humming";
@@ -29,13 +29,13 @@ export interface CharacterSession {
   setOutfit: (o: Outfit) => void;
   currentScene: SceneId;
   setCurrentScene: (s: SceneId) => void;
-  currentMood: string;
+  currentMood: Mood;
   updateMoodFromExpressions: (expressions: string[]) => string;
   milestoneQueue: string[];
   setMilestoneQueue: React.Dispatch<React.SetStateAction<string[]>>;
   levelUpMilestone: { level: number; levelName: string } | null;
   setLevelUpMilestone: React.Dispatch<React.SetStateAction<{ level: number; levelName: string } | null>>;
-  addAffinity: (event: AffinityEvent, bonus?: number) => {
+  addAffinity: (event: AffinityEvent["type"], bonus?: number) => {
     newMilestones: string[];
     leveledUp: boolean;
     data: ReturnType<typeof getAffinity>;
@@ -54,7 +54,7 @@ export interface CharacterSession {
 export function useCharacterSession(characterId: string): CharacterSession {
   const character = getCharacter(characterId);
   const router = useRouter();
-  const currentMoodRef = useRef<string>("neutral");
+  const currentMoodRef = useRef<Mood>("neutral");
   const saveInitialized = useRef(false);
 
   // Outfit persistence
@@ -174,7 +174,7 @@ export function useCharacterSession(characterId: string): CharacterSession {
 
   // --- Actions ---
 
-  const addAffinity = useCallback((event: AffinityEvent, bonus?: number) => {
+  const addAffinity = useCallback((event: AffinityEvent["type"], bonus?: number) => {
     const result = addAffinityPoints(characterId, { type: event }, bonus);
     if (result.newMilestones.length > 0) {
       setMilestoneQueue(prev => [...prev, ...result.newMilestones]);

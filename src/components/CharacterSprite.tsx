@@ -6,9 +6,6 @@ import type { Outfit } from "./OutfitSelector";
 import { CharacterGlow } from "./CharacterGlow";
 import { useParallax } from "@/lib/parallax";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
-import { getZoneConfig } from "@/lib/sprites/zones";
-import { useIdleBehavior } from "@/lib/sprites/idle";
-import { useReactiveAnimation } from "@/lib/sprites/reactive";
 
 function getGlowIntensity(level: number, isTalking: boolean): "low" | "medium" | "high" | "radiant" {
   if (level >= 10) return "radiant";
@@ -24,7 +21,6 @@ interface CharacterSpriteProps {
   pose?: BodyPose;
   outfit?: Outfit;
   level?: number;
-  chatPhase?: "idle" | "waiting" | "speaking" | "user_typing";
   onHeadpat?: () => void;
   onExpressionChange?: (effect: ExpressionEffect) => void;
 }
@@ -36,14 +32,10 @@ export function CharacterSprite({
   pose,
   outfit = "default",
   level = 1,
-  chatPhase = "idle",
   onHeadpat,
   onExpressionChange,
 }: CharacterSpriteProps) {
   const parallax = useParallax();
-  const config = getZoneConfig(character.id);
-  const idle = useIdleBehavior(config.personality, false);
-  const reactive = useReactiveAnimation(expression, chatPhase, isTalking, config.personality, idle.headRef, idle.torsoRef, idle.baseRef);
   const showBack = outfit === "back" || outfit === "bikini-back";
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
@@ -125,11 +117,15 @@ export function CharacterSprite({
   return (
     <div
       className="w-full h-full flex items-end justify-center animate-[slideIn_0.6s_ease-out]"
+      style={{ animation: "idleSway 6s ease-in-out infinite" }}
     >
       <div
         className="relative h-full w-full max-w-[700px]"
         style={{
           maxHeight: "100%",
+          animation: isTalking
+            ? "talkBounce 0.4s ease-in-out infinite"
+            : "breathe 4s ease-in-out infinite",
           transform: `translate(${parallax.x * 3}px, ${parallax.y * 2}px)`,
         }}
       >
@@ -154,36 +150,26 @@ export function CharacterSprite({
             ))}
           </div>
         )}
-        {/* Idle animation wrapper (breathing, sway) */}
-        <div ref={idle.torsoRef} className="absolute inset-0" style={{ zIndex: 1, willChange: "transform" }}>
-          {/* Reactive animation wrapper (expression reactions) */}
-          <div ref={idle.headRef} className="absolute inset-0" style={{ willChange: "transform", transition: "transform 300ms ease-out" }}>
-            {/* Base layer */}
-            <img
-              src={getSrc(visibleExpr)}
-              alt={character.name}
-              className="h-full object-contain object-bottom absolute inset-0"
-              style={{
-                pointerEvents: "none",
-                opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1,
-                transition: "opacity 300ms ease",
-              }}
-            />
-            {/* Transition layer */}
-            {expression !== visibleExpr && (
-              <img
-                src={getSrc(expression)}
-                alt={`${character.name} ${expression}`}
-                className="h-full object-contain object-bottom absolute inset-0"
-                style={{
-                  pointerEvents: "none",
-                  opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
-                  transition: "opacity 300ms ease",
-                }}
-              />
-            )}
-          </div>
-        </div>
+        {/* Base layer */}
+        <img
+          src={getSrc(visibleExpr)}
+          alt={character.name}
+          className="h-full object-contain object-bottom absolute inset-0"
+          style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
+        />
+        {/* Transition layer */}
+        {expression !== visibleExpr && (
+          <img
+            src={getSrc(expression)}
+            alt={`${character.name} ${expression}`}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{
+              zIndex: 2,
+              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
+              transition: "opacity 300ms ease",
+            }}
+          />
+        )}
         {/* Back view - only for characters with outfit assets */}
         {hasOutfitAssets && (
           <img

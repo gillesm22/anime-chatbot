@@ -91,7 +91,7 @@ interface UseMessageHandlerArgs {
   setUserName: (name: string) => void;
   responseLength: "short" | "medium" | "long";
   aiProvider: string;
-  addAffinity: (event: AffinityEvent, bonus?: number) => {
+  addAffinity: (event: AffinityEvent["type"], bonus?: number) => {
     newMilestones: string[];
     leveledUp: boolean;
     data: ReturnType<typeof getAffinity>;
@@ -135,7 +135,7 @@ export function useMessageHandler({
       haptic.pulse();
       dispatch(sendMessage(message));
 
-      const msgEvent: AffinityEvent = message.length > 50 ? "long_message" : "message_sent";
+      const msgEvent: AffinityEvent["type"] = message.length > 50 ? "long_message" : "message_sent";
       addAffinity(msgEvent);
 
       const history = state.messages.map((m) => ({ role: m.role, content: m.content }));

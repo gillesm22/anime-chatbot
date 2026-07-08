@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     const audio = await tts.toBuffer();
 
-    return new Response(audio, {
+    return new Response(new Uint8Array(audio), {
       headers: {
         "Content-Type": "audio/mpeg",
         "Cache-Control": "public, max-age=3600",

@@ -209,7 +209,6 @@ function ChatContent({ characterId }: { characterId: string }) {
       level={getAffinity(characterId).level}
       currentScene={session.currentScene}
       activeEffect={effects.activeEffect}
-      chatPhase={state.phase}
       onHeadpat={() => session.addAffinity("headpat")}
       onExpressionChange={effects.handleExpressionChange}
       onSpriteTap={effects.handleSpriteTap}

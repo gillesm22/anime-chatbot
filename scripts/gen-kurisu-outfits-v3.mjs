@@ -1,25 +1,51 @@
 /**
- * Kurisu outfits v3: Suzuka v2 formula — high CFG, variable denoise, weighted prompts, anti-bleed.
+ * Kurisu outfits v3: IllustriousXL MMMix v80, high CFG, variable denoise, weighted prompts, anti-bleed.
+ * Same model/sampler/resolution as Suzuka's winning regen.
  * Run: node scripts/gen-kurisu-outfits-v3.mjs
  */
-import { writeFileSync, copyFileSync } from "fs";
+import { writeFileSync, copyFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SPRITES = join(__dirname, "..", "public", "sprites", "kurisu");
+const SPRITES = join(__dirname, "..", "public", "sprites", "kurisu-regen");
 const COMFY_URL = "http://localhost:8188";
 const COMFY_INPUT = "C:/Users/G$/AppData/Local/Comfy-Desktop/ComfyUI-Shared/input";
 
-const CHAR = "(blue violet eyes:1.3), (long chestnut auburn wavy hair:1.2), hair between eyes, sharp eyes, athletic body, toned, medium-large breasts, fit waist, slim waist, defined figure";
-const SEXY = `${CHAR}, very sexy, seductive, heavy cleavage, revealing, showing skin, midriff, bare stomach, bare thighs`;
-const NEG = "low quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature, worst quality, ugly, missing arm, extra limbs, poorly drawn hands, mutation, bad proportions, (white lab coat:1.3), (red necktie:1.3), (white collared shirt:1.3), (black shorts:1.3), modest, covered up";
+// Exact identity match from the winning body-neutral
+const CHAR = [
+  "(pale skin:1.3), (fair skin:1.2), soft skin",
+  "(dark red-brown hair:1.5), (reddish brown hair:1.4), (chestnut hair:1.3), (long hair:1.3), (hair between eyes:1.2)",
+  "(hair past shoulders:1.3), (slight wavy hair:1.2)",
+  "(dark violet eyes:1.5), (deep purple eyes:1.4), (sharp eyes:1.3)",
+  "(dark eyelashes:1.2), (long eyelashes:1.2), (pretty face:1.2)",
+  "pretty face, mature face",
+  "mature female, adult, (athletic:1.2), (toned:1.2), (medium-large breasts:1.2), slender waist, (fit body:1.2), smooth skin",
+].join(", ");
+
+const SEXY = `${CHAR}, very sexy, seductive, (heavy cleavage:1.3), revealing, showing skin, (midriff:1.2), bare stomach, bare thighs`;
+
+const BASE_NEGATIVE = [
+  "low quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, (multiple girls:1.8), (2girls:1.8), (multiple characters:1.8), (split screen:1.5), (mirror:1.5), (reflection:1.5), (duo:1.5)",
+  "signature, worst quality, ugly, duplicate, morbid, mutilated, extra limbs",
+  "poorly drawn face, mutation, bad proportions",
+  "reference sheet, multiple views, character sheet, expression sheet",
+  "collage, grid, thumbnails, panels, borders, frames",
+  "props, furniture, background objects",
+  "(white lab coat:1.6), (lab coat:1.5), (red necktie:1.5), (white collared shirt:1.5), (black shorts:1.5), (white coat:1.4)",
+  "modest, covered up, cropped head, head out of frame",
+  "(blonde hair:1.4), (silver hair:1.4), (white hair:1.4), (pink hair:1.3), (orange hair:1.4), (ginger hair:1.3), (blue eyes:1.3), (pink eyes:1.4), (magenta eyes:1.4), (red eyes:1.4)",
+  "(tanned skin:1.3), (dark skin:1.3)",
+  "(glasses:1.5), (sunglasses:1.4)",
+  "child, loli, young",
+  "(chibi:1.5), (doll:1.5), (mask:1.5), (plush:1.4), (toy:1.4), (extra head:1.5), (floating head:1.5)",
+].join(", ");
 
 const OUTFITS = [
   { id: "body-casual", prompt: `${SEXY}, off shoulder oversized sweater, no pants, bare legs, relaxed seductive`, seed: 101 },
   { id: "body-formal", prompt: `${SEXY}, elegant black evening gown, (deep v neckline:1.3), thigh slit, pearl earrings, sophisticated`, seed: 102 },
-  { id: "body-school", prompt: `${SEXY}, japanese school uniform, white shirt unbuttoned, cleavage, (very short plaid skirt:1.2), loose tie, thigh highs`, seed: 103 },
+  { id: "body-school", prompt: `${SEXY}, japanese school uniform, white shirt unbuttoned, cleavage, (very short plaid skirt:1.2), loose tie, thigh highs`, seed: 303 },
   { id: "body-school-skimpy", prompt: `${SEXY}, revealing school uniform, (bikini top under open white shirt:1.3), micro plaid skirt, bow tie, midriff`, seed: 104 },
   { id: "body-cheerleader", prompt: `${SEXY}, cheerleader crop top, bare midriff, (very short pleated skirt:1.2), pom poms, thigh highs`, seed: 105 },
   { id: "body-cheer-extreme", prompt: `${SEXY}, (tiny red sports bra:1.3), (micro red pleated skirt:1.3), bare arms, bare shoulders, maximum skin, pom poms`, seed: 106 },
@@ -36,55 +62,90 @@ const OUTFITS = [
 ];
 
 function img2img(positive, negative, seed, denoise, cfg) {
-  return { prompt: {
-    "1": { class_type: "CheckpointLoaderSimple", inputs: { ckpt_name: "anything-v5.safetensors" } },
-    "2": { class_type: "CLIPTextEncode", inputs: { text: `masterpiece, best quality, absurdres, highres, anime style, visual novel sprite, game cg, transparent background, png, white background, simple background, solo, 1girl, cowboy shot, ${positive}, looking at viewer, warm lighting, soft shading, clean lineart`, clip: ["1", 1] } },
-    "3": { class_type: "CLIPTextEncode", inputs: { text: negative, clip: ["1", 1] } },
-    "8": { class_type: "LoadImage", inputs: { image: "kurisu-v2-outfit-base.png" } },
-    "9": { class_type: "VAEEncode", inputs: { pixels: ["8", 0], vae: ["1", 2] } },
-    "5": { class_type: "KSampler", inputs: { seed, steps: 35, cfg, sampler_name: "euler_ancestral", scheduler: "normal", denoise, model: ["1", 0], positive: ["2", 0], negative: ["3", 0], latent_image: ["9", 0] } },
-    "6": { class_type: "VAEDecode", inputs: { samples: ["5", 0], vae: ["1", 2] } },
-    "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `kurisu-v3-${Date.now()}` } },
-  }};
+  return {
+    prompt: {
+      "1": { class_type: "CheckpointLoaderSimple", inputs: { ckpt_name: "illustriousxlMmmix_v80.safetensors" } },
+      "2": { class_type: "CLIPTextEncode", inputs: { text: `masterpiece, best quality, absurdres, highres, anime style, visual novel sprite, game cg, transparent background, png, (white background:1.4), (simple background:1.3), (solo:1.7), (1girl:1.7), (pale skin:1.3), (fair skin:1.2), (cowboy shot:1.5), (thighs visible:1.5), (show from head to mid-thigh:1.4), (head space:1.2), ${positive}, looking at viewer, (cel shading:1.2), (anime coloring:1.1), clean lineart, high detail skin, sharp focus, anime style`, clip: ["1", 1] } },
+      "3": { class_type: "CLIPTextEncode", inputs: { text: negative, clip: ["1", 1] } },
+      "8": { class_type: "LoadImage", inputs: { image: "kurisu-v2-outfit-base.png" } },
+      "10": { class_type: "ImageScale", inputs: { image: ["8", 0], width: 832, height: 1216, upscale_method: "lanczos", crop: "center" } },
+      "9": { class_type: "VAEEncode", inputs: { pixels: ["10", 0], vae: ["1", 2] } },
+      "5": { class_type: "KSampler", inputs: {
+        seed, steps: 40, cfg, sampler_name: "dpmpp_2m_sde", scheduler: "karras", denoise,
+        model: ["1", 0], positive: ["2", 0], negative: ["3", 0], latent_image: ["9", 0],
+      }},
+      "6": { class_type: "VAEDecode", inputs: { samples: ["5", 0], vae: ["1", 2] } },
+      "7": { class_type: "SaveImage", inputs: { images: ["6", 0], filename_prefix: `kurisu-v3-${Date.now()}` } },
+    },
+  };
 }
 
-async function queue(workflow) {
-  const res = await fetch(`${COMFY_URL}/prompt`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(workflow) });
-  if (!res.ok) throw new Error(`Queue failed: ${res.status}`);
+async function queuePrompt(workflow) {
+  const res = await fetch(`${COMFY_URL}/prompt`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(workflow),
+  });
+  if (!res.ok) throw new Error(`Queue failed: ${res.status} ${await res.text()}`);
   return res.json();
 }
 
-async function wait(promptId) {
-  while (true) {
+async function waitForCompletion(promptId, timeoutMs = 180000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
     const res = await fetch(`${COMFY_URL}/history/${promptId}`);
-    const d = await res.json();
-    if (d[promptId]?.outputs) return d[promptId].outputs;
-    if (d[promptId]?.status?.status_str === "error") throw new Error("Failed");
-    await new Promise(r => setTimeout(r, 3000));
+    const data = await res.json();
+    if (data[promptId]?.outputs) return data[promptId].outputs;
+    if (data[promptId]?.status?.status_str === "error") {
+      throw new Error("Generation failed: " + JSON.stringify(data[promptId].status));
+    }
+    await new Promise((r) => setTimeout(r, 3000));
   }
+  throw new Error(`Timeout waiting for ${promptId}`);
 }
 
-async function dl(filename, outPath) {
+async function downloadImage(filename, outputPath) {
   const res = await fetch(`${COMFY_URL}/view?filename=${encodeURIComponent(filename)}&type=output`);
-  writeFileSync(outPath, Buffer.from(await res.arrayBuffer()));
+  if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+  writeFileSync(outputPath, Buffer.from(await res.arrayBuffer()));
 }
 
 async function main() {
-  console.log("=== Kurisu Outfits v3 (Suzuka formula: 35 steps, high CFG, variable denoise) ===\n");
+  const arg = process.argv[2];
+  console.log("=== Kurisu Outfits v3 (IllustriousXL MMMix v80, 832x1216, dpmpp_2m_sde/karras) ===\n");
 
-  copyFileSync(join(SPRITES, "body-neutral.png"), join(COMFY_INPUT, "kurisu-v2-outfit-base.png"));
+  const basePath = join(SPRITES, "body-neutral.png");
+  if (!existsSync(basePath)) {
+    console.error("No body-neutral.png in kurisu-regen/! Run regen-kurisu-v2.mjs first.");
+    process.exit(1);
+  }
 
-  for (const outfit of OUTFITS) {
+  try { await fetch(`${COMFY_URL}/system_stats`); }
+  catch { console.error("ComfyUI not running at " + COMFY_URL); process.exit(1); }
+
+  copyFileSync(basePath, join(COMFY_INPUT, "kurisu-v2-outfit-base.png"));
+
+  const outfitsToGen = arg
+    ? OUTFITS.filter(o => o.id === arg || o.id === `body-${arg}`)
+    : OUTFITS;
+
+  if (arg && outfitsToGen.length === 0) {
+    console.error(`Unknown outfit: "${arg}". Valid: ${OUTFITS.map(o => o.id).join(", ")}`);
+    process.exit(1);
+  }
+
+  for (const outfit of outfitsToGen) {
     console.log(`  Generating: ${outfit.id}...`);
     const isBack = outfit.id.includes("back");
     const isExtreme = outfit.id === "body-cow" || outfit.id === "body-bikini-front";
-    const neg = isBack ? NEG + ", (front view:1.4), (facing forward:1.4)" : NEG;
-    const denoise = isExtreme ? 0.8 : isBack ? 0.74 : 0.72;
+    const neg = isBack ? BASE_NEGATIVE + ", (front view:1.4), (facing forward:1.4)" : BASE_NEGATIVE;
+    const denoise = isExtreme ? 0.72 : isBack ? 0.62 : 0.58;
     const cfg = isExtreme ? 10 : 9.5;
-    const { prompt_id } = await queue(img2img(outfit.prompt, neg, 626000 + outfit.seed, denoise, cfg));
-    const outputs = await wait(prompt_id);
-    const img = Object.values(outputs).find(o => o.images);
-    await dl(img.images[0].filename, join(SPRITES, `${outfit.id}.png`));
+    const { prompt_id } = await queuePrompt(img2img(outfit.prompt, neg, 444000 + outfit.seed, denoise, cfg));
+    const outputs = await waitForCompletion(prompt_id);
+    const saveNode = Object.values(outputs).find((o) => o.images);
+    if (!saveNode?.images?.[0]) throw new Error("No output image");
+    await downloadImage(saveNode.images[0].filename, join(SPRITES, `${outfit.id}.png`));
     console.log(`    Saved: ${outfit.id}.png`);
   }
 

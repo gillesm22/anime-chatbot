@@ -126,7 +126,7 @@ export function CharacterCard({ character, index, isFavorite }: CharacterCardPro
         <img
           src={`${character.sprite.basePath}/body-neutral.png`}
           alt={character.name}
-          className="h-64 sm:h-96 object-contain object-bottom relative z-10 transition-all duration-300"
+          className="h-72 sm:h-[26rem] object-cover object-top relative z-10 transition-all duration-300"
           draggable={false}
           style={{
             transform: isHovered ? "translateY(-8px) scale(1.05)" : "translateY(0) scale(1)",
