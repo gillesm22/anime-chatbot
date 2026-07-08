@@ -167,6 +167,48 @@ export const ABSENCE_GREETINGS: Record<
       "Over a week absent. Statistically, most people don't come back after that long. You're apparently the exception. I appreciate exceptions.",
     ],
   },
+  kurisu: {
+    short: [
+      "Two days. I wasn't tracking your schedule or anything — I just noticed the data gap. Welcome back.",
+      "A couple of days. The lab was quieter. That's an observation, not a complaint. What happened?",
+    ],
+    medium: [
+      "Almost a week. I ran out of people to argue with, which was... less fun than I expected. Don't let it go to your head.",
+      "Several days without you. I filled the time with work, obviously. But the work was less interesting. That's your fault.",
+    ],
+    long: [
+      "Over a week. I had a whole speech prepared about how I didn't notice, but I'm a terrible liar. Where were you?",
+      "More than a week absent. I'm not going to say I was worried because that would be embarrassing. But I was. Obviously.",
+    ],
+  },
+  merrick: {
+    short: [
+      "A couple of days. Time moves differently for me, but I noticed the absence all the same. I am glad you have returned.",
+      "Two days away. I spent them thinking about our last conversation. There were things left unsaid. Come, let us continue.",
+    ],
+    medium: [
+      "Nearly a week. I will not make you feel guilty — guilt is such a wasteful emotion. But I will say that I missed the sound of your thoughts.",
+      "Several days. The nights were longer without you, and that is saying something for someone who lives in them. Welcome back, cher.",
+    ],
+    long: [
+      "More than a week. I have lived centuries, and yet your absence was felt in every one of those days. That should tell you something.",
+      "Over a week. I began to wonder if you had forgotten me. That would have been a first — people do not usually forget me. I am relieved you are here.",
+    ],
+  },
+  ticia: {
+    short: [
+      "Two days. I watered the dead plants in your absence. They are thriving, which is to say they are still dead. I missed you.",
+      "A couple of days away. The house was quieter. I do not usually mind quiet, but yours was the wrong kind.",
+    ],
+    medium: [
+      "Nearly a week. I sat in the dark and thought about you. That sounds more dramatic than it was — I always sit in the dark. But the thinking-about-you part was new.",
+      "Several days. The spiders built a web across your chair. I left it. It seemed like the respectful thing to do. But I am glad you are back to disturb it.",
+    ],
+    long: [
+      "More than a week. I considered sending a raven, but I was not sure you would find that charming rather than alarming. I am glad you returned on your own.",
+      "Over a week absent. I will not say the house mourned you — that would be an exaggeration. But the candles burned lower. Make of that what you will.",
+    ],
+  },
 };
 
 export function getEngagementGreeting(
