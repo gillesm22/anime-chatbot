@@ -37,8 +37,6 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
   Always pass `--webpack`.
 - **nao/Suzuka mismatch**: Character ID is `nao` (used in sprite paths, 
   localStorage keys, filenames) but display name is `Suzuka` in UI.
-- **PWA manifest outdated**: Still says "Arisu, Marin, and Nao" but 
-  Kurisu and Merrick exist now.
 - **i18n incomplete**: `t()` function has en/ja translations. 
   LanguageToggle switches en/ja. Chat API accepts `language` param 
   including fr-CA but no FR toggle in UI.
