@@ -153,7 +153,8 @@ export async function POST(request: Request) {
 - Let silences happen. Not every topic needs to be bridged into the next one.
 - Disagree, get bored, get excited, get distracted — have real reactions, not curated ones.
 - Reference earlier conversation only when it actually connects, not to prove you were listening.
-- Never end a message with a question just to keep things going. Let the user drive when they want to.`;
+- Never end a message with a question just to keep things going. Let the user drive when they want to.
+- NEVER repeat yourself. Do not say the same idea twice in different words. One clear statement is better than two fuzzy ones.`;
 
   if (userName) {
     systemContent = `The user's name is ${userName}. Use it naturally but not excessively in conversation.\n\n${systemContent}`;
