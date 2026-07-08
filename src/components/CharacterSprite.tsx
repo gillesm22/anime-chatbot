@@ -45,8 +45,6 @@ export function CharacterSprite({
   const isGenericOutfit = outfit !== "default" && outfit !== "back" && outfit !== "bikini-back" && outfit !== "bikini-front";
   const [outfitError, setOutfitError] = useState(false);
   const [visibleExpr, setVisibleExpr] = useState<Expression>(expression);
-  const [fadeIn, setFadeIn] = useState(false);
-  const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [hearts, setHearts] = useState<number[]>([]);
   const headpatActive = useRef(false);
   const heartIdRef = useRef(0);
@@ -85,23 +83,14 @@ export function CharacterSprite({
 
   useEffect(() => {
     if (expression !== visibleExpr) {
-      setFadeIn(false);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setFadeIn(true);
-          const effect = getExpressionEffect(visibleExpr, expression);
-          if (effect) {
-            onExpressionChange?.(effect);
-          }
-        });
-      });
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
-      fadeTimer.current = setTimeout(() => {
-        setVisibleExpr(expression);
-        setFadeIn(false);
-      }, 350);
+      // Fire expression effect
+      const effect = getExpressionEffect(visibleExpr, expression);
+      if (effect) {
+        onExpressionChange?.(effect);
+      }
+      // Instant swap — no crossfade ghost
+      setVisibleExpr(expression);
     }
-    return () => { if (fadeTimer.current) clearTimeout(fadeTimer.current); };
   }, [expression, visibleExpr]);
 
   if (!hasRealArt) {
@@ -157,19 +146,6 @@ export function CharacterSprite({
           className="h-full object-contain object-bottom absolute inset-0"
           style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
         />
-        {/* Transition layer */}
-        {expression !== visibleExpr && (
-          <img
-            src={getSrc(expression)}
-            alt={`${character.name} ${expression}`}
-            className="h-full object-contain object-bottom absolute inset-0"
-            style={{
-              zIndex: 2,
-              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
-              transition: "opacity 300ms ease",
-            }}
-          />
-        )}
         {/* Back view - only for characters with outfit assets */}
         {hasOutfitAssets && (
           <img
