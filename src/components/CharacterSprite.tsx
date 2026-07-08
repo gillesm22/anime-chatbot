@@ -6,12 +6,9 @@ import type { Outfit } from "./OutfitSelector";
 import { CharacterGlow } from "./CharacterGlow";
 import { useParallax } from "@/lib/parallax";
 import { getExpressionEffect, type ExpressionEffect } from "@/lib/expressionEffects";
-import { SpriteZone } from "./SpriteZone";
-import { HairSwayCanvas } from "./HairSwayCanvas";
 import { getZoneConfig } from "@/lib/sprites/zones";
 import { useIdleBehavior } from "@/lib/sprites/idle";
 import { useReactiveAnimation } from "@/lib/sprites/reactive";
-import { useBlink } from "@/lib/sprites/engine";
 
 function getGlowIntensity(level: number, isTalking: boolean): "low" | "medium" | "high" | "radiant" {
   if (level >= 10) return "radiant";
@@ -47,7 +44,6 @@ export function CharacterSprite({
   const config = getZoneConfig(character.id);
   const idle = useIdleBehavior(config.personality, false);
   const reactive = useReactiveAnimation(expression, chatPhase, isTalking, config.personality, idle.headRef, idle.torsoRef, idle.baseRef);
-  const isBlinking = useBlink(config.personality.blinkInterval[0] * 1000, config.personality.blinkInterval[1] * 1000);
   const showBack = outfit === "back" || outfit === "bikini-back";
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
@@ -158,61 +154,37 @@ export function CharacterSprite({
             ))}
           </div>
         )}
-        {/* Zone-based sprite layers */}
-        {(["head", "torso", "base"] as const).map((zone) => {
-          const zoneRef = zone === "head" ? idle.headRef : zone === "torso" ? idle.torsoRef : idle.baseRef;
-          const hideBase = ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError);
-          return (
-            <SpriteZone
-              key={zone}
-              ref={zoneRef}
-              src={getSrc(visibleExpr)}
-              alt={character.name}
-              zone={config[zone]}
-              style={{ zIndex: 1, opacity: hideBase ? 0 : 1, transition: "opacity 300ms ease" }}
-            />
-          );
-        })}
-        {/* Expression transition zones */}
-        {expression !== visibleExpr && (["head", "torso", "base"] as const).map((zone) => {
-          const hideBase = ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError);
-          return (
-            <SpriteZone
-              key={`transition-${zone}`}
+        {/* Base layer — whole sprite with idle animation */}
+        <div
+          ref={idle.torsoRef}
+          className="absolute inset-0"
+          style={{ zIndex: 1, opacity: ((showBack || showFrontBikini) && hasOutfitAssets) || (isGenericOutfit && !outfitError) ? 0 : 1, transition: "opacity 300ms ease" }}
+        >
+          <img
+            src={getSrc(visibleExpr)}
+            alt={character.name}
+            className="h-full object-contain object-bottom absolute inset-0"
+            style={{ pointerEvents: "none" }}
+          />
+        </div>
+        {/* Transition layer */}
+        {expression !== visibleExpr && (
+          <div
+            className="absolute inset-0"
+            style={{
+              zIndex: 2,
+              opacity: fadeIn && !((showBack || showFrontBikini) && hasOutfitAssets) && !(isGenericOutfit && !outfitError) ? 1 : 0,
+              transition: "opacity 300ms ease",
+            }}
+          >
+            <img
               src={getSrc(expression)}
               alt={`${character.name} ${expression}`}
-              zone={config[zone]}
-              style={{
-                zIndex: 2,
-                opacity: fadeIn && !hideBase ? 1 : 0,
-                transition: "opacity 300ms ease",
-              }}
+              className="h-full object-contain object-bottom absolute inset-0"
+              style={{ pointerEvents: "none" }}
             />
-          );
-        })}
-        {/* Hair sway canvas overlay */}
-        <HairSwayCanvas
-          spriteSrc={getSrc(visibleExpr)}
-          heightPercent={config.hairCanvasHeight}
-          speed={config.personality.hairSwaySpeed}
-          amount={config.personality.hairSwayAmount}
-          windIntensity={reactive.windIntensity}
-        />
-        {/* Blink overlay */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: `${config.head.clipTop + 8}%`,
-            left: "25%",
-            right: "25%",
-            height: "6%",
-            background: "rgba(0,0,0,0.15)",
-            opacity: isBlinking ? 1 : 0,
-            transition: isBlinking ? "opacity 50ms ease-in" : "opacity 100ms ease-out",
-            zIndex: 12,
-            borderRadius: "40%",
-          }}
-        />
+          </div>
+        )}
         {/* Back view - only for characters with outfit assets */}
         {hasOutfitAssets && (
           <img
