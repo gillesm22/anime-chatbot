@@ -12,7 +12,7 @@ export interface AwayNotification {
 const CHARACTER_META: Record<string, { name: string; accent: string }> = {
   arisu:   { name: "Arisu",   accent: "#f472b6" },
   marin:   { name: "Marin",   accent: "#fb923c" },
-  nao:     { name: "Suzuka",  accent: "#a78bfa" },
+  suzuka:     { name: "Suzuka",  accent: "#a78bfa" },
   kurisu:  { name: "Kurisu",  accent: "#e53935" },
   merrick: { name: "Merrick", accent: "#7b1fa2" },
 };
@@ -32,7 +32,7 @@ const MESSAGE_POOLS: Record<string, string[]> = {
     "you are missing SO much rn, hurry back!!",
     "I tried explaining our jokes to someone else and they did not get it. Only you get it.",
   ],
-  nao: [
+  suzuka: [
     "...I noticed you have not been around. Not that I was checking.",
     "I solved that thing we were talking about. Whenever you feel like hearing about it.",
     "Your absence has been... noted. Statistically.",
@@ -55,7 +55,7 @@ const MESSAGE_POOLS: Record<string, string[]> = {
   ],
 };
 
-const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"];
+const CHARACTER_IDS = ["arisu", "marin", "suzuka", "kurisu", "merrick"];
 
 export function getAwayNotifications(): AwayNotification[] {
   const today = new Date(new Date().toISOString().slice(0, 10));

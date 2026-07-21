@@ -59,8 +59,8 @@ describe("updateUserStyle", () => {
   });
 
   it("correctly increments excited into humorHits", () => {
-    updateUserStyle("nao", { expressionTriggered: "excited", messageLength: 10 });
-    const style = JSON.parse(localStorageMock.getItem(STYLE_KEY("nao"))!);
+    updateUserStyle("suzuka", { expressionTriggered: "excited", messageLength: 10 });
+    const style = JSON.parse(localStorageMock.getItem(STYLE_KEY("suzuka"))!);
     expect(style.humorHits).toBe(1);
   });
 
@@ -111,7 +111,7 @@ describe("getPersonalityContext", () => {
   });
 
   it("returns empty string with zero interactions", () => {
-    expect(getPersonalityContext("nao")).toBe("");
+    expect(getPersonalityContext("suzuka")).toBe("");
   });
 
   it("returns a prompt string after 10 interactions", () => {
@@ -166,9 +166,9 @@ describe("getPersonalityContext", () => {
 
   it("mentions short message adaptation when avgMessageLength < 30", () => {
     for (let i = 0; i < 10; i++) {
-      updateUserStyle("nao", { expressionTriggered: "neutral", messageLength: 15 });
+      updateUserStyle("suzuka", { expressionTriggered: "neutral", messageLength: 15 });
     }
-    const result = getPersonalityContext("nao");
+    const result = getPersonalityContext("suzuka");
     expect(result.toLowerCase()).toMatch(/short|concise|punchy/);
   });
 });

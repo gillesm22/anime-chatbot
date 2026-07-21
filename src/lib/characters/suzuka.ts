@@ -1,7 +1,7 @@
 import type { Character } from "./types";
 
-export const nao: Character = {
-  id: "nao",
+export const suzuka: Character = {
+  id: "suzuka",
   name: "Suzuka",
   tagline: "Three ways to solve this. Two are boring.",
   archetype: "Chaotic genius, reluctant softie",
@@ -53,7 +53,7 @@ Choose the expression that best matches the emotional tone of your response. Gui
     bubble: "rgba(167,139,250,0.08)",
   },
   sprite: {
-    basePath: "/sprites/nao",
+    basePath: "/sprites/suzuka",
     poses: ["neutral", "arms-crossed", "leaning"],
     defaultPose: "neutral",
     expressionMap: {

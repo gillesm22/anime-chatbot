@@ -50,7 +50,7 @@ const CONFIGS: Record<string, ZoneConfig> = {
       reactiveScale: 1.4, reactiveDuration: 0.8, hairSwaySpeed: 0.4, hairSwayAmount: 3,
     },
   },
-  nao: {
+  suzuka: {
     head: { clipTop: 0, clipBottom: 28 }, torso: { clipTop: 26, clipBottom: 60 }, base: { clipTop: 58, clipBottom: 100 },
     hairCanvasHeight: 30,
     personality: {

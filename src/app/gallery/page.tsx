@@ -9,7 +9,7 @@ import { PageTransition } from "@/components/PageTransition";
 const CHARACTERS = [
   { id: "arisu", name: "Arisu", color: "#f472b6" },
   { id: "marin", name: "Marin", color: "#fb923c" },
-  { id: "nao", name: "Suzuka", color: "#a78bfa" },
+  { id: "suzuka", name: "Suzuka", color: "#a78bfa" },
   { id: "kurisu", name: "Kurisu", color: "#e53935" },
   { id: "merrick", name: "Merrick", color: "#7b1fa2" },
 ] as const;
@@ -24,7 +24,7 @@ interface SpriteEntry {
   onlyFor?: readonly string[];
 }
 
-const FULL_OUTFIT_CHARS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
+const FULL_OUTFIT_CHARS = ["arisu", "marin", "suzuka", "kurisu", "merrick"] as const;
 
 const SPRITES: SpriteEntry[] = [
   // Expressions (all characters)
@@ -45,11 +45,11 @@ const SPRITES: SpriteEntry[] = [
   { file: "face-crying.png", label: "Crying", category: "expression" },
   // Body poses (all characters)
   { file: "body-neutral.png", label: "Default", category: "body" },
-  // Body poses (arisu/marin/nao only)
+  // Body poses (arisu/marin/suzuka only)
   { file: "body-back.png", label: "Back", category: "body", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-front-bikini.png", label: "Bikini Front", category: "body", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-back-bikini.png", label: "Bikini Back", category: "body", onlyFor: FULL_OUTFIT_CHARS },
-  // Outfits (arisu/marin/nao only)
+  // Outfits (arisu/marin/suzuka only)
   { file: "body-casual.png", label: "Casual", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-formal.png", label: "Formal", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-school.png", label: "School", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },

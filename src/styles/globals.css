@@ -19,11 +19,11 @@
   --color-marin-tint: #201a10;
   --color-marin-bubble: rgba(251, 146, 60, 0.08);
 
-  --color-nao: #a78bfa;
-  --color-nao-light: #c4b5fd;
-  --color-nao-glow: rgba(167, 139, 250, 0.15);
-  --color-nao-tint: #10101f;
-  --color-nao-bubble: rgba(167, 139, 250, 0.08);
+  --color-suzuka: #a78bfa;
+  --color-suzuka-light: #c4b5fd;
+  --color-suzuka-glow: rgba(167, 139, 250, 0.15);
+  --color-suzuka-tint: #10101f;
+  --color-suzuka-bubble: rgba(167, 139, 250, 0.08);
 
   --color-surface-alpha: rgba(13, 13, 18, 0.88);
   --color-overlay: rgba(13, 13, 18, 0.85);
@@ -89,9 +89,9 @@ html[data-theme="light"] {
   --color-marin-tint: #fff3e0;
   --color-marin-glow: rgba(251, 146, 60, 0.25);
   --color-marin-bubble: rgba(251, 146, 60, 0.12);
-  --color-nao-tint: #ede7f6;
-  --color-nao-glow: rgba(167, 139, 250, 0.25);
-  --color-nao-bubble: rgba(167, 139, 250, 0.12);
+  --color-suzuka-tint: #ede7f6;
+  --color-suzuka-glow: rgba(167, 139, 250, 0.25);
+  --color-suzuka-bubble: rgba(167, 139, 250, 0.12);
 }
 
 /* Light mode specific adjustments */

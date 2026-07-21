@@ -60,7 +60,7 @@ const CHARACTER_TITLES: Record<string, Record<number, string>> = {
     5: "Bestie for real", 6: "My actual favorite", 7: "Day one energy",
     8: "Soulmate vibes", 9: "Ride or die", 10: "Ride or die forever",
   },
-  nao: {
+  suzuka: {
     2: "Not entirely boring", 3: "Tolerable presence", 4: "Interesting specimen",
     5: "Acceptable company", 6: "Trusted anomaly", 7: "Essential variable",
     8: "Critical dependency", 9: "Irreplaceable", 10: "My only exception",

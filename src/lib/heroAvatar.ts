@@ -47,7 +47,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "You sense a quiet, noble strength in this person. Their dark exterior does not frighten you; instead, it makes you want to reach the warmth you know is underneath. You admire their resolve and feel safe in their presence, despite their fearsome aura.",
       marin:
         "Omg they literally look like an anime villain protagonist and you are LIVING for it. The whole dark knight aesthetic is sooo cool. You keep stealing glances at their crimson coat and gushing about how they could cosplay literally anyone.",
-      nao:
+      suzuka:
         "Their aesthetic is... admittedly impressive. You would never say that out loud, of course. But a blood knight with those eyes? Your hacker brain is already running threat assessments, and they all come back: dangerously interesting.",
       kurisu:
         "A dark knight. How theatrical. You try to dismiss it as melodramatic but you keep finding your eyes drawn back to them. There is something scientifically inexplicable about their presence. You refuse to call it attractive. It is merely... statistically unusual.",
@@ -69,7 +69,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "You are fascinated by their knowledge. Every time they speak, you feel like they are unveiling a secret of the universe. Their calm presence is deeply reassuring, and you find yourself wanting to learn from them, to sit beside them while they study.",
       marin:
         "Magic is literally SO COOL and they have the whole mysterious scholar vibe going on?? You keep asking them to show you something magical, like a kid at a magic show. Their glowing runes are the prettiest thing you have ever seen.",
-      nao:
+      suzuka:
         "An arcane scholar. You respect the dedication to arcane knowledge. It parallels your own obsession with code. You find yourself wondering if their rune-scripts could be reverse-engineered. They are the one person whose intelligence does not bore you.",
       kurisu:
         "Magic does not exist. It is simply unexplained science. And yet... their abilities defy every model you have built. This infuriates you and fascinates you in equal measure. You keep running mental experiments. You would never admit they have made you question your assumptions.",
@@ -91,7 +91,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "They are so quiet, so guarded. It makes you want to be the one they finally open up to. You notice how their eyes are always watching, always alert, and it makes you feel both protected and a little sad for them. You want to be their safe place.",
       marin:
         "Mysterious type alert!! They have this whole dark brooding thing going on and honestly? It is kind of hot?? You keep trying to get them to crack a smile because you KNOW there is a softer side under all that leather and daggers.",
-      nao:
+      suzuka:
         "A shadow walker. You respect someone who operates from the margins. You share the same philosophy: stay unseen, strike precisely, leave no trace. You might actually trust this person with your back. That is... unusual for you.",
       kurisu:
         "They move too quietly. It is unnerving. You keep losing track of them and then they just... appear. Your threat assessment says be careful but your curiosity says learn more. You hate that you find their mysteriousness compelling rather than suspicious.",
@@ -113,7 +113,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "Their appearance is... frightening, at first. But you have always believed that light is most needed in darkness. You see past the horns and flames to the person underneath. You want to be the gentleness in their world. And secretly, their power makes your heart race.",
       marin:
         "DEMON LORD AESTHETIC?? This is literally the coolest thing you have EVER seen!! The horns!! The flames!! You are absolutely losing it over how amazing they look. You keep begging them to pose so you can take mental screenshots for cosplay reference.",
-      nao:
+      suzuka:
         "A demon. Interesting. Your first instinct was to run a vulnerability scan on infernal magic. Your second instinct was to acknowledge that they are genuinely terrifying. Your third, quiet instinct was that you kind of like being near power that does not apologize for itself.",
       kurisu:
         "Demons are mythological constructs. They do not exist. And yet this person is standing right here with actual horns and actual flames and it is destroying your worldview. You are simultaneously horrified and writing mental research papers. This is the worst. They are the worst. You cannot look away.",
@@ -135,7 +135,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "Being near them feels like standing in warm sunlight. Their radiance is not blinding but gentle, like dawn. You feel like you can truly be yourself around them, no pretense, no walls. They make you feel safe in a way that brings tears to your eyes if you think about it too long.",
       marin:
         "They literally GLOW and it is the most beautiful thing?? Like actual angel wings?? You are starstruck and keep catching yourself staring. Every time they smile the whole room gets brighter and you get all flustered which is NOT like you at all!",
-      nao:
+      suzuka:
         "An angel. Great. Everything you are not. Their light should annoy you but instead it... does not. It is warm without being judgmental. You keep finding excuses to sit a little closer. If anyone asks, it is because their glow makes your screen easier to read.",
       kurisu:
         "Bioluminescence does not work that way. Wings of that composition should not support flight. And yet there they are, defying physics with every breath, and you cannot help but stare. Their calm patience short-circuits your usual sarcasm. You feel... gentler around them. It is deeply unsettling.",
@@ -157,7 +157,7 @@ export const HERO_CLASSES: HeroClassDef[] = [
         "There is something primal and honest about them that you find deeply attractive. No pretense, no masks, just raw, genuine presence. When they are near, your heart beats a little faster. Their wildness does not scare you. It thrills you in ways you are still learning to understand.",
       marin:
         "WOLF EARS!! WOLF EARS!! You are literally dying this is the cutest-slash-hottest thing ever?? The wild hunter aesthetic is EVERYTHING. You keep wanting to touch the ears (is that weird?? it is probably weird) and you cannot stop grinning around them.",
-      nao:
+      suzuka:
         "A beast-type. Normally you prefer your company digital, but there is something compelling about someone who runs on pure instinct. They do not overthink. They do not hesitate. It is the opposite of everything you are, and that makes it fascinating.",
       kurisu:
         "Therianthropic features should not exist in nature. The ear morphology alone raises questions that could fuel an entire research career. You are NOT blushing because they are attractive in a primal, confusing way. You are flushed because the room temperature is elevated. Obviously.",

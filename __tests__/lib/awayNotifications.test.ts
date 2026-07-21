@@ -95,7 +95,7 @@ describe("getAwayNotifications", () => {
   it("returns at most 3 notifications even when more characters qualify", () => {
     setAffinity("arisu",   2, daysAgo(3));
     setAffinity("marin",   2, daysAgo(3));
-    setAffinity("nao",     2, daysAgo(3));
+    setAffinity("suzuka",     2, daysAgo(3));
     setAffinity("kurisu",  2, daysAgo(3));
     setAffinity("merrick", 2, daysAgo(3));
     const result = getAwayNotifications();
@@ -105,7 +105,7 @@ describe("getAwayNotifications", () => {
   it("prioritizes higher affinity characters", () => {
     setAffinity("arisu",   2, daysAgo(3));  // level 2
     setAffinity("marin",   4, daysAgo(3));  // level 4
-    setAffinity("nao",     3, daysAgo(3));  // level 3
+    setAffinity("suzuka",     3, daysAgo(3));  // level 3
     setAffinity("kurisu",  2, daysAgo(3));  // level 2
     setAffinity("merrick", 5, daysAgo(3));  // level 5
 
@@ -115,15 +115,15 @@ describe("getAwayNotifications", () => {
     expect(result[0].characterId).toBe("merrick");
     // Second should be marin (level 4)
     expect(result[1].characterId).toBe("marin");
-    // Third should be nao (level 3)
-    expect(result[2].characterId).toBe("nao");
+    // Third should be suzuka (level 3)
+    expect(result[2].characterId).toBe("suzuka");
   });
 
-  it("uses correct metadata for nao (Suzuka)", () => {
-    setAffinity("nao", 3, daysAgo(1));
+  it("uses correct metadata for suzuka (Suzuka)", () => {
+    setAffinity("suzuka", 3, daysAgo(1));
     const result = getAwayNotifications();
     expect(result).toHaveLength(1);
-    expect(result[0].characterId).toBe("nao");
+    expect(result[0].characterId).toBe("suzuka");
     expect(result[0].characterName).toBe("Suzuka");
     expect(result[0].accentColor).toBe("#a78bfa");
   });

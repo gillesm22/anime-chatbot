@@ -53,7 +53,7 @@ describe("buildGreetingContext", () => {
   });
 
   it("includes absence info when daysAbsent >= 2", () => {
-    const result = buildGreetingContext("nao", 3, 1);
+    const result = buildGreetingContext("suzuka", 3, 1);
     expect(result).toMatch(/\[Absence\]/);
     expect(result).toMatch(/3 days/);
   });

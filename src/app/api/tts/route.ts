@@ -12,7 +12,7 @@ const EDGE_VOICES: Record<string, { voice: string; rate: string; pitch: string }
     rate: "+12%",
     pitch: "+15Hz",
   },
-  nao: {
+  suzuka: {
     voice: "en-US-AriaNeural",  // Smooth, cool, confident
     rate: "+2%",
     pitch: "+0Hz",

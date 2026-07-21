@@ -12,7 +12,7 @@ interface CharacterLineupProps {
   onSelect: (characterId: string, rect: DOMRect) => void;
 }
 
-const CHARACTER_ORDER = ["merrick", "marin", "arisu", "kurisu", "nao", "ticia"];
+const CHARACTER_ORDER = ["merrick", "marin", "arisu", "kurisu", "suzuka", "ticia"];
 
 export function CharacterLineup({ onSelect }: CharacterLineupProps) {
   const parallax = useParallax();

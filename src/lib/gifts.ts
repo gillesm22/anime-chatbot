@@ -37,7 +37,7 @@ export const GIFT_PREFERENCES: Record<string, GiftPreference[]> = {
     { giftId: "candy", multiplier: 1.5, reaction: { expression: "laugh", dialogue: "CANDY!! you know me SO well bestie, this is literally my love language okay thank youuu!!" } },
     { giftId: "coffee", multiplier: 0.5, reaction: { expression: "thinking", dialogue: "coffee?? I mean... I'll drink it but like... you know I'm more of a boba person right lol" } },
   ],
-  nao: [
+  suzuka: [
     { giftId: "coffee", multiplier: 1.5, reaction: { expression: "smirk", dialogue: "Coffee. You actually remembered I run on this. ...That's annoyingly thoughtful of you." } },
     { giftId: "letter", multiplier: 0.5, reaction: { expression: "flustered", dialogue: "A love letter. You're really doing this. I — okay. I'll read it later. Alone. Stop looking at me." } },
     { giftId: "flower", multiplier: 0.5, reaction: { expression: "neutral", dialogue: "Flowers. Romantic. They'll be dead in a week, you know. ...Fine, I'll put them in water." } },
@@ -123,7 +123,7 @@ export function getCharacterReaction(characterId: string, gift: Gift): Character
     return { expression: "flustered/crying", dialogue: "...okay I'm not gonna cry. I'm NOT. ...okay maybe a little." };
   }
 
-  if (id === "nao") {
+  if (id === "suzuka") {
     if (gift.rarity === "common") {
       return { expression: "smirk", dialogue: "...Not bad. I'll keep it." };
     }

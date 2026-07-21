@@ -115,7 +115,7 @@ const MILESTONE_DIALOGUES: Record<string, Record<number, DialogueLine[]>> = {
     ],
   },
 
-  nao: {
+  suzuka: {
     2: [
       {
         speaker: "Suzuka",

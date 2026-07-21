@@ -44,7 +44,7 @@ export interface PlayerStats {
 const CHARACTER_COLORS: Record<string, string> = {
   arisu: "#f472b6",
   marin: "#fb923c",
-  nao: "#a78bfa",
+  suzuka: "#a78bfa",
   kurisu: "#e53935",
   merrick: "#7b1fa2",
 };

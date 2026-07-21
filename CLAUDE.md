@@ -35,8 +35,6 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
   revert file edits. Always re-read files from disk before editing.
 - **Turbopack**: Cannot use (`$` in path breaks persistence DB). 
   Always pass `--webpack`.
-- **nao/Suzuka mismatch**: Character ID is `nao` (used in sprite paths, 
-  localStorage keys, filenames) but display name is `Suzuka` in UI.
 - **i18n incomplete**: `t()` function has en/ja translations. 
   LanguageToggle switches en/ja. Chat API accepts `language` param 
   including fr-CA but no FR toggle in UI.
@@ -131,7 +129,7 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 |----|-------------|-----------|--------|-----------|---------------|
 | arisu | Arisu | Supportive senpai | #f472b6 pink | en-AU-NatashaNeural +6Hz -10% | sakura |
 | marin | Marin | Tanned gyaru hype queen | #fb923c orange | en-US-SaraNeural +8Hz +5% | beach |
-| nao | Suzuka | Edgy-cute chaotic genius | #a78bfa purple | en-US-AriaNeural -2Hz +0% | cyberpunk |
+| suzuka | Suzuka | Edgy-cute chaotic genius | #a78bfa purple | en-US-AriaNeural -2Hz +0% | cyberpunk |
 | kurisu | Kurisu | Genius tsundere scientist | #e53935 red | en-US-JennyNeural +2Hz +3% | lab |
 | merrick | Merrick | Mystical vampire witch | #7b1fa2 violet | en-US-AmberNeural -4Hz -5% | moonlight |
 
@@ -166,7 +164,7 @@ the text content. The sprite updates immediately on expression events.
 - **Hero avatars**: `public/sprites/hero/` · 6 class PNGs (manhwa style)
 - **Backgrounds**: `public/backgrounds/bg-{scene}.png` · beach, bedroom, 
   cafe, cyberpunk, lab, rain, rooftop, sakura, starfield
-- **SVG layers**: arisu/marin/nao have eyes/eyebrows/mouth SVGs but the 
+- **SVG layers**: arisu/marin/suzuka have eyes/eyebrows/mouth SVGs but the 
   compositing system (`useBlink`) is not fully wired
 
 ## Art Generation (ComfyUI)

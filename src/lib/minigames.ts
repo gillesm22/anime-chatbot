@@ -80,7 +80,7 @@ export function getRandomGameSuggestion(characterId: string): string | null {
       return "Um... if you're not busy, would you maybe want to play a little game? Only if you feel like it, of course...";
     case "marin":
       return "Okay STOP — we are playing a game RIGHT NOW. Pick one: Would You Rather, Truth or Dare, or Story Chain. GO.";
-    case "nao":
+    case "suzuka":
       return "I'm bored. We're playing 20 Questions. You're guessing. Don't embarrass yourself.";
     default:
       return "Want to play a game? I know a few.";

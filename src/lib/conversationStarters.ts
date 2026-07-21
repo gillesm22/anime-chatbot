@@ -21,7 +21,7 @@ const STARTERS: Record<string, string[]> = {
     "What song is stuck in your head?",
     "Roast me, I can take it",
   ],
-  nao: [
+  suzuka: [
     "Found any good exploits lately?",
     "What's the scariest thing on the dark web?",
     "Teach me something most people don't know",

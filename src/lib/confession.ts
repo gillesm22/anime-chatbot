@@ -177,7 +177,7 @@ const MARIN_SCRIPT: ConfessionScript = {
 };
 
 const NAO_SCRIPT: ConfessionScript = {
-  characterId: "nao",
+  characterId: "suzuka",
   startNode: "start",
   nodes: {
     start: {
@@ -413,7 +413,7 @@ const MERRICK_SCRIPT: ConfessionScript = {
 const SCRIPTS: Record<string, ConfessionScript> = {
   arisu: ARISU_SCRIPT,
   marin: MARIN_SCRIPT,
-  nao: NAO_SCRIPT,
+  suzuka: NAO_SCRIPT,
   kurisu: KURISU_SCRIPT,
   merrick: MERRICK_SCRIPT,
 };

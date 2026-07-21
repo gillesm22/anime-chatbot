@@ -58,8 +58,8 @@ describe("getSessionStartMood", () => {
   });
 
   it("returns thoughtful + check-in prompt when last session was thoughtful", () => {
-    saveSessionEndMood("nao", "thoughtful");
-    const result = getSessionStartMood("nao", 1, 1);
+    saveSessionEndMood("suzuka", "thoughtful");
+    const result = getSessionStartMood("suzuka", 1, 1);
     expect(result.mood).toBe("thoughtful");
     expect(result.prompt).toMatch(/check in/i);
   });

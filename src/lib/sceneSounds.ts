@@ -392,7 +392,7 @@ function buildMarinMelody(audioCtx: AudioContext, dest: AudioNode): () => void {
   return buildArpeggioMelody(audioCtx, dest, gMajor, 0.4, "square", 0.2);
 }
 
-// nao — dark synthwave sawtooth pad, A minor, slow arpeggiation.
+// suzuka — dark synthwave sawtooth pad, A minor, slow arpeggiation.
 // A2 C3 E3 G3 A3 C4
 function buildNaoMelody(audioCtx: AudioContext, dest: AudioNode): () => void {
   const aMinor = [110.0, 130.81, 164.81, 196.0, 220.0, 261.63];
@@ -535,7 +535,7 @@ export function setCharacterMusic(characterId: string): void {
     case "marin":
       melodyCleanup = buildMarinMelody(audioCtx, melodyGain);
       break;
-    case "nao":
+    case "suzuka":
       melodyCleanup = buildNaoMelody(audioCtx, melodyGain);
       break;
     case "kurisu":

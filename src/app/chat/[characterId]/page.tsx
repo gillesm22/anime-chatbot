@@ -101,7 +101,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const TODO_ADD_REACTIONS: Record<string, string[]> = {
     arisu: ["I'll remember that for you.", "Adding it to the list~ Let's get it done together.", "That's important to you, isn't it? I'll keep track."],
     marin: ["Ooh writing stuff down, look at you being productive!", "Got it got it!! We're SO on top of this.", "Added! Now don't forget ok??"],
-    nao: ["Noted. I'll hold you accountable.", "...fine, I'll help you stay organized.", "Task logged. Don't slack off."],
+    suzuka: ["Noted. I'll hold you accountable.", "...fine, I'll help you stay organized.", "Task logged. Don't slack off."],
     kurisu: ["Documented. I expect you to follow through.", "Adding it to the queue. Efficiency matters.", "Hmph. At least you're being systematic about it."],
     merrick: ["I shall remember this... across the ages if necessary.", "Written in ink that does not fade.", "Consider it etched into the record."],
     ticia: ["Mm, I'll keep that safe for you~", "Another thing to do... how deliciously mortal.", "Noted, darling."],
@@ -110,7 +110,7 @@ function ChatContent({ characterId }: { characterId: string }) {
   const TODO_COMPLETE_REACTIONS: Record<string, string[]> = {
     arisu: ["You did it! I'm proud of you.", "One less thing to worry about~", "See? You're more capable than you think."],
     marin: ["YESSS checked off!! Let's GOOO!", "Productivity queen!! Slay!!", "Another one DONE! You're unstoppable!"],
-    nao: ["...impressive. Don't let it go to your head.", "Task eliminated. Acceptable performance.", "Hm. Maybe you're not hopeless after all."],
+    suzuka: ["...impressive. Don't let it go to your head.", "Task eliminated. Acceptable performance.", "Hm. Maybe you're not hopeless after all."],
     kurisu: ["Completed. Your efficiency is... noted.", "Good. One variable resolved.", "Don't expect praise for doing what you should. ...Well done though."],
     merrick: ["Another burden lifted from your mortal shoulders.", "It is done. Time moves ever forward.", "Satisfying, isn't it? The completion of a task."],
     ticia: ["Mmm, well done~", "How productive of you... I approve.", "Crossed off. You're full of surprises."],

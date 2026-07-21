@@ -24,6 +24,27 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        <Script id="suzuka-migration" strategy="beforeInteractive">{`
+          (function() {
+            try {
+              var GUARD = "anime-chatbot-migrated-nao-suzuka";
+              if (localStorage.getItem(GUARD)) return;
+              var keys = [];
+              for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.slice(-4) === "-nao") keys.push(k);
+              }
+              for (var j = 0; j < keys.length; j++) {
+                var oldKey = keys[j];
+                var newKey = oldKey.slice(0, -4) + "-suzuka";
+                if (localStorage.getItem(newKey) === null) {
+                  localStorage.setItem(newKey, localStorage.getItem(oldKey));
+                }
+              }
+              localStorage.setItem(GUARD, "1");
+            } catch(e) {}
+          })();
+        `}</Script>
         <Script id="theme-init" strategy="beforeInteractive">{`
           (function() {
             try {

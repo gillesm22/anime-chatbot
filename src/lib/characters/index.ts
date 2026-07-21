@@ -1,14 +1,14 @@
 import type { Character } from "./types";
 import { arisu } from "./arisu";
 import { marin } from "./marin";
-import { nao } from "./nao";
+import { suzuka } from "./suzuka";
 import { kurisu } from "./kurisu";
 import { merrick } from "./merrick";
 
 export const characters: Record<string, Character> = {
   arisu,
   marin,
-  nao,
+  suzuka,
   kurisu,
   merrick,
 };

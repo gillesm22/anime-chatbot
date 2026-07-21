@@ -160,7 +160,7 @@ export function getCharacterDefaultScene(characterId: string): SceneId {
   const map: Record<string, SceneId> = {
     arisu: "sakura",
     marin: "beach",
-    nao: "cyberpunk",
+    suzuka: "cyberpunk",
     kurisu: "lab",
     merrick: "moonlight",
   };

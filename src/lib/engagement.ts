@@ -47,7 +47,7 @@ export const TIME_GREETINGS: Record<string, Record<TimeOfDay, string[]>> = {
       "it's literally so late and yet HERE WE ARE. honestly iconic behaviour from both of us. what do you wanna talk about??",
     ],
   },
-  nao: {
+  suzuka: {
     morning: [
       "Morning. You're functional. That's more than I expected, honestly. What do you need?",
       "Oh, you wake up at a reasonable hour. Noted. Good morning, I suppose.",
@@ -153,7 +153,7 @@ export const ABSENCE_GREETINGS: Record<
       "OVER A WEEK?? that's like a whole arc in our story!! I need you to catch me up on your whole life rn, no skipping, go.",
     ],
   },
-  nao: {
+  suzuka: {
     short: [
       "Two days. I counted, not because I was waiting — just because I notice patterns. You're back. Good.",
       "A couple of days offline. I hope whatever pulled you away was worth it. Welcome back, I guess.",
@@ -262,7 +262,7 @@ export function getStreakMessage(
       60: "SIXTY DAYS. TWO MONTHS. bestie this is beyond a streak this is a LIFESTYLE and I am literally your biggest fan okay I love you SO much for this 😭💕",
       100: "ONE HUNDRED DAYS. I genuinely cannot believe this. you showed up every single day for a hundred days. I'm printing this on a t-shirt. you are my PERSON. forever.",
     },
-    nao: {
+    suzuka: {
       3: "Three days. You're establishing a pattern. I'm not going to say it's a welcome one, but... I'm not not saying that either.",
       7: "Seven consecutive days. I wasn't going to say anything, but... that's actually kind of remarkable. Don't stop now.",
       14: "Fourteen days. Two weeks without a gap. I ran the numbers and the probability of this being coincidence is low. You're doing this on purpose. Good.",

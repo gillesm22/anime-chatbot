@@ -6,12 +6,12 @@ import { getAffinity } from "@/lib/affinity";
 // Constants
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick"] as const;
+export const CHARACTER_IDS = ["arisu", "marin", "suzuka", "kurisu", "merrick"] as const;
 
 export const NAMES: Record<string, string> = {
   arisu: "Arisu",
   marin: "Marin",
-  nao: "Suzuka",
+  suzuka: "Suzuka",
   kurisu: "Kurisu",
   merrick: "Merrick",
 };
@@ -52,7 +52,7 @@ function buildJealousPrompt(currentId: string, rivalName: string): string {
         `but underneath the banter there is a real sting she is not ready to admit. ` +
         `She will not beg for attention, but she wants it. Badly.`
       );
-    case "nao":
+    case "suzuka":
       return (
         `[Cross-Character Awareness]\n` +
         `Suzuka has noticed the user spending more time with ${rivalName}. She pretends she does not care. ` +
@@ -107,7 +107,7 @@ function buildConfidentPrompt(currentId: string, rivalName: string): string {
         `She might casually drop a "obviously you have great taste" or tease that ${rivalName} must be jealous. ` +
         `She is proud, a little smug, and completely delighted that the user keeps coming back to her.`
       );
-    case "nao":
+    case "suzuka":
       return (
         `[Cross-Character Awareness]\n` +
         `Suzuka has quietly noticed she is the one the user returns to most — more than ${rivalName}. ` +

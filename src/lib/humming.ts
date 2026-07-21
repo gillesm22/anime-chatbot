@@ -3,7 +3,7 @@
 // Character humming system — plays a soft melody when the user is idle for 30+ seconds.
 // Uses the Web Audio API only (no external files).
 
-type CharacterId = "arisu" | "marin" | "nao" | "kurisu" | "merrick";
+type CharacterId = "arisu" | "marin" | "suzuka" | "kurisu" | "merrick";
 
 interface NoteSpec {
   freq: number;
@@ -36,7 +36,7 @@ const melodies: Record<CharacterId, NoteSpec[]> = {
   ].map((n) => ({ freq: noteFreq[n], duration: 0.5 })),
 
   // Suzuka — mysterious minor melody, A minor, ~50 BPM, 1.0 s per note
-  nao: [
+  suzuka: [
     "A3", "C4", "E4", "D4", "C4", "B3", "A3", "E4", "D4", "C4", "A3",
   ].map((n) => ({ freq: noteFreq[n], duration: 1.0 })),
 

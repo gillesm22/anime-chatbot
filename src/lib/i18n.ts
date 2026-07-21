@@ -84,7 +84,7 @@ export function getCharacterJapaneseVoice(characterId: string): string {
       return "ja-JP-NanamiNeural";
     case "marin":
       return "ja-JP-MayuNeural";
-    case "nao":
+    case "suzuka":
       return "ja-JP-NanamiNeural";
     default:
       return "ja-JP-NanamiNeural";

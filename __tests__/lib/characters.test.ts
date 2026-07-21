@@ -9,7 +9,7 @@ describe("Character registry", () => {
     expect(Object.keys(characters)).toHaveLength(5);
     expect(characters.arisu).toBeDefined();
     expect(characters.marin).toBeDefined();
-    expect(characters.nao).toBeDefined();
+    expect(characters.suzuka).toBeDefined();
     expect(characters.kurisu).toBeDefined();
     expect(characters.merrick).toBeDefined();
   });
@@ -24,7 +24,7 @@ describe("Character registry", () => {
     expect(getCharacter("nobody")).toBeUndefined();
   });
 
-  it.each(["arisu", "marin", "nao"])("%s has all required fields", (id) => {
+  it.each(["arisu", "marin", "suzuka"])("%s has all required fields", (id) => {
     const char = characters[id] as Character;
     expect(char.id).toBe(id);
     expect(char.name).toBeTruthy();
@@ -35,7 +35,7 @@ describe("Character registry", () => {
     expect(char.sprite.poses.length).toBeGreaterThanOrEqual(2);
   });
 
-  it.each(["arisu", "marin", "nao"])("%s has all expression mappings", (id) => {
+  it.each(["arisu", "marin", "suzuka"])("%s has all expression mappings", (id) => {
     const char = characters[id] as Character;
     for (const expr of ALL_EXPRESSIONS) {
       const mapping = char.sprite.expressionMap[expr];

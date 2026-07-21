@@ -20,7 +20,7 @@ interface ConfessionSceneProps {
 const ACCENT_COLORS: Record<string, string> = {
   arisu: "#f9a8d4",
   marin: "#fb923c",
-  nao: "#a78bfa",
+  suzuka: "#a78bfa",
   kurisu: "#e53935",
   merrick: "#7b1fa2",
 };

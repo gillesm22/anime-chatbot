@@ -40,8 +40,8 @@ export function CharacterSprite({
   const showBikini = outfit === "bikini-back";
   const showFrontBikini = outfit === "bikini-front";
   const basePath = character.sprite.basePath;
-  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
-  const hasOutfitAssets = character.id === "arisu" || character.id === "marin" || character.id === "nao" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
+  const hasRealArt = character.id === "arisu" || character.id === "marin" || character.id === "suzuka" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
+  const hasOutfitAssets = character.id === "arisu" || character.id === "marin" || character.id === "suzuka" || character.id === "kurisu" || character.id === "merrick" || character.id === "ticia";
   const isGenericOutfit = outfit !== "default" && outfit !== "back" && outfit !== "bikini-back" && outfit !== "bikini-front";
   const [outfitError, setOutfitError] = useState(false);
   const [visibleExpr, setVisibleExpr] = useState<Expression>(expression);

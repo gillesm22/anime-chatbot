@@ -9,11 +9,11 @@ import { exportAsText, exportAsJSON } from "@/lib/exportChat";
 import type { ChatMessage } from "@/lib/chat/types";
 import { getHeroConfig, saveHeroConfig, selectHeroClass, HERO_CLASSES, type HeroClassId } from "@/lib/heroAvatar";
 
-const CHARACTER_IDS = ["arisu", "marin", "nao", "kurisu", "merrick", "ticia"] as const;
+const CHARACTER_IDS = ["arisu", "marin", "suzuka", "kurisu", "merrick", "ticia"] as const;
 const CHARACTER_LABELS: Record<string, { name: string; color: string }> = {
   arisu: { name: "Arisu", color: "#f472b6" },
   marin: { name: "Marin", color: "#fb923c" },
-  nao: { name: "Suzuka", color: "#a78bfa" },
+  suzuka: { name: "Suzuka", color: "#a78bfa" },
   kurisu: { name: "Kurisu", color: "#e53935" },
   merrick: { name: "Merrick", color: "#7b1fa2" },
   ticia: { name: "Ticia", color: "#1a1a1a" },

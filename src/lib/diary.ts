@@ -78,7 +78,7 @@ export function generateDiaryPrompt(
           "Use abbreviations, exclamation marks, and write about fun or exciting moments. " +
           "Let your bubbly personality shine through."
         );
-      case "nao":
+      case "suzuka":
         return (
           "You are Suzuka: terse and analytical by nature. Write in short, precise observations. " +
           "Occasionally let a hint of vulnerability slip through, though you would never admit it."
