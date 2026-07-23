@@ -169,24 +169,26 @@ the text content. The sprite updates immediately on expression events.
 
 ## Art Generation (ComfyUI)
 
-All scripts in `scripts/` are Node ESM `.mjs` calling ComfyUI API at 
-`localhost:8188`.
+**Use the `gen-sprites` skill** (`.claude/skills/gen-sprites/`) for all new
+sprite generation. It encodes the locked V3 standard and drives one
+parameterized runner (`comfy-gen.mjs` + JSON config) — do not add new
+one-off scripts to `scripts/`.
 
 - **ComfyUI Desktop**: `C:/Users/G$/AppData/Local/Programs/Comfy Desktop/`
-- **Model**: `anything-v5.safetensors`
+- **Model (V3, current)**: `illustriousxlMmmix_v80.safetensors`
 - **Input dir**: `C:/Users/G$/AppData/Local/Comfy-Desktop/ComfyUI-Shared/input`
-- **Canvas**: 800x1400px, Euler a / DPM++ 2M Karras, 28-35 steps, CFG 6-7
+- **Canvas**: 832x1216, dpmpp_2m_sde / karras, 40 steps, CFG 6.5. Denoise: 
+  1.0 base, 0.58 expressions (img2img), 0.72 outfit fallback (img2img)
+- **Prompting**: danbooru tag order, ONE weight only — `(solo:1.5)`. 
+  Full rules + per-character tags/seeds: `docs/sprite-prompts.md`
 
-Key scripts:
-- `generate-art.mjs` · Original txt2img sprite gen
-- `regen-sprites.mjs` · Consistent regen (txt2img base + img2img expressions)
-- `generate-extras.mjs` · Lab bg + hero avatars
-- `generate-outfits-img2img.mjs` · Outfit gen (low denoise ~0.45)
-- `gen-*-outfits-v2.mjs` · Per-character outfit batches
-- `remove_backgrounds.py` (root) · rembg background removal
+The ~85 legacy `.mjs` files in `scripts/` predate the skill. The V1 system 
+(anything-v5 at 800x1400, `docs/locked-prompts.md`) is deprecated. Known 
+bad legacy scripts: `test-arisu-v3.mjs` (contains Merrick's identity 
+block), `test-kurisu-v3.mjs` (weighted tag violates V3).
 
-Prompt references: `docs/sprite-prompts.md`, `docs/locked-prompts.md`, 
-`docs/comfyui-art-prompts.md`
+Still-useful helpers: `build-pick-gallery.mjs` / `apply-picks-add.mjs` 
+(selection flow), `remove_backgrounds.py` (root, rembg).
 
 ## localStorage Keys
 
