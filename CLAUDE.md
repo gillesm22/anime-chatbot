@@ -182,13 +182,16 @@ one-off scripts to `scripts/`.
 - **Prompting**: danbooru tag order, ONE weight only — `(solo:1.5)`. 
   Full rules + per-character tags/seeds: `docs/sprite-prompts.md`
 
-The ~85 legacy `.mjs` files in `scripts/` predate the skill. The V1 system 
-(anything-v5 at 800x1400, `docs/locked-prompts.md`) is deprecated. Known 
-bad legacy scripts: `test-arisu-v3.mjs` (contains Merrick's identity 
-block), `test-kurisu-v3.mjs` (weighted tag violates V3).
+Legacy one-off generation scripts live in `scripts/archive/` — reference 
+only, do not imitate (many carry V1/V2 mistakes; the V1 system with 
+anything-v5 at 800x1400 is deprecated).
 
-Still-useful helpers: `build-pick-gallery.mjs` / `apply-picks-add.mjs` 
-(selection flow), `remove_backgrounds.py` (root, rembg).
+Active helpers in `scripts/`: `build-pick-gallery.mjs` / 
+`apply-picks-add.mjs` (additive selection flow), `build-regen-gallery.mjs` 
+/ `apply-regen-selection.mjs` (full re-curation — WIPES `regen-3/`), 
+`remove_backgrounds.py` (root, rembg). Sprite finalization (rembg + 
+face compositing + canvas verify + promote) is the **`pick-and-apply` 
+skill** (`.claude/skills/pick-and-apply/`).
 
 ## localStorage Keys
 
