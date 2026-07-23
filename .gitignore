@@ -35,6 +35,14 @@ yarn-error.log*
 .env*
 !.env.local.example
 
+# hexxii remote (job history + push subscriptions + dev server log)
+/.hexxii-remote/
+/hexxii-dev.log
+
+# generated review galleries
+/regen-gallery.html
+/public/regen-gallery.html
+
 # vercel
 .vercel
 

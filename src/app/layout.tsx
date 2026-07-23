@@ -82,14 +82,9 @@ export default function RootLayout({
               origError.apply(console, arguments);
             };
             if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(reg) { reg.unregister(); });
-              });
-              if (typeof caches !== 'undefined') {
-                caches.keys().then(function(keys) {
-                  keys.forEach(function(k) { caches.delete(k); });
-                });
-              }
+              // Push-only SW (web push for HEXXII remote). It caches nothing;
+              // it clears stale caches from older SWs on activate.
+              navigator.serviceWorker.register('/sw.js');
             }
           }
         `}</Script>
