@@ -99,8 +99,8 @@ const OUTFITS = {
   "body-school-skimpy": "(open white shirt:1.3), (tied up shirt:1.3), (deep cleavage:1.4), (bikini top under shirt:1.3), (micro plaid skirt:1.5), (extremely short skirt:1.5), (barely covering:1.4), loose tie, (bare midriff:1.4), (bare stomach:1.3), (bare thighs:1.3), (thigh highs:1.3), (maximum skin:1.4), (extremely skimpy:1.4)",
   "body-nurse": "(sexy nurse outfit:1.4), (very short white nurse dress:1.3), (deep neckline:1.3), red cross, nurse cap, thigh highs, cleavage, bare shoulders",
   "body-nurse-plus": "(sexy nurse:1.4), (micro teal nurse bikini:1.5), (teal string bikini:1.4), (dark fabric:1.2), red cross on chest, nurse cap, (bare midriff:1.4), (bare stomach:1.4), (bare thighs:1.4), (maximum skin:1.5), (extremely skimpy:1.4), thigh highs",
-  "body-cheerleader": "(sporty crop top:1.4), (white and teal crop top:1.3), bare midriff, (short pleated miniskirt:1.3), (white pleated skirt:1.3), thigh highs, (composed smirk:1.2), confident",
-  "body-cheer-extreme": "(cheerleader:1.3), (tiny red sports bra:1.5), (micro red pleated skirt:1.5), (extremely short skirt:1.4), bare arms, bare shoulders, bare midriff, bare stomach, bare thighs, (maximum skin:1.5), (extremely skimpy:1.5), pom poms",
+  "body-cheerleader": "cheerleader outfit, crop top, bare midriff, pleated miniskirt",
+  "body-cheer-extreme": "tiny sports bra, micro pleated skirt, bare midriff, bare thighs, maximum skin, extremely skimpy, confident smirk, half-lidded eyes",
 };
 
 const EXPRESSIONS = {
@@ -271,7 +271,7 @@ async function main() {
 
   } else if (OUTFITS[arg]) {
     console.log(`\n=== Merrick V2: ${arg} (txt2img, seed ${MERRICK_SEED + 100}) ===\n`);
-    const outfitSeed = MERRICK_SEED;
+    const outfitSeed = arg === "body-cheer-extreme" ? MERRICK_SEED + 1 : MERRICK_SEED;
     console.log(`\n=== Merrick V2: ${arg} (txt2img, seed ${outfitSeed}) ===\n`);
     await generate(
       txt2imgWorkflow(

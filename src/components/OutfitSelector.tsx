@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { getAffinity } from "@/lib/affinity";
 
-export type Outfit = "default" | "back" | "bikini-front" | "bikini-back" | "casual" | "formal" | "school" | "school-skimpy" | "cheerleader" | "cheer-extreme" | "cheer-extreme-back" | "maid" | "vampire" | "nurse" | "cow" | "cowgirl" | "demon";
+export type Outfit = "default" | "back" | "bikini-front" | "bikini-back" | "casual" | "formal" | "school" | "school-skimpy" | "cheerleader" | "cheer-extreme" | "cheer-extreme-back" | "maid" | "vampire" | "nurse" | "cow" | "cowgirl" | "demon" | "clown" | "flamenco";
 
 interface OutfitSelectorProps {
   accentColor: string;

@@ -1,0 +1,43 @@
+{
+  "prefix": "arisu-v3",
+  "outputDir": "public/sprites/arisu-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "light pink hair, long hair, wavy hair",
+    "brown eyes, long eyelashes",
+    "pretty face, mature face",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip",
+    "clown outfit, colorful ruffled collar, pom pom buttons, red clown nose, rainbow striped dress, white gloves",
+    "flower hair clip",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "shadow, cast shadow, drop shadow",
+    "silver hair, white hair, red hair, brown hair, black hair",
+    "pale skin, fair skin",
+    "blue eyes, red eyes, green eyes",
+    "face paint, white face makeup, creepy, scary clown, horror",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background, colored background, pink background, yellow background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    { "name": "arisu-v3-clown-55904", "mode": "txt2img", "seed": 55904 },
+    { "name": "arisu-v3-clown-55905", "mode": "txt2img", "seed": 55905 },
+    { "name": "arisu-v3-clown-55906", "mode": "txt2img", "seed": 55906 },
+    { "name": "arisu-v3-clown-55907", "mode": "txt2img", "seed": 55907 }
+  ]
+}

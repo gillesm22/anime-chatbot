@@ -1,0 +1,153 @@
+{
+  "prefix": "arisu-v3",
+  "outputDir": "public/sprites/arisu-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "light pink hair, long hair, wavy hair",
+    "brown eyes, long eyelashes",
+    "pretty face, mature face",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip, waving, hands visible",
+    "black long sleeve top, v-neck, white shorts",
+    "flower hair clip",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "shadow, cast shadow, drop shadow",
+    "hands behind back, arms behind back, hands in pockets, hand behind head",
+    "silver hair, white hair, red hair, brown hair, black hair",
+    "pale skin, fair skin",
+    "blue eyes, red eyes, green eyes",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background, colored background, pink background, yellow background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    {
+      "name": "arisu-v3-default-55960",
+      "mode": "txt2img",
+      "seed": 55960,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, waving, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    },
+    {
+      "name": "arisu-v3-default-55961",
+      "mode": "txt2img",
+      "seed": 55961,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, waving, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    },
+    {
+      "name": "arisu-v3-default-55962",
+      "mode": "txt2img",
+      "seed": 55962,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, waving, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    },
+    {
+      "name": "arisu-v3-default-55963",
+      "mode": "txt2img",
+      "seed": 55963,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, peace sign, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    },
+    {
+      "name": "arisu-v3-default-55964",
+      "mode": "txt2img",
+      "seed": 55964,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, peace sign, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    },
+    {
+      "name": "arisu-v3-default-55965",
+      "mode": "txt2img",
+      "seed": 55965,
+      "positive": [
+        "(solo:1.5), 1girl, one person",
+        "white background, simple background, transparent background, png",
+        "dark brown skin, smooth skin",
+        "light pink hair, long hair, wavy hair",
+        "brown eyes, long eyelashes",
+        "pretty face, mature face",
+        "mature female, adult, tall, large breasts, slender waist, curvy",
+        "cowboy shot, looking at viewer, standing, hand on hip, peace sign, hands visible",
+        "black long sleeve top, v-neck, white shorts",
+        "flower hair clip",
+        "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+        "cel shading, clean lineart, sharp focus"
+      ]
+    }
+  ]
+}

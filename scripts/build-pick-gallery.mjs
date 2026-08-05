@@ -77,14 +77,34 @@ const html = `<!doctype html>
   .card.picked::after { content:"KEEP"; position:absolute; top:6px; right:6px; background:#35d07f; color:#06210f; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; }
   .card .pick { position:absolute; top:6px; left:6px; z-index:2; width:22px; height:22px; cursor:pointer; accent-color:#35d07f; }
   .card .seed { position:absolute; bottom:0; left:0; right:0; padding:2px 6px; font-size:11px; color:#dcdce6; background:linear-gradient(transparent,#000a); pointer-events:none; }
+  .card.focused { border-color:#6b6bff; box-shadow:0 0 0 3px #6b6bff66; }
+  .card.focused.picked { border-color:#35d07f; box-shadow:0 0 0 3px #35d07f66; }
+  #lightbox { position:fixed; inset:0; z-index:100; background:#000d; display:none; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
+  #lightbox.open { display:flex; }
+  #lightbox img { max-width:92vw; max-height:84vh; object-fit:contain; border-radius:8px; box-shadow:0 8px 40px #000; display:block; }
+  #lightbox .lb-frame { position:relative; }
+  #lightbox .lb-frame .pick { position:absolute; top:10px; left:10px; z-index:2; width:28px; height:28px; cursor:pointer; accent-color:#35d07f; }
+  #lightbox .lb-caption { color:#dcdce6; font-size:13px; }
+  #lightbox .lb-caption b { color:#fff; text-transform:capitalize; }
+  #lightbox .lb-badge { display:inline-block; margin-left:10px; padding:1px 8px; border-radius:4px; font-size:11px; font-weight:700; background:#2a2a35; color:#9a9aa8; }
+  #lightbox.picked .lb-badge { background:#35d07f; color:#06210f; }
+  #lightbox .lb-hint { color:#7a7a88; font-size:11px; }
 </style></head><body>
 <header>
   <h1>${esc(charId)} — pick gap outfits</h1>
-  <div class="meta">${outfitFilter.length} outfits · ${total} candidates · pick your favorite per outfit</div>
+  <div class="meta">${outfitFilter.length} outfits · ${total} candidates · pick your favorite per outfit · arrow keys to move, Space/Enter to pick</div>
   <div class="toolbar"><span><span id="count">0</span> picked</span>
     <button class="primary" id="export">Export picks</button><button id="clear">Clear</button></div>
 </header>
 ${sections}
+<div id="lightbox">
+  <div class="lb-frame">
+    <input type="checkbox" id="lb-pick" class="pick" title="Pick this one">
+    <img alt="">
+  </div>
+  <div class="lb-caption"></div>
+  <div class="lb-hint">&larr; &rarr; browse &middot; Space or checkbox picks &middot; Esc closes</div>
+</div>
 <script>
 const KEY = "pick-gallery-${charId}";
 const saved = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
@@ -104,6 +124,69 @@ persist();
 document.getElementById("clear").addEventListener("click", () => {
   if (!confirm("Clear " + saved.size + " picks?")) return;
   saved.clear(); cards.forEach((c) => { c.querySelector(".pick").checked=false; c.classList.remove("picked"); }); persist();
+});
+// Keyboard navigation: arrows move focus, Space/Enter toggles the pick.
+// Enter (or clicking an image) opens the lightbox; inside it, arrows flip
+// through full-size images, Space picks, Esc closes.
+let focusIdx = -1;
+const lb = document.getElementById("lightbox");
+const lbImg = lb.querySelector("img");
+const lbCaption = lb.querySelector(".lb-caption");
+function setFocus(i, scroll = true){
+  if (!cards.length) return;
+  i = Math.max(0, Math.min(cards.length - 1, i));
+  if (focusIdx >= 0) cards[focusIdx].classList.remove("focused");
+  focusIdx = i;
+  cards[i].classList.add("focused");
+  if (scroll) cards[i].scrollIntoView({ block: "center", behavior: "auto" });
+}
+function colsOf(card){
+  const cols = getComputedStyle(card.parentElement).gridTemplateColumns.split(" ").length;
+  return Math.max(1, cols);
+}
+function togglePick(i){
+  const cb = cards[i].querySelector(".pick");
+  cb.checked = !cb.checked;
+  cb.dispatchEvent(new Event("change"));
+}
+const lbPick = document.getElementById("lb-pick");
+function lbSync(){
+  const card = cards[focusIdx];
+  lbImg.src = card.dataset.src;
+  lbCaption.innerHTML = "<b>" + card.dataset.outfit + "</b> &middot; " + card.dataset.file +
+    ' <span class="lb-badge">KEEP</span>';
+  const isPicked = card.classList.contains("picked");
+  lb.classList.toggle("picked", isPicked);
+  lbPick.checked = isPicked;
+}
+lbPick.addEventListener("change", () => { togglePick(focusIdx); lbSync(); });
+function lbOpen(i){ setFocus(i, false); lb.classList.add("open"); lbSync(); }
+function lbClose(){ lb.classList.remove("open"); cards[focusIdx].scrollIntoView({ block: "center", behavior: "auto" }); }
+lb.addEventListener("click", (e) => { if (e.target === lb) lbClose(); });
+document.addEventListener("keydown", (e) => {
+  const keys = ["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," ","Enter","Escape"];
+  if (!keys.includes(e.key)) return;
+  e.preventDefault();
+  if (lb.classList.contains("open")) {
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") { setFocus(focusIdx - 1, false); lbSync(); }
+    else if (e.key === "ArrowRight" || e.key === "ArrowDown") { setFocus(focusIdx + 1, false); lbSync(); }
+    else if (e.key === " ") { togglePick(focusIdx); lbSync(); }
+    else if (e.key === "Escape" || e.key === "Enter") lbClose();
+    return;
+  }
+  if (e.key === "Escape") return;
+  if (focusIdx < 0) { setFocus(0); if (e.key === " " || e.key === "Enter") return; }
+  if (e.key === "ArrowLeft") setFocus(focusIdx - 1);
+  else if (e.key === "ArrowRight") setFocus(focusIdx + 1);
+  else if (e.key === "ArrowUp") setFocus(focusIdx - colsOf(cards[focusIdx]));
+  else if (e.key === "ArrowDown") setFocus(focusIdx + colsOf(cards[focusIdx]));
+  else if (e.key === " ") togglePick(focusIdx);
+  else if (e.key === "Enter") lbOpen(focusIdx);
+});
+cards.forEach((card, i) => {
+  card.addEventListener("click", () => setFocus(i, false));
+  const link = card.querySelector("a");
+  link.addEventListener("click", (e) => { e.preventDefault(); lbOpen(i); });
 });
 document.getElementById("export").addEventListener("click", () => {
   const picks = cards.filter((c) => saved.has(c.dataset.src))

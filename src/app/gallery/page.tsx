@@ -63,6 +63,8 @@ const SPRITES: SpriteEntry[] = [
   { file: "body-cow.png", label: "Cow", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-cowgirl.png", label: "Cowgirl", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
   { file: "body-demon.png", label: "Demon", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-clown.png", label: "Clown", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
+  { file: "body-flamenco.png", label: "Flamenco", category: "outfit", onlyFor: FULL_OUTFIT_CHARS },
 ];
 
 const CATEGORY_LABELS: Record<SpriteEntry["category"], string> = {

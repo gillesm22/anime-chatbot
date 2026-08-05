@@ -1,0 +1,156 @@
+{
+  "prefix": "arisu-v3",
+  "outputDir": "public/sprites/arisu-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "light pink hair, long hair, wavy hair",
+    "brown eyes, long eyelashes",
+    "pretty face, mature face, detailed face, detailed eyes, sharp facial features",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, relaxed, own hands together, hands in front, hands visible",
+    "black long sleeve top, v-neck, white shorts",
+    "flower hair clip",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "shadow, cast shadow, drop shadow",
+    "hands behind back, arms behind back, hands in pockets, hand behind head",
+    "waving, peace sign, salute, pointing",
+    "face paint, war paint, face markings, makeup streaks, black eye makeup, fangs, vampire, blood",
+    "silver hair, white hair, red hair, brown hair, black hair",
+    "pale skin, fair skin",
+    "blue eyes, red eyes, green eyes",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background, colored background, pink background, yellow background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    {
+      "name": "arisu-v3-face-thinking-55982",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55982,
+      "appendPositive": "thinking, looking up, finger to own chin, head tilt, curious, pursed lips",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-surprised-55983",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55983,
+      "appendPositive": "surprised, shocked, wide eyes, open mouth, gasp, raised eyebrows",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-sad-55984",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55984,
+      "appendPositive": "sad, downcast eyes, frown, trembling lips, teary eyes"
+    },
+    {
+      "name": "arisu-v3-face-smirk-55985",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55985,
+      "appendPositive": "smirk, smug, half-lidded eyes, raised eyebrow, confident grin",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-laugh-55986",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55986,
+      "appendPositive": "laughing, open mouth, closed eyes, big smile, cheerful, head tilted back",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-angry-55987",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55987,
+      "appendPositive": "furious, angry, glaring at viewer, furrowed brows, gritted teeth, scowl",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-devoted-55988",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55988,
+      "appendPositive": "in love, adoring gaze, tender smile, blush, half-lidded eyes",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-teasing-55989",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55989,
+      "appendPositive": "teasing, playful grin, wink, one eye closed, tongue out",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-sleepy-55990",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55990,
+      "appendPositive": "sleepy, drowsy, heavy eyelids, yawning, hand near mouth",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-excited-55991",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55991,
+      "appendPositive": "excited, wide eyes, open mouth grin, beaming, enthusiastic",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-shy-55992",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55992,
+      "appendPositive": "shy, embarrassed, deep blush, averted eyes, timid smile",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-jealous-55993",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55993,
+      "appendPositive": "jealous, pouting, puffed cheeks, sidelong glare, frown",
+      "appendNegative": "teardrop, tears, crying"
+    },
+    {
+      "name": "arisu-v3-face-crying-55994",
+      "mode": "img2img",
+      "input": "arisu-base-55978.png",
+      "denoise": 0.58,
+      "seed": 55994,
+      "appendPositive": "tears on dark skin, grief, scrunched brows, rare vulnerability"
+    }
+  ]
+}

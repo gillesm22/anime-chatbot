@@ -1,0 +1,52 @@
+{
+  "prefix": "merrick-faces",
+  "outputDir": "C:/Users/G$/AppData/Local/Temp/claude/C--Users-G--anime-chatbot/749a1188-57a3-41d8-8b64-022534d26da4/scratchpad/merrick-newdefault-staging",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "long black hair, hair past waist, straight hair",
+    "green eyes, long eyelashes",
+    "pretty face, mature face",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip",
+    "black tank top, fitted black pants",
+    "gold hoop earrings, jade pendant necklace",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "blonde hair, silver hair, white hair, pink hair, red hair",
+    "pale skin, fair skin",
+    "blue eyes, violet eyes, red eyes",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    { "name": "face-happy", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55961, "denoise": 0.58, "appendPositive": "happy warm smile, bright eyes, genuine warmth, quiet delight" },
+    { "name": "face-thinking", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55962, "denoise": 0.58, "appendPositive": "thoughtful expression, eyes looking up, contemplative, finger on chin" },
+    { "name": "face-surprised", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55963, "denoise": 0.58, "appendPositive": "wide eyes, slightly open mouth, eyebrows raised, rarely caught off guard" },
+    { "name": "face-sad", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55964, "denoise": 0.58, "appendPositive": "downcast eyes, slight frown, melancholic, quiet grief" },
+    { "name": "face-smirk", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55965, "denoise": 0.58, "appendPositive": "knowing smirk, one corner raised, half-lidded eyes, sees right through you" },
+    { "name": "face-laugh", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55966, "denoise": 0.58, "appendPositive": "eyes closed with quiet joy, measured laugh, hand near mouth" },
+    { "name": "face-angry", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55967, "denoise": 0.58, "appendPositive": "cool displeasure, narrowed eyes, tight jaw, composed fury" },
+    { "name": "face-flustered", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55968, "denoise": 0.58, "appendPositive": "rare loss of composure, slight blush on dark skin, averted gaze" },
+    { "name": "face-devoted", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55969, "denoise": 0.58, "appendPositive": "deep unhurried love, warm soft gaze, gentle expression, tender smile" },
+    { "name": "face-teasing", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55970, "denoise": 0.58, "appendPositive": "playful curiosity, sly grin, one eyebrow raised, elegant mischief" },
+    { "name": "face-sleepy", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55971, "denoise": 0.58, "appendPositive": "meditative stillness, half-closed eyes, peaceful, serene" },
+    { "name": "face-excited", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55972, "denoise": 0.58, "appendPositive": "intellectual delight, wide bright eyes, genuine interest" },
+    { "name": "face-shy", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55973, "denoise": 0.58, "appendPositive": "rare uncertainty, looking slightly away, quiet moment" },
+    { "name": "face-jealous", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55974, "denoise": 0.58, "appendPositive": "possessive glance, narrowed eyes, side look" },
+    { "name": "face-crying", "mode": "img2img", "input": "merrick-newbase.png", "seed": 55975, "denoise": 0.58, "appendPositive": "tears on dark skin, grief, scrunched brows, rare vulnerability" }
+  ]
+}

@@ -42,6 +42,18 @@ yarn-error.log*
 # generated review galleries
 /regen-gallery.html
 /public/regen-gallery.html
+/pick-gallery*.html
+/selection-gallery.html
+
+# sprite generation working files (candidate batches, never ship)
+/public/sprites/*-regen/
+/regen-3/
+/regen-others/
+/merrick-spicy/
+/ticia-gen-runs/
+
+# superpowers plugin working state
+/.superpowers/
 
 # vercel
 .vercel
@@ -49,3 +61,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.dev-server.log

@@ -128,7 +128,7 @@ export default function SettingsPage() {
   return (
     <PageTransition>
       <div
-        className="min-h-screen flex flex-col"
+        className="h-screen overflow-y-auto flex flex-col"
         style={{ background: "linear-gradient(180deg, var(--color-surface, #16161e) 0%, var(--color-bg, #0d0d12) 100%)" }}
       >
         {/* Header */}

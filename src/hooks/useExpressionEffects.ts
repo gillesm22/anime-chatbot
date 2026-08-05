@@ -36,15 +36,5 @@ export function useExpressionEffects({ currentMood }: UseExpressionEffectsArgs) 
     return () => clearTimeout(timer);
   }, []);
 
-  // Tap the sprite to trigger a flustered reaction (only when idle)
-  const handleSpriteTap = useCallback(() => {
-    if (state.phase !== "idle") return;
-    dispatch(setExpression("flustered"));
-    const timer = setTimeout(() => {
-      dispatch(setExpression(moodToExpression(currentMood)));
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [state.phase, currentMood, dispatch]);
-
-  return { activeEffect, handleExpressionChange, handleSpriteTap };
+  return { activeEffect, handleExpressionChange };
 }

@@ -1,0 +1,75 @@
+{
+  "prefix": "merrick-v3",
+  "outputDir": "public/sprites/merrick-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "long black hair, hair past waist, straight hair",
+    "green eyes, long eyelashes",
+    "pretty face, mature face",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip",
+    "black tank top, fitted black pants",
+    "gold hoop earrings, jade pendant necklace",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "blonde hair, silver hair, white hair, pink hair, red hair",
+    "pale skin, fair skin",
+    "blue eyes, violet eyes, red eyes",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    { "name": "v3-55810", "mode": "txt2img", "seed": 55810 },
+    { "name": "v3-55820", "mode": "txt2img", "seed": 55820 },
+    { "name": "v3-55830", "mode": "txt2img", "seed": 55830 },
+
+    { "name": "merrick-v3-formal-55810", "mode": "txt2img", "seed": 55810,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "elegant black evening gown, thigh slit, pearl earrings, sophisticated", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-formal-55820", "mode": "txt2img", "seed": 55820,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "elegant black evening gown, thigh slit, pearl earrings, sophisticated", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-formal-55830", "mode": "txt2img", "seed": 55830,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "elegant black evening gown, thigh slit, pearl earrings, sophisticated", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+
+    { "name": "merrick-v3-cow-55810", "mode": "txt2img", "seed": 55810,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "cow print micro bikini, cow pattern, cow horns headband, golden bell choker, bare midriff, bare thighs, maximum skin", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-cow-55820", "mode": "txt2img", "seed": 55820,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "cow print micro bikini, cow pattern, cow horns headband, golden bell choker, bare midriff, bare thighs, maximum skin", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-cow-55830", "mode": "txt2img", "seed": 55830,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "cow print micro bikini, cow pattern, cow horns headband, golden bell choker, bare midriff, bare thighs, maximum skin", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+
+    { "name": "merrick-v3-vamp-55810", "mode": "txt2img", "seed": 55810,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, bat wings, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-vamp-55820", "mode": "txt2img", "seed": 55820,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, bat wings, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-vamp-55830", "mode": "txt2img", "seed": 55830,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, bat wings, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+
+    { "name": "merrick-v3-back-default-55810", "mode": "txt2img", "seed": 55810,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "black tank top, fitted black pants", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-back-default-55820", "mode": "txt2img", "seed": 55820,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "black tank top, fitted black pants", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-back-default-55830", "mode": "txt2img", "seed": 55830,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "black tank top, fitted black pants", "gold hoop earrings, jade pendant necklace", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+
+    { "name": "merrick-v3-cheer-extreme-back-55810", "mode": "txt2img", "seed": 55810,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "string bikini top, micro pleated skirt, pom poms, bare midriff, bare back, bare thighs, bare hips, skimpy", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-cheer-extreme-back-55820", "mode": "txt2img", "seed": 55820,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "string bikini top, micro pleated skirt, pom poms, bare midriff, bare back, bare thighs, bare hips, skimpy", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] },
+    { "name": "merrick-v3-cheer-extreme-back-55830", "mode": "txt2img", "seed": 55830,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, from behind, looking back over shoulder, standing, hand on hip", "string bikini top, micro pleated skirt, pom poms, bare midriff, bare back, bare thighs, bare hips, skimpy", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"] }
+  ]
+}

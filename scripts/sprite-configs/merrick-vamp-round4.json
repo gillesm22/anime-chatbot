@@ -1,0 +1,42 @@
+{
+  "prefix": "merrick-v3",
+  "outputDir": "public/sprites/merrick-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, dark skin, smooth skin",
+    "long black hair, hair past waist, straight hair",
+    "green eyes, long eyelashes",
+    "pretty face, mature face, fangs, fang out, open mouth, smile",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip",
+    "vampire, black corset gown, red accents, high collar cape, garter stockings, black choker with red gem, blood red lips",
+    "gold hoop earrings",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "blonde hair, silver hair, white hair, pink hair, red hair",
+    "pale skin, fair skin, white skin",
+    "blue eyes, violet eyes, red eyes",
+    "bat wings, wings, bad teeth, crooked teeth, blurry teeth, missing teeth",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background, red background, colored background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    { "name": "merrick-v3-vamp4-55890", "mode": "txt2img", "seed": 55890 },
+    { "name": "merrick-v3-vamp4-55900", "mode": "txt2img", "seed": 55900 },
+    { "name": "merrick-v3-vamp4-55910", "mode": "txt2img", "seed": 55910 },
+    { "name": "merrick-v3-vamp4-55920", "mode": "txt2img", "seed": 55920 }
+  ]
+}

@@ -21,7 +21,6 @@ export interface VNLayoutProps {
   level?: number;
   onHeadpat: () => void;
   onExpressionChange: (effect: ExpressionEffect) => void;
-  onSpriteTap: () => void;
   onDiscoveryReaction: (line: string, expression: string) => void;
   onDiscoveryContext: (ctx: string) => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -117,7 +116,6 @@ export function VNLayout({
   level,
   onHeadpat,
   onExpressionChange,
-  onSpriteTap,
   onDiscoveryReaction,
   onDiscoveryContext,
   containerRef,
@@ -157,7 +155,7 @@ export function VNLayout({
       {activeEffect && <EffectOverlay effect={activeEffect} />}
 
       {/* Layer 4: Character sprite */}
-      <div className="vn-sprite-zone" onClick={onSpriteTap}>
+      <div className="vn-sprite-zone">
         <CharacterSprite
           character={character}
           expression={expression}

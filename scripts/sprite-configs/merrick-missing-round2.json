@@ -1,0 +1,52 @@
+{
+  "prefix": "merrick-v3",
+  "outputDir": "public/sprites/merrick-regen",
+  "positive": [
+    "(solo:1.5), 1girl, one person",
+    "white background, simple background, transparent background, png",
+    "dark brown skin, smooth skin",
+    "long black hair, hair past waist, straight hair",
+    "green eyes, long eyelashes",
+    "pretty face, mature face",
+    "mature female, adult, tall, large breasts, slender waist, curvy",
+    "cowboy shot, looking at viewer, standing, hand on hip",
+    "black tank top, fitted black pants",
+    "gold hoop earrings, jade pendant necklace",
+    "masterpiece, best quality, highres, anime style, visual novel sprite, game cg",
+    "cel shading, clean lineart, sharp focus"
+  ],
+  "negative": [
+    "low quality, worst quality, blurry, deformed, extra fingers, bad anatomy, text, watermark, signature",
+    "multiple girls, 2girls, multiple characters, split screen, mirror, reflection, duo",
+    "ugly, duplicate, extra limbs, poorly drawn face, mutation, bad proportions",
+    "reference sheet, multiple views, character sheet, expression sheet",
+    "collage, grid, panels, borders, frames",
+    "props, furniture, background objects",
+    "blonde hair, silver hair, white hair, pink hair, red hair",
+    "pale skin, fair skin",
+    "blue eyes, violet eyes, red eyes",
+    "close-up, portrait, full body",
+    "sitting, kneeling",
+    "background, grey background, gradient background",
+    "child, loli, young",
+    "chibi, glasses, headphones",
+    "male, man, boy"
+  ],
+  "jobs": [
+    { "name": "base-55840", "mode": "txt2img", "seed": 55840 },
+    { "name": "base-55850", "mode": "txt2img", "seed": 55850 },
+    { "name": "base-55860", "mode": "txt2img", "seed": 55860 },
+    { "name": "base-55870", "mode": "txt2img", "seed": 55870 },
+    { "name": "base-55880", "mode": "txt2img", "seed": 55880 },
+
+    { "name": "merrick-v3-vamp2-55840", "mode": "txt2img", "seed": 55840,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"],
+      "appendNegative": "bat wings, wings" },
+    { "name": "merrick-v3-vamp2-55850", "mode": "txt2img", "seed": 55850,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"],
+      "appendNegative": "bat wings, wings" },
+    { "name": "merrick-v3-vamp2-55860", "mode": "txt2img", "seed": 55860,
+      "positive": ["(solo:1.5), 1girl, one person", "white background, simple background, transparent background, png", "dark brown skin, smooth skin", "long black hair, hair past waist, straight hair", "green eyes, long eyelashes", "pretty face, mature face", "mature female, adult, tall, large breasts, slender waist, curvy", "cowboy shot, looking at viewer, standing, hand on hip", "vampire, black corset mini dress, garter stockings, red ribbon accents, black choker with gem, small fangs", "gold hoop earrings", "masterpiece, best quality, highres, anime style, visual novel sprite, game cg", "cel shading, clean lineart, sharp focus"],
+      "appendNegative": "bat wings, wings" }
+  ]
+}

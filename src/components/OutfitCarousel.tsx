@@ -17,6 +17,8 @@ const OUTFITS: { id: Outfit; label: string }[] = [
   { id: "cow", label: "Cow" },
   { id: "cowgirl", label: "Cowgirl" },
   { id: "demon", label: "Demon" },
+  { id: "clown", label: "Clown" },
+  { id: "flamenco", label: "Flamenco" },
 ];
 
 export interface OutfitCarouselProps {

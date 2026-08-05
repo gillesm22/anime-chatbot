@@ -211,7 +211,6 @@ function ChatContent({ characterId }: { characterId: string }) {
       activeEffect={effects.activeEffect}
       onHeadpat={() => session.addAffinity("headpat")}
       onExpressionChange={effects.handleExpressionChange}
-      onSpriteTap={effects.handleSpriteTap}
       onDiscoveryReaction={handleDiscoveryReaction}
       onDiscoveryContext={(ctx) => setPendingDiscoveryContext(ctx)}
       containerRef={containerRef}

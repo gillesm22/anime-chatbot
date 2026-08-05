@@ -185,6 +185,7 @@ function computeOutfits(_level: number): string[] {
     "casual", "school", "back", "formal", "cheerleader",
     "bikini-front", "bikini-back", "maid", "vampire", "nurse", "cowgirl",
     "school-skimpy", "cheer-extreme", "cheer-extreme-back", "cow", "demon",
+    "clown", "flamenco",
   ];
 }
 
