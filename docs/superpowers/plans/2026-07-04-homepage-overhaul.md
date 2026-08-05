@@ -215,7 +215,7 @@ export function HomepageScene() {
 
 - [ ] **Step 2: Verify it compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass (no test for this component — it's purely visual)
 
 - [ ] **Step 3: Commit**
@@ -386,7 +386,7 @@ export function CharacterLineup({ onSelect }: CharacterLineupProps) {
 
 - [ ] **Step 2: Verify it compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 3: Commit**
@@ -496,7 +496,7 @@ export function CharacterTransition({
 
 - [ ] **Step 2: Verify it compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 3: Commit**
@@ -754,12 +754,12 @@ function HomeContent() {
 
 - [ ] **Step 2: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 3: Verify build compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx next build 2>&1 | grep -E "error|Error|✓" | head -5`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx next build 2>&1 | grep -E "error|Error|✓" | head -5`
 Expected: "Compiled successfully" (ignore pre-existing TTS Buffer error)
 
 - [ ] **Step 4: Commit**
@@ -778,7 +778,7 @@ git commit -m "feat: rewrite homepage with atmospheric scene and character lineu
 
 - [ ] **Step 1: Start dev server and test**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Open http://localhost:3000 and verify:
 1. Dark atmospheric background fills viewport

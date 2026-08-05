@@ -913,7 +913,7 @@ git commit -m "feat: mount BloodDripCanvas in root layout"
 
 - [ ] **Step 1: Start dev server**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 - [ ] **Step 2: Test basic drip (off by default)**
 

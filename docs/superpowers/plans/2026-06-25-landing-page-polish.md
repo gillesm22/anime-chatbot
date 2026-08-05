@@ -428,7 +428,7 @@ git commit -m "feat: crossfade to random expression on card hover for personalit
 - [ ] **Step 1: Build**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot" && npx next build
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx next build
 ```
 
 Expected: Compiled successfully, no errors.

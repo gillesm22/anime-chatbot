@@ -475,12 +475,12 @@ export function formatAffinityForPrompt(characterId: string): string {
 
 - [ ] **Step 3: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run __tests__/lib/affinity.test.ts`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run __tests__/lib/affinity.test.ts`
 Expected: All 9 tests pass
 
 - [ ] **Step 4: Run full test suite**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass (existing tests that reference old level names may need updates — check and fix)
 
 - [ ] **Step 5: Commit**
@@ -534,7 +534,7 @@ import { getAffinity, getNextLevelProgress, getTitleForLevel, recordVisit } from
 
 - [ ] **Step 2: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 3: Commit**
@@ -666,7 +666,7 @@ Then in `src/app/chat/[characterId]/page.tsx`, pass `level` to VNLayout:
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 5: Commit**
@@ -682,7 +682,7 @@ git commit -m "feat: visual upgrades — glow and particles scale with level"
 
 - [ ] **Step 1: Test in browser**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Test:
 1. XP bar shows `Lv.X` without old level name

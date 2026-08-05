@@ -371,7 +371,7 @@ git commit -m "feat: BloodBat displays AI-generated chat phrases with active moo
 - [ ] **Step 1: Start dev server**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot"
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot"
 rm -rf .next
 npx next dev --webpack -p 3000
 ```

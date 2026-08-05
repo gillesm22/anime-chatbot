@@ -6,15 +6,15 @@ The repo's own `CLAUDE.md` remains the source of truth for architecture,
 characters, run commands, known issues, and the art pipeline.
 
 ## Location
-- **Source code**: `C:/Users/G$/anime-chatbot/` (local, NOT the Google Drive copy)
+- **Source code**: `C:/Users/G$/Kikaku 企画/anime-chatbot/` (local, NOT the Google Drive copy)
 - **GitHub**: `gillesm22/anime-chatbot` (private)
 - **Full docs**: The repo has its own `CLAUDE.md` with complete architecture,
   characters, run commands, known issues, and art pipeline.
 
 ## Quick Start
 ```bash
-cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
 ```
 
 **Why:** The chatbot project lives outside the Drive workspace. Open a Claude
-session directly in `C:/Users/G$/anime-chatbot/` so its `CLAUDE.md` auto-loads.
+session directly in `C:/Users/G$/Kikaku 企画/anime-chatbot/` so its `CLAUDE.md` auto-loads.

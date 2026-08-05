@@ -632,7 +632,7 @@ git commit -m "feat: wire profile page into landing and settings navigation"
 - [ ] **Step 1: Build**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot" && npx next build
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx next build
 ```
 
 Expected: Compiled successfully, no errors.

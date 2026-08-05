@@ -9,7 +9,7 @@
 **Tech Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, OpenAI GPT-4o, Web Audio API, CSS animations. No new dependencies.
 
 **Run commands:**
-- Dev server: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+- Dev server: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 - Type check: `npx tsc --noEmit`
 - Tests: `npm test`
 - Single test: `npx vitest run __tests__/lib/<file>.test.ts`
@@ -2285,7 +2285,7 @@ has unique dialogue for Acquaintance, Friend, and Close Friend."
 - [ ] **Step 1: Start dev server and test**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
 ```
 
 Open http://localhost:3000 in a browser.

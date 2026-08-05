@@ -8,7 +8,7 @@ import glob
 import sys
 from PIL import Image, ImageFilter
 
-SPRITE_BASE = r"C:\Users\G$\anime-chatbot\public\sprites"
+SPRITE_BASE = r"C:\Users\G$\Kikaku 企画\anime-chatbot\public\sprites"
 CHARACTERS = ["arisu", "marin", "nao"]
 
 

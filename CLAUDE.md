@@ -3,7 +3,7 @@
 ## How to Run
 
 ```bash
-cd "C:/Users/G$/anime-chatbot"
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot"
 rm -rf .next
 npx next dev --webpack -p 3000
 ```
@@ -31,8 +31,6 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 - **framer-motion v10 pinned**: v11+ breaks with React 19 JSX types. 
   Type augmentation at `src/types/framer-motion.d.ts` bridges the gap. 
   Do not upgrade or remove.
-- **Google Drive sync**: This repo is also synced via Drive. Drive can 
-  revert file edits. Always re-read files from disk before editing.
 - **Turbopack**: Cannot use (`$` in path breaks persistence DB). 
   Always pass `--webpack`.
 - **i18n incomplete**: `t()` function has en/ja translations. 
@@ -230,10 +228,3 @@ Run: `npm test` or `npm run test:watch`
 
 - **Repo**: `gillesm22/anime-chatbot` (private)
 - **Collaborator**: gillesm22
-
-## Safety (Google Drive)
-
-This repo syncs via Google Drive. Always:
-- Re-read files from disk before editing (Drive can revert silently)
-- Make targeted edits only, never regenerate entire files
-- Preserve all existing behavior unless explicitly told to change it

@@ -776,7 +776,7 @@ Find where `MilestoneToast` is rendered (around line 604) and add nearby:
 
 - [ ] **Step 6: Run dev server and test**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Test:
 1. Open http://localhost:3000, go to any character chat
@@ -805,7 +805,7 @@ Expected: All existing tests pass + new saveSystem tests pass
 
 - [ ] **Step 2: Run the dev server for manual verification**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Verify:
 1. Fresh load — no restore toast (localStorage has data)

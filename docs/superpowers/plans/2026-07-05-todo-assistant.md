@@ -175,7 +175,7 @@ export function deleteTodo(id: string): void {
 
 - [ ] **Step 3: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run __tests__/lib/todos.test.ts`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run __tests__/lib/todos.test.ts`
 Expected: All 7 tests pass
 
 - [ ] **Step 4: Commit**
@@ -447,7 +447,7 @@ function TodoItem({
 
 - [ ] **Step 2: Run all tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 3: Commit**
@@ -623,7 +623,7 @@ describe("getHotspotsForScene", () => {
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 5: Commit**
@@ -743,7 +743,7 @@ Add the TodoPanel in the overlays section (near the other panels):
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 5: Commit**
@@ -759,7 +759,7 @@ git commit -m "feat: wire todo panel with character reactions to scene hotspots"
 
 - [ ] **Step 1: Test in browser**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Test:
 1. Go to a character chat, switch to lab/cafe/cyberpunk scene

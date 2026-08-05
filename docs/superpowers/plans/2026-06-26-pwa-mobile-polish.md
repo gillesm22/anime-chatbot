@@ -9,7 +9,7 @@
 **Tech Stack:** Service Worker + Cache API, Vibration API, Touch Events, CSS env() safe areas, 100dvh viewport units.
 
 **Run commands:**
-- Dev server: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+- Dev server: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 - Type check: `npx tsc --noEmit`
 - Tests: `npm test`
 - Single test: `npx vitest run __tests__/lib/<file>.test.ts`
@@ -1187,7 +1187,7 @@ resets to dark default on exit."
 - [ ] **Step 1: Start dev server**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000
 ```
 
 - [ ] **Step 2: Test on desktop browser**

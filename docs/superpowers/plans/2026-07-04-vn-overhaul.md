@@ -368,13 +368,13 @@ describe("useCharacterSession", () => {
 
 - [ ] **Step 3: Run test to verify it passes**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run __tests__/lib/useCharacterSession.test.ts`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run __tests__/lib/useCharacterSession.test.ts`
 Expected: PASS
 
 - [ ] **Step 4: Commit**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot"
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot"
 git add src/hooks/useCharacterSession.ts __tests__/lib/useCharacterSession.test.ts
 git commit -m "refactor: extract useCharacterSession hook from chat page"
 ```
@@ -709,7 +709,7 @@ describe("extractNameFromIntroduction", () => {
 
 - [ ] **Step 3: Run test**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run __tests__/lib/useMessageHandler.test.ts`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run __tests__/lib/useMessageHandler.test.ts`
 Expected: PASS
 
 - [ ] **Step 4: Commit**
@@ -1817,7 +1817,7 @@ describe("getObjectsForScene", () => {
 
 - [ ] **Step 4: Run tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run __tests__/lib/sceneObjects.test.ts`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run __tests__/lib/sceneObjects.test.ts`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1866,7 +1866,7 @@ The key changes:
 
 - [ ] **Step 2: Verify typewriter and TTS still work**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All existing tests pass
 
 - [ ] **Step 3: Commit**
@@ -2337,12 +2337,12 @@ export default function ChatPage({ params }: { params: Promise<{ characterId: st
 
 - [ ] **Step 2: Verify the build compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx next build 2>&1 | head -50`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx next build 2>&1 | head -50`
 Expected: No TypeScript errors. Build succeeds or only warns.
 
 - [ ] **Step 3: Run all tests**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 4: Commit**
@@ -2361,7 +2361,7 @@ git commit -m "refactor: rewrite chat page using extracted hooks and VN layout"
 
 - [ ] **Step 1: Start dev server and test in browser**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && rm -rf .next && npx next dev --webpack -p 3000`
 
 Open http://localhost:3000 and test:
 1. Landing page still works, character cards navigate to chat
@@ -2389,7 +2389,7 @@ Adjust VNLayout, CSS, or component styling as needed. Common fixes:
 
 - [ ] **Step 3: Run full test suite**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx vitest run`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx vitest run`
 Expected: All tests pass
 
 - [ ] **Step 4: Commit**
@@ -2412,14 +2412,14 @@ git commit -m "fix: visual QA polish for VN layout, menu, and dialogue overlay"
 
 - [ ] **Step 1: Search for remaining imports of retired components**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && grep -rn "BottomNav\|ControlBar\|ChatInput\|PageTransition" src/ --include="*.tsx" --include="*.ts" | grep -v node_modules`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && grep -rn "BottomNav\|ControlBar\|ChatInput\|PageTransition" src/ --include="*.tsx" --include="*.ts" | grep -v node_modules`
 
 Fix any remaining imports found. The chat page should no longer import these.
 
 - [ ] **Step 2: Delete retired files**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot"
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot"
 rm src/components/BottomNav.tsx
 rm src/components/ControlBar.tsx
 rm src/components/ChatInput.tsx
@@ -2428,7 +2428,7 @@ rm src/components/PageTransition.tsx
 
 - [ ] **Step 3: Verify build still compiles**
 
-Run: `cd "C:/Users/G$/anime-chatbot" && npx next build 2>&1 | head -30`
+Run: `cd "C:/Users/G$/Kikaku 企画/anime-chatbot" && npx next build 2>&1 | head -30`
 Expected: No import errors
 
 - [ ] **Step 4: Commit**

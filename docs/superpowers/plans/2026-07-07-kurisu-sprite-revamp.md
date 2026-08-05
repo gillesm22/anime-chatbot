@@ -292,7 +292,7 @@ This task requires ComfyUI Desktop running at localhost:8188.
 - [ ] **Step 1: Run the base + expressions script**
 
 ```bash
-cd "C:/Users/G$/anime-chatbot"
+cd "C:/Users/G$/Kikaku 企画/anime-chatbot"
 node scripts/regen-kurisu-v2.mjs
 ```
 
