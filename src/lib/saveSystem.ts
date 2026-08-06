@@ -206,7 +206,7 @@ async function pushSnapshotToServer(data: Record<string, string>): Promise<void>
 }
 
 /** Character-specific key patterns that indicate real user data. */
-const CHARACTER_KEY_PATTERNS = [
+export const CHARACTER_KEY_PATTERNS = [
   "history-",
   "affinity-",
   "memories-",

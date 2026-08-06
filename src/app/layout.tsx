@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { SplashScreen } from "@/components/SplashScreen";
 import { BloodDripCanvas } from "@/components/BloodDripCanvas";
+import { buildBootstrapScript } from "@/lib/bootstrapRestore";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,6 +46,13 @@ export default function RootLayout({
             } catch(e) {}
           })();
         `}</Script>
+        {/* Rescue on-disk progress into localStorage BEFORE React reads or
+            writes it (e.g. before the home screen writes affinity keys, which
+            would otherwise block the restore). Runs only when the browser has
+            no character data. */}
+        <Script id="save-bootstrap" strategy="beforeInteractive">
+          {buildBootstrapScript()}
+        </Script>
         <Script id="theme-init" strategy="beforeInteractive">{`
           (function() {
             try {
