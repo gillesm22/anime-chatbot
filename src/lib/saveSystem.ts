@@ -149,6 +149,7 @@ export async function saveSnapshot(): Promise<"full" | "diff" | "skipped"> {
   // First save — always full
   if (allSnapshots.length === 0) {
     await writeSnapshot({ timestamp: Date.now(), type: "full", data: current });
+    void pushSnapshotToServer(current);
     return "full";
   }
 
@@ -185,11 +186,23 @@ export async function saveSnapshot(): Promise<"full" | "diff" | "skipped"> {
   if (shouldForceFull) {
     await writeSnapshot({ timestamp: Date.now(), type: "full", data: current });
     await pruneOldSnapshots();
+    void pushSnapshotToServer(current);
     return "full";
   }
 
   await writeSnapshot({ timestamp: Date.now(), type: "diff", data: diff });
+  void pushSnapshotToServer(current);
   return "diff";
+}
+
+/**
+ * Fire-and-forget push of the full blob to the on-disk save. Gated on
+ * `serverSyncEnabled` (turned on by initSaveSystem) so pure unit tests of
+ * saveSnapshot don't reach for the network.
+ */
+async function pushSnapshotToServer(data: Record<string, string>): Promise<void> {
+  if (!serverSyncEnabled) return;
+  await saveToServer(data);
 }
 
 /** Character-specific key patterns that indicate real user data. */
@@ -240,11 +253,62 @@ export async function restoreFromIndexedDB(): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
+// On-disk durability via the local server (/api/save, /api/load)
+// ---------------------------------------------------------------------------
+
+/**
+ * Push the full save blob to the local server, which writes it to disk.
+ * Non-fatal: any failure (server down, offline) is swallowed and logged so
+ * play continues on browser storage exactly as before. Returns true on success.
+ */
+export async function saveToServer(data: Record<string, string>): Promise<boolean> {
+  try {
+    const res = await fetch("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data }),
+    });
+    if (!res.ok) return false;
+    const body = await res.json();
+    return body?.ok === true;
+  } catch (err) {
+    console.warn("[saveSystem] saveToServer failed (non-fatal):", err);
+    return false;
+  }
+}
+
+/**
+ * Rescue progress from the on-disk save when the browser has none — e.g. after
+ * a browser-data wipe or on a fresh browser. Never overwrites a live session:
+ * bails out immediately if localStorage already has character data.
+ * Returns true if it hydrated localStorage from disk.
+ */
+export async function restoreFromServer(): Promise<boolean> {
+  if (hasCharacterData()) return false;
+  try {
+    const res = await fetch("/api/load");
+    if (!res.ok) return false;
+    const body = await res.json();
+    const data = body?.data as Record<string, string> | null | undefined;
+    if (!data || Object.keys(data).length === 0) return false;
+    for (const [key, value] of Object.entries(data)) {
+      localStorage.setItem(key, value);
+    }
+    return true;
+  } catch (err) {
+    console.warn("[saveSystem] restoreFromServer failed (non-fatal):", err);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Module-level state for save system lifecycle
 // ---------------------------------------------------------------------------
 
 let saveInterval: ReturnType<typeof setInterval> | null = null;
 let lastSaveTimestamp: number | null = null;
+/** When true, saveSnapshot mirrors saves to the on-disk server store. */
+let serverSyncEnabled = false;
 
 /** Returns the timestamp of the last successful save, or null. */
 export function getLastSaveTime(): number | null {
@@ -259,7 +323,25 @@ export function getLastSaveTime(): number | null {
  * 4. Save on page hide (visibilitychange)
  */
 export async function initSaveSystem(): Promise<{ restored: boolean }> {
-  const restored = await restoreFromIndexedDB();
+  // Enable on-disk mirroring for this session's saves.
+  serverSyncEnabled = true;
+
+  // Ask the browser not to evict our storage (best-effort, guarded).
+  try {
+    await navigator.storage?.persist?.();
+  } catch {
+    // Unsupported or denied — safe to ignore.
+  }
+
+  // Layered restore — stop at the first source with data so a live session is
+  // never rolled back:
+  //   1. localStorage already has data → both restores below no-op.
+  //   2. else IndexedDB (instant, same-browser).
+  //   3. else on-disk save via /api/load (survives a browser-data wipe).
+  let restored = await restoreFromIndexedDB();
+  if (!restored) {
+    restored = await restoreFromServer();
+  }
 
   // Initial snapshot
   await saveSnapshot();
@@ -279,6 +361,21 @@ export async function initSaveSystem(): Promise<{ restored: boolean }> {
     if (document.visibilityState === "hidden") {
       await saveSnapshot();
       lastSaveTimestamp = Date.now();
+    }
+  });
+
+  // Hard-close durability: a browser tab close may not run async saves in time,
+  // so flush the current blob to disk with sendBeacon (fire-and-forget, keeps
+  // the request alive through unload). Guarded for environments without it.
+  window.addEventListener("pagehide", () => {
+    try {
+      if (typeof navigator.sendBeacon !== "function") return;
+      const data = getAllLocalStorageData();
+      if (Object.keys(data).length === 0) return;
+      const blob = new Blob([JSON.stringify({ data })], { type: "application/json" });
+      navigator.sendBeacon("/api/save", blob);
+    } catch {
+      // Best-effort; the visibilitychange save above already covers most cases.
     }
   });
 

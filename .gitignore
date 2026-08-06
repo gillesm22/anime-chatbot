@@ -52,6 +52,9 @@ yarn-error.log*
 /merrick-spicy/
 /ticia-gen-runs/
 
+# durable on-disk saves (personal game progress — never commit)
+/saves/
+
 # superpowers plugin working state
 /.superpowers/
 
