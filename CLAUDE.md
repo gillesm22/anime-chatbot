@@ -75,7 +75,7 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 ### Lib Modules (`src/lib/`)
 
 **Characters & Sprites:**
-- `characters/` · Config for all 5 characters (see table below)
+- `characters/` · Config for all 6 characters (see table below)
 - `characters/types.ts` · Expression (16 values), BodyPose, Character, ThemeColors, SpriteConfig
 - `sprites/engine.ts` · `useBlink()` hook (3-6s), `useTalkAnimation()` (120ms mouth cycle)
 - `sprites/expressions.ts` · `getSpritePaths()`, `parseExpressionTag()`, `stripExpressionTags()`
@@ -130,6 +130,7 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 | suzuka | Suzuka | Edgy-cute chaotic genius | #a78bfa purple | en-US-AriaNeural -2Hz +0% | cyberpunk |
 | kurisu | Kurisu | Genius tsundere scientist | #e53935 red | en-US-JennyNeural +2Hz +3% | lab |
 | merrick | Merrick | Mystical vampire witch | #7b1fa2 violet | en-US-AmberNeural -4Hz -5% | moonlight |
+| ticia | Ticia | Gothic matriarch (Morticia-inspired) | #1a1a1a black | en-GB-SoniaNeural -3Hz +0% | night_sky (fallback — no entry in default-scene map) |
 
 16 expressions (all characters): neutral, happy, thinking, surprised, sad, 
 smirk, laugh, angry, flustered, devoted, teasing, sleepy, excited, shy, 
@@ -157,7 +158,8 @@ the text content. The sprite updates immediately on expression events.
 
 - **Sprites**: `public/sprites/{character}/` · `body-neutral.png` + 
   `face-{expression}.png` x15 + outfit variants (bikini, casual, formal, 
-  school, cheerleader, maid, nurse, cow, cowgirl, demon, vampire)
+  school, cheerleader, maid, nurse, cow, cowgirl, demon, vampire, 
+  clown, flamenco)
 - **Hexx mascot**: `public/sprites/hexx/` · 70+ mood/emotion PNGs
 - **Hero avatars**: `public/sprites/hero/` · 6 class PNGs (manhwa style)
 - **Backgrounds**: `public/backgrounds/bg-{scene}.png` · beach, bedroom, 
