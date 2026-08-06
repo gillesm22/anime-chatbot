@@ -52,6 +52,8 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 | `/settings` | Text speed, sound, response length, AI provider, hero config, export |
 | `/api/chat` | SSE streaming chat (OpenAI). Expression tags parsed mid-stream. 50-msg history cap |
 | `/api/tts` | Edge TTS. Per-character voices. 500-char cap. Returns audio/mpeg |
+| `/api/save` | POST `{ data }` → writes `saves/latest.json` (atomic) + timestamped copy, prunes to 10. Local FS only |
+| `/api/load` | GET → reads `saves/latest.json`; `{ data: null }` if none |
 
 ### Key Components (37 total in `src/components/`)
 
@@ -215,6 +217,30 @@ anime-chatbot-daily-quests-{charId}  DailyQuestState JSON
 anime-chatbot-gifts-{charId}         GiftRecord[] JSON
 anime-chatbot-confession-{charId}    boolean (has confessed)
 ```
+
+## Save System (`src/lib/saveSystem.ts`, `src/lib/serverSaves.ts`)
+
+Three durable layers. `initSaveSystem()` (called on chat mount in
+`useCharacterSession`) runs a **layered restore that stops at the first source
+with data**, so a live session is never rolled back:
+
+1. `localStorage` already has character data → trust it, touch nothing.
+2. else IndexedDB snapshot restore (instant, same-browser).
+3. else `GET /api/load` → hydrate `localStorage` from disk. ← survives a
+   browser-data wipe / different browser / changed port.
+
+Whichever restore fires shows the "Progress restored" toast.
+
+**Saving** (auto every 5 min while visible, on tab-hide, on `pagehide` via
+`sendBeacon`): `localStorage` → IndexedDB snapshot **and** `POST /api/save` →
+`saves/latest.json` (atomic tmp+rename) + a pruned timestamped history copy.
+Also calls `navigator.storage.persist()` once to resist eviction.
+
+- `saves/` is at project root, **gitignored** (personal progress, never
+  committed). Timestamped filenames are Windows-safe (ISO `:`/`.` → `-`).
+- **Local-only**: relies on the Next.js server having FS access — does NOT work
+  on serverless/Vercel (ephemeral FS). Design + rationale:
+  `docs/superpowers/specs/2026-08-06-durable-save-system-design.md`.
 
 ## Tests
 
