@@ -40,6 +40,30 @@ function prune(dir: string, keep: number): void {
 }
 
 /**
+ * A coarse "how much progress" score for a save blob: total affinity points +
+ * total chat-history length across characters. In normal play these only grow,
+ * so a lower score means the incoming save is blank/regressed — used to stop a
+ * fresh or polluted browser from overwriting real progress on disk.
+ */
+export function progressScore(data: SaveData): number {
+  let score = 0;
+  for (const [key, value] of Object.entries(data)) {
+    try {
+      if (key.includes("affinity-")) {
+        const points = (JSON.parse(value) as { points?: number }).points;
+        if (typeof points === "number") score += points;
+      } else if (key.includes("history-")) {
+        const arr = JSON.parse(value);
+        if (Array.isArray(arr)) score += arr.length;
+      }
+    } catch {
+      // unparseable value contributes nothing
+    }
+  }
+  return score;
+}
+
+/**
  * Write the merged save to disk:
  * - `latest.json` written atomically (temp file + rename) so a crash mid-write
  *   cannot corrupt it.
@@ -56,6 +80,13 @@ export function writeSave(
   const now = opts.now;
 
   if (!data || Object.keys(data).length === 0) {
+    return { ok: false, timestamp: now };
+  }
+
+  // Guard: never let a lower-progress save clobber real progress already on
+  // disk (a blank/fresh browser must not overwrite a good save).
+  const existing = readSave(dir);
+  if (existing.data && progressScore(data) < progressScore(existing.data)) {
     return { ok: false, timestamp: now };
   }
 

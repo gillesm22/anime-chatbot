@@ -69,6 +69,43 @@ describe("writeSave", () => {
   });
 });
 
+describe("writeSave progress guard", () => {
+  const HIGH = {
+    "anime-chatbot-affinity-arisu": JSON.stringify({ points: 755 }),
+    "anime-chatbot-history-arisu": JSON.stringify(new Array(180).fill({ role: "user" })),
+  };
+  const BLANK = {
+    "anime-chatbot-affinity-arisu": JSON.stringify({ points: 10 }),
+    "anime-chatbot-history-arisu": JSON.stringify([{ role: "user" }]),
+  };
+
+  it("refuses to overwrite when the incoming save has less progress than what's on disk", () => {
+    writeSave(dir, HIGH, { now: 1000 });
+    const result = writeSave(dir, BLANK, { now: 2000 });
+
+    expect(result.ok).toBe(false);
+    // latest.json must still hold the high-progress save
+    const latest = JSON.parse(fs.readFileSync(path.join(dir, "latest.json"), "utf8"));
+    expect(latest).toEqual(HIGH);
+    // no new timestamped copy for the rejected save
+    expect(timestampedFiles(dir)).toHaveLength(1);
+  });
+
+  it("allows a save with equal or greater progress", () => {
+    writeSave(dir, BLANK, { now: 1000 });
+    const result = writeSave(dir, HIGH, { now: 2000 });
+
+    expect(result.ok).toBe(true);
+    const latest = JSON.parse(fs.readFileSync(path.join(dir, "latest.json"), "utf8"));
+    expect(latest).toEqual(HIGH);
+  });
+
+  it("always writes the first save when no prior latest.json exists", () => {
+    const result = writeSave(dir, BLANK, { now: 1000 });
+    expect(result.ok).toBe(true);
+  });
+});
+
 describe("readSave", () => {
   it("returns parsed data and a timestamp from latest.json", () => {
     const data = { "anime-chatbot-affinity-arisu": '{"level":3}' };
