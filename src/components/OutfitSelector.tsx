@@ -77,6 +77,8 @@ const OUTFIT_UNLOCK_LEVELS: Record<Outfit, number> = {
   "cow": 4,
   "cowgirl": 3,
   "demon": 5,
+  "clown": 2,
+  "flamenco": 2,
 };
 
 const OUTFIT_UNLOCK_LABELS: Record<Outfit, string | null> = {
@@ -97,6 +99,8 @@ const OUTFIT_UNLOCK_LABELS: Record<Outfit, string | null> = {
   "cow": "Unlock at Lv.4",
   "cowgirl": "Unlock at Lv.3",
   "demon": "Unlock at Lv.5",
+  "clown": "Unlock at Lv.2",
+  "flamenco": "Unlock at Lv.2",
 };
 
 export function OutfitSelector({ accentColor, characterId, currentOutfit, onSelectOutfit }: OutfitSelectorProps) {

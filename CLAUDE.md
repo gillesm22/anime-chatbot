@@ -130,7 +130,7 @@ Only one required var: `OPENAI_API_KEY` in `.env.local`
 | suzuka | Suzuka | Edgy-cute chaotic genius | #a78bfa purple | en-US-AriaNeural -2Hz +0% | cyberpunk |
 | kurisu | Kurisu | Genius tsundere scientist | #e53935 red | en-US-JennyNeural +2Hz +3% | lab |
 | merrick | Merrick | Mystical vampire witch | #7b1fa2 violet | en-US-AmberNeural -4Hz -5% | moonlight |
-| ticia | Ticia | Gothic matriarch (Morticia-inspired) | #1a1a1a black | en-GB-SoniaNeural -3Hz +0% | night_sky (fallback — no entry in default-scene map) |
+| ticia | Ticia | Gothic matriarch (Morticia-inspired) | #1a1a1a black | en-GB-SoniaNeural -3Hz +0% | graveyard |
 
 16 expressions (all characters): neutral, happy, thinking, surprised, sad, 
 smirk, laugh, angry, flustered, devoted, teasing, sleepy, excited, shy, 

@@ -11,7 +11,8 @@ export type SceneId =
   | "cyberpunk"
   | "cozy_room"
   | "moonlight"
-  | "lab";
+  | "lab"
+  | "graveyard";
 
 export interface SceneConfig {
   id: SceneId;
@@ -145,6 +146,16 @@ export const SCENES: Record<SceneId, SceneConfig> = {
     particleColorLight: "#7986cb",
     ambientGlow: "rgba(180, 190, 240, 0.08)",
   },
+  graveyard: {
+    id: "graveyard",
+    name: "Moonlit Graveyard",
+    gradient: "linear-gradient(to bottom, #0a0208 0%, #150510 35%, #1f0812 65%, #050203 100%)",
+    gradientLight: "linear-gradient(to bottom, #ece7ea 0%, #d5c8d0 35%, #b8a8b2 65%, #cfc5cb 100%)",
+    particles: "fireflies",
+    particleColor: "#e57373",
+    particleColorLight: "#ad1457",
+    ambientGlow: "rgba(200, 40, 80, 0.07)",
+  },
 };
 
 export function getTimeBasedScene(): SceneId {
@@ -163,6 +174,7 @@ export function getCharacterDefaultScene(characterId: string): SceneId {
     suzuka: "cyberpunk",
     kurisu: "lab",
     merrick: "moonlight",
+    ticia: "graveyard",
   };
   return map[characterId.toLowerCase()] ?? "night_sky";
 }

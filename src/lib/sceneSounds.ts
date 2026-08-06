@@ -453,6 +453,7 @@ export function startSceneAudio(sceneId: string, characterId: string): void {
     case "night_sky":
     case "moonlight":
     case "lab":
+    case "graveyard":
       buildNightSky(audioCtx, masterGain);
       break;
     case "cozy_room":
